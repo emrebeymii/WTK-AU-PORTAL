@@ -92,6 +92,8 @@ img{max-width:100%; display:block;}
   body{display:flex; justify-content:center; align-items:flex-start; background:linear-gradient(160deg,#f0e6d8 0%,#eef1f5 45%,#e8ecf3 100%); padding:32px 0;}
   [data-theme="dark"] body{background:linear-gradient(160deg,#050608 0%,#0d0f14 50%,#111319 100%);}
   #appFrame{width:428px; min-height:calc(100vh - 64px); border-radius:40px; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,0.28), 0 0 0 10px #0d0f14, 0 0 0 12px #2a2d34; position:relative;}
+  /* Tam ekran katmanlar masaüstünde tarayıcı penceresini değil, telefon çerçevesini kaplasın */
+  #appFrame #splash, #appFrame #loginScreen, #appFrame .modal-overlay{ position:absolute; }
 }
 #appFrame{width:100%; position:relative; min-height:100vh; background:var(--bg);}
 
@@ -168,10 +170,14 @@ img{max-width:100%; display:block;}
 /* ---------- Login ---------- */
 #loginScreen{
   position:fixed; inset:0; z-index:900; background:var(--bg); display:flex; flex-direction:column;
-  opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease;
+  opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease, visibility .5s ease;
   overflow-y:auto;
+  /* KRİTİK: kapalıyken görünmez OLMASI, tıklamaları/scroll'u ENGELLEMESİ anlamına gelmez.
+     visibility+pointer-events olmadan bu katman opacity:0 haldeyken bile tüm ekranı
+     görünmez biçimde kilitleyip donmuş hissi verebilir. */
+  visibility:hidden; pointer-events:none;
 }
-#loginScreen.show{opacity:1; transform:translateY(0);}
+#loginScreen.show{opacity:1; transform:translateY(0); visibility:visible; pointer-events:auto;}
 .login-hero{
   background:linear-gradient(155deg,var(--primary) 0%, var(--primary-dark) 100%);
   padding:56px 26px 60px; color:#fff; border-radius:0 0 40px 40px; position:relative; overflow:hidden;
@@ -955,6 +961,26 @@ function updateNotifDot(){
 }
 function closeNotifPanel(){ document.getElementById('notifPanel').classList.remove('open'); }
 
+/* ---------------- Arayüz bütünlüğü koruma (donma önleyici) ----------------
+   Giriş ekranı (#loginScreen) tam ekranı kaplayan sabit konumlu bir katman.
+   Uygulama (#app) görünürken bu katmanın KESİNLİKLE gizli ve tıklamalara
+   kapalı olduğundan emin oluyoruz. Ayrıca hiçbir modal açık değilken
+   body üzerindeki scroll kilidinin takılı kalmadığını garanti ediyoruz.
+   Bu fonksiyon; ilk yüklemede, sekme arka plandan öne geldiğinde (visibilitychange)
+   ve mobil tarayıcıların bfcache'den sayfayı geri getirdiği durumlarda (pageshow)
+   çağrılır — böylece "sekmeyi kapatıp açınca düzeliyor" senaryosuna muhtaç
+   kalınmadan durum kendiliğinden onarılır. */
+function reconcileUIState(){
+  const app = document.getElementById('app');
+  const loginScreen = document.getElementById('loginScreen');
+  if(app && !app.classList.contains('hidden')){
+    loginScreen.classList.add('hidden');
+    loginScreen.classList.remove('show');
+  }
+  const anyModalOpen = document.querySelector('.modal-overlay.open');
+  if(!anyModalOpen){ document.body.classList.remove('scroll-lock'); }
+}
+
 /* ---------------- Render: Faydalı Bağlantılar ---------------- */
 function linkCardHtml(l){
   return `<a class="card link-card" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer">
@@ -1160,6 +1186,16 @@ function openForm(type, id){
 }
 
 function saveForm(){
+  try{
+    saveFormInner();
+  }catch(err){
+    // Beklenmeyen bir hata modalı/scroll kilidini sonsuza dek açık bırakmasın.
+    console.error('Form kaydetme hatası:', err);
+    closeModal('formModal');
+    toast('Beklenmeyen bir hata oluştu, lütfen tekrar deneyin', 'error');
+  }
+}
+function saveFormInner(){
   const {type, id} = formCtx;
   const isEdit = !!id;
   const val = sel => (document.getElementById(sel) ? document.getElementById(sel).value.trim() : '');
@@ -1256,9 +1292,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---- Uygulamayı göster ---- */
   window.showApp = function(){
+    // Önce uygulamayı göster, ardından giriş ekranının kesinlikle
+    // gizlendiğinden ve tıklamaları engellemediğinden emin ol.
     document.getElementById('app').classList.remove('hidden');
+    reconcileUIState();
     renderAll();
   };
+
+  /* ---- Sekme arka plandan öne geldiğinde / bfcache'den geri geldiğinde
+     arayüz durumunu doğrula (donma önleyici güvenlik ağı) ---- */
+  window.addEventListener('pageshow', reconcileUIState);
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible') reconcileUIState();
+  });
+
+  /* ---- Esc tuşu: açık modal/panel varsa güvenli şekilde kapat ---- */
+  document.addEventListener('keydown', (e)=>{
+    if(e.key !== 'Escape') return;
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+    document.body.classList.remove('scroll-lock');
+    closeNotifPanel();
+  });
 
   /* ---- Alt menü + genel nav yönlendirme ---- */
   document.body.addEventListener('click', (e)=>{
