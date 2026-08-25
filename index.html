@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>WTK Portal | Ankara Üniversitesi Açıköğretim</title>
+<meta name="description" content="Ankara Üniversitesi Açıköğretim Web Tasarımı ve Kodlama bölümü öğrencileri için bağımsız topluluk portalı.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23ff7a00'/%3E%3Ctext x='50' y='64' font-size='42' font-family='monospace' font-weight='bold' fill='white' text-anchor='middle'%3E%3C/%3E%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   WTK PORTAL — TEK DOSYA STİL TABLOSU
+   Tasarım dili: Beyaz zemin + turuncu vurgu, cam efektli kartlar,
+   iOS/Android uygulama hissi veren sabit üst/alt çubuklar.
+   ============================================================ */
+
+:root{
+  --bg:#f5f6f8;
+  --surface:#ffffff;
+  --surface-glass:rgba(255,255,255,0.72);
+  --primary:#ff7a00;
+  --primary-dark:#e06600;
+  --primary-light:#fff1e0;
+  --primary-rgb:255,122,0;
+  --text:#1a1d29;
+  --text-secondary:#6b7280;
+  --text-tertiary:#9aa1ae;
+  --border:rgba(20,20,30,0.08);
+  --success:#16a34a;
+  --success-bg:#e9f9ee;
+  --danger:#e11d48;
+  --danger-bg:#fdeaee;
+  --info:#2563eb;
+  --info-bg:#eaf1fd;
+  --radius-sm:12px;
+  --radius-md:18px;
+  --radius-lg:26px;
+  --shadow-sm:0 2px 10px rgba(20,20,40,0.05);
+  --shadow-md:0 8px 24px rgba(20,20,40,0.08);
+  --shadow-lg:0 16px 40px rgba(20,20,40,0.14);
+  --shadow-primary:0 10px 24px rgba(255,122,0,0.28);
+  --font:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+  --t-fast:.18s cubic-bezier(.4,0,.2,1);
+  --t-base:.32s cubic-bezier(.4,0,.2,1);
+  --topbar-h:64px;
+  --navbar-h:72px;
+}
+
+[data-theme="dark"]{
+  --bg:#0d0f14;
+  --surface:#171a21;
+  --surface-glass:rgba(23,26,33,0.72);
+  --primary:#ff8c1f;
+  --primary-dark:#ff7a00;
+  --primary-light:#2a2013;
+  --text:#f2f3f5;
+  --text-secondary:#a4aab6;
+  --text-tertiary:#6b7280;
+  --border:rgba(255,255,255,0.08);
+  --success:#22c55e;
+  --success-bg:#0f2417;
+  --danger:#fb3f63;
+  --danger-bg:#2a1219;
+  --info:#5b8def;
+  --info-bg:#101f33;
+  --shadow-sm:0 2px 10px rgba(0,0,0,0.28);
+  --shadow-md:0 8px 24px rgba(0,0,0,0.36);
+  --shadow-lg:0 16px 40px rgba(0,0,0,0.5);
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html{-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  transition:background var(--t-base), color var(--t-base);
+  -webkit-font-smoothing:antialiased;
+}
+button, input{font-family:inherit; color:inherit;}
+a{color:inherit; text-decoration:none;}
+img{max-width:100%; display:block;}
+::selection{background:var(--primary); color:#fff;}
+:focus-visible{outline:2px solid var(--primary); outline-offset:2px; border-radius:6px;}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+
+/* Masaüstünde uygulamayı telefon çerçevesi gibi ortala */
+@media (min-width:640px){
+  body{display:flex; justify-content:center; align-items:flex-start; background:linear-gradient(160deg,#f0e6d8 0%,#eef1f5 45%,#e8ecf3 100%); padding:32px 0;}
+  [data-theme="dark"] body{background:linear-gradient(160deg,#050608 0%,#0d0f14 50%,#111319 100%);}
+  #appFrame{width:428px; min-height:calc(100vh - 64px); border-radius:40px; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,0.28), 0 0 0 10px #0d0f14, 0 0 0 12px #2a2d34; position:relative;}
+}
+#appFrame{width:100%; position:relative; min-height:100vh; background:var(--bg);}
+
+.hidden{display:none !important;}
+.scroll-lock{overflow:hidden;}
+
+/* ---------- Utility ---------- */
+.icon-btn{
+  width:40px; height:40px; border-radius:50%; border:none; background:rgba(var(--primary-rgb),0.1);
+  display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer;
+  transition:transform var(--t-fast), background var(--t-fast); position:relative; flex-shrink:0;
+}
+.icon-btn:active{transform:scale(0.88);}
+.badge-dot{position:absolute; top:6px; right:6px; width:9px; height:9px; border-radius:50%; background:var(--danger); border:2px solid var(--surface);}
+
+.btn{
+  border:none; cursor:pointer; font-weight:600; font-size:15px; border-radius:var(--radius-sm);
+  padding:14px 20px; transition:transform var(--t-fast), box-shadow var(--t-fast), opacity var(--t-fast);
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:var(--shadow-primary); width:100%;}
+.btn-primary:disabled{opacity:.55; box-shadow:none; cursor:not-allowed;}
+.btn-ghost{background:rgba(var(--primary-rgb),0.1); color:var(--primary);}
+.btn-outline{background:transparent; border:1.5px solid var(--border); color:var(--text);}
+.btn-danger-ghost{background:var(--danger-bg); color:var(--danger);}
+.btn-sm{padding:9px 14px; font-size:13px; border-radius:10px;}
+.btn-block{width:100%;}
+
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm); transition:transform var(--t-fast), box-shadow var(--t-fast), background var(--t-base), border-color var(--t-base);
+}
+.glass{
+  background:var(--surface-glass); backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+}
+.section-title{font-size:19px; font-weight:800; letter-spacing:-.3px;}
+.section-head{display:flex; align-items:center; justify-content:space-between; margin:28px 0 14px;}
+.link-more{font-size:13px; font-weight:700; color:var(--primary); background:none; border:none; cursor:pointer;}
+.chip{display:inline-flex; align-items:center; padding:5px 12px; border-radius:999px; font-size:12px; font-weight:700;}
+.chip-orange{background:var(--primary-light); color:var(--primary-dark);}
+.chip-green{background:var(--success-bg); color:var(--success);}
+.chip-blue{background:var(--info-bg); color:var(--info);}
+.chip-gray{background:var(--border); color:var(--text-secondary);}
+.empty-state{text-align:center; padding:48px 20px; color:var(--text-secondary);}
+.empty-state .emoji{font-size:40px; display:block; margin-bottom:10px;}
+.container-pad{padding:0 18px;}
+
+/* ---------- Splash ---------- */
+#splash{
+  position:fixed; inset:0; z-index:999; background:linear-gradient(160deg,var(--primary),var(--primary-dark));
+  display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;
+  transition:opacity .5s ease, visibility .5s ease;
+}
+#splash.fade-out{opacity:0; visibility:hidden; pointer-events:none;}
+.splash-logo{
+  width:96px; height:96px; border-radius:28px; background:rgba(255,255,255,0.16); backdrop-filter:blur(10px);
+  display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:38px; font-weight:800;
+  box-shadow:0 20px 50px rgba(0,0,0,0.25); animation:splashPop .9s cubic-bezier(.34,1.56,.64,1);
+  border:1px solid rgba(255,255,255,0.3);
+}
+@keyframes splashPop{
+  0%{transform:scale(.4) rotate(-12deg); opacity:0;}
+  60%{transform:scale(1.08) rotate(3deg); opacity:1;}
+  100%{transform:scale(1) rotate(0);}
+}
+.splash-title{margin-top:22px; font-size:17px; font-weight:800; text-align:center; padding:0 40px; animation:fadeUp .7s ease .2s both;}
+.splash-sub{margin-top:6px; font-size:12.5px; opacity:.85; animation:fadeUp .7s ease .35s both;}
+@keyframes fadeUp{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+.splash-loader{margin-top:30px; width:120px; height:4px; border-radius:99px; background:rgba(255,255,255,0.25); overflow:hidden; animation:fadeUp .7s ease .45s both;}
+.splash-loader::after{content:''; display:block; width:40%; height:100%; background:#fff; border-radius:99px; animation:loaderMove 1.1s ease-in-out infinite;}
+@keyframes loaderMove{0%{transform:translateX(-100%);} 100%{transform:translateX(340%);}}
+
+/* ---------- Login ---------- */
+#loginScreen{
+  position:fixed; inset:0; z-index:900; background:var(--bg); display:flex; flex-direction:column;
+  opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease;
+  overflow-y:auto;
+}
+#loginScreen.show{opacity:1; transform:translateY(0);}
+.login-hero{
+  background:linear-gradient(155deg,var(--primary) 0%, var(--primary-dark) 100%);
+  padding:56px 26px 60px; color:#fff; border-radius:0 0 40px 40px; position:relative; overflow:hidden;
+}
+.login-hero::before{content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.1); top:-90px; right:-60px;}
+.login-hero::after{content:''; position:absolute; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.08); bottom:-60px; left:-40px;}
+.login-logo{
+  width:64px; height:64px; border-radius:18px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.35);
+  display:flex; align-items:center; justify-content:center; font-family:monospace; font-weight:800; font-size:26px; margin-bottom:20px; position:relative;
+}
+.login-hero h1{font-size:22px; font-weight:800; line-height:1.35; position:relative; letter-spacing:-.3px;}
+.login-hero p{font-size:13px; margin-top:10px; opacity:.9; max-width:320px; position:relative; line-height:1.5;}
+.login-body{padding:26px 22px 40px; flex:1; display:flex; flex-direction:column; margin-top:-28px; position:relative;}
+.login-card{background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:26px 22px; border:1px solid var(--border);}
+.field-label{font-size:12.5px; font-weight:700; color:var(--text-secondary); margin-bottom:8px; display:block; text-transform:uppercase; letter-spacing:.4px;}
+.pw-wrap{position:relative;}
+.pw-wrap input{
+  width:100%; padding:15px 46px 15px 16px; border-radius:var(--radius-sm); border:1.5px solid var(--border);
+  background:var(--bg); font-size:16px; letter-spacing:1px; transition:border-color var(--t-fast), background var(--t-fast);
+}
+.pw-wrap input:focus{border-color:var(--primary); background:var(--surface);}
+.pw-toggle{position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:18px; cursor:pointer; padding:8px; opacity:.6;}
+.remember-row{display:flex; align-items:center; gap:9px; margin:16px 0 20px;}
+.remember-row input[type=checkbox]{width:19px; height:19px; accent-color:var(--primary); cursor:pointer;}
+.remember-row label{font-size:13.5px; color:var(--text-secondary); cursor:pointer;}
+.error-card{
+  display:flex; align-items:center; gap:10px; background:var(--danger-bg); color:var(--danger); border-radius:var(--radius-sm);
+  padding:13px 14px; font-size:13.5px; font-weight:600; margin-top:14px; max-height:0; opacity:0; overflow:hidden;
+  transition:max-height .35s ease, opacity .35s ease, margin .35s ease;
+}
+.error-card.show{max-height:80px; opacity:1;}
+.error-card.shake{animation:shakeErr .45s;}
+@keyframes shakeErr{
+  10%,90%{transform:translateX(-1px);} 20%,80%{transform:translateX(2px);}
+  30%,50%,70%{transform:translateX(-5px);} 40%,60%{transform:translateX(5px);}
+}
+.login-footer-note{text-align:center; font-size:11.5px; color:var(--text-tertiary); margin-top:24px; line-height:1.6; padding:0 10px;}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px; height:var(--topbar-h); border-bottom:1px solid var(--border);
+}
+.topbar-left{display:flex; align-items:center; gap:10px; min-width:0;}
+.topbar-logo{width:36px; height:36px; border-radius:11px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-family:monospace; font-weight:800; color:#fff; font-size:15px; flex-shrink:0;}
+.topbar-titles{min-width:0;}
+.topbar-titles .t1{font-size:13.5px; font-weight:800; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;}
+.topbar-titles .t2{font-size:10.5px; color:var(--text-secondary); font-weight:600;}
+.topbar-right{display:flex; align-items:center; gap:8px;}
+.avatar-mini{width:36px; height:36px; border-radius:50%; background:var(--primary-light); color:var(--primary-dark); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; cursor:pointer; border:2px solid var(--primary);}
+
+.notif-panel{
+  position:absolute; top:60px; right:14px; width:290px; max-width:82vw; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:70; opacity:0; transform:translateY(-8px) scale(.97);
+  pointer-events:none; transition:all var(--t-fast); overflow:hidden;
+}
+.notif-panel.open{opacity:1; transform:translateY(0) scale(1); pointer-events:auto;}
+.notif-panel h4{padding:14px 16px 8px; font-size:13px; font-weight:800;}
+.notif-item{padding:10px 16px; border-top:1px solid var(--border); font-size:12.5px;}
+.notif-item b{display:block; font-size:12.8px; margin-bottom:2px;}
+.notif-item span{color:var(--text-secondary); font-size:11px;}
+.notif-empty{padding:18px 16px; text-align:center; color:var(--text-secondary); font-size:12.5px;}
+
+/* ---------- Main content / pages ---------- */
+.content{padding-bottom:calc(var(--navbar-h) + 24px); min-height:calc(100vh - var(--topbar-h));}
+.page{display:none; animation:pageIn .38s cubic-bezier(.22,1,.36,1);}
+.page.active{display:block;}
+@keyframes pageIn{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+.page-header{padding:20px 18px 4px;}
+.page-header h2{font-size:22px; font-weight:800; letter-spacing:-.4px;}
+.page-header p{font-size:13px; color:var(--text-secondary); margin-top:4px;}
+
+/* Welcome block */
+.welcome-block{padding:18px 18px 6px;}
+.welcome-block .greet{font-size:22px; font-weight:800; letter-spacing:-.4px;}
+.welcome-block .date{font-size:13px; color:var(--text-secondary); margin-top:3px; text-transform:capitalize;}
+.welcome-note{
+  margin-top:16px; border-radius:var(--radius-md); padding:16px 18px; background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff; box-shadow:var(--shadow-primary); font-size:13px; line-height:1.55; position:relative; overflow:hidden;
+}
+.welcome-note::after{content:'</>'; position:absolute; right:-6px; bottom:-14px; font-family:monospace; font-size:64px; font-weight:800; opacity:.15;}
+.welcome-note b{display:block; font-size:14.5px; margin-bottom:4px;}
+
+/* Quick access grid */
+.quick-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:11px; padding:18px; }
+.quick-item{
+  display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 4px; cursor:pointer;
+  border-radius:var(--radius-md); transition:transform var(--t-fast), background var(--t-fast);
+}
+.quick-item:active{transform:scale(.92); background:var(--primary-light);}
+.quick-icon{width:48px; height:48px; border-radius:16px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:22px;}
+.quick-item span{font-size:10.8px; font-weight:700; text-align:center; color:var(--text-secondary); line-height:1.2;}
+
+/* Horizontal scroller for calendar preview */
+.hscroll{display:flex; gap:12px; overflow-x:auto; padding:2px 18px 10px; scroll-snap-type:x mandatory;}
+.hscroll::-webkit-scrollbar{display:none;}
+.mini-cal-card{
+  scroll-snap-align:start; min-width:168px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
+  padding:14px; box-shadow:var(--shadow-sm); flex-shrink:0;
+}
+.mini-cal-card .status{font-size:10px; font-weight:800; margin-bottom:7px;}
+.mini-cal-card h5{font-size:13px; font-weight:800; line-height:1.3; margin-bottom:5px;}
+.mini-cal-card .rng{font-size:11px; color:var(--text-secondary);}
+
+/* Announcement card */
+.ann-card{margin:0 18px 12px; padding:16px; cursor:default;}
+.ann-card:hover{box-shadow:var(--shadow-md);}
+.ann-top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px;}
+.ann-top h5{font-size:14.5px; font-weight:800; line-height:1.35;}
+.ann-date{font-size:10.5px; color:var(--text-tertiary); white-space:nowrap; font-weight:700; flex-shrink:0; margin-top:2px;}
+.ann-card p{font-size:12.8px; color:var(--text-secondary); line-height:1.6;}
+
+/* Links list */
+.link-card{
+  display:flex; align-items:center; gap:14px; margin:0 18px 12px; padding:15px 16px; cursor:pointer;
+}
+.link-card:active{transform:scale(.98);}
+.link-ic{width:46px; height:46px; border-radius:14px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:21px; flex-shrink:0;}
+.link-info{flex:1; min-width:0;}
+.link-info h5{font-size:14px; font-weight:800;}
+.link-info span{font-size:11.5px; color:var(--text-secondary); word-break:break-all;}
+.link-arrow{color:var(--text-tertiary); font-size:16px;}
+
+/* Search bar */
+.search-bar{margin:14px 18px; position:relative;}
+.search-bar input{
+  width:100%; padding:13px 16px 13px 42px; border-radius:var(--radius-sm); border:1.5px solid var(--border);
+  background:var(--surface); font-size:14px; transition:border-color var(--t-fast);
+}
+.search-bar input:focus{border-color:var(--primary);}
+.search-bar .sic{position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:15px; opacity:.5;}
+
+.filter-row{display:flex; gap:8px; padding:0 18px 6px; overflow-x:auto;}
+.filter-row::-webkit-scrollbar{display:none;}
+.filter-chip{
+  flex-shrink:0; padding:8px 15px; border-radius:999px; font-size:12.5px; font-weight:700; border:1.5px solid var(--border);
+  background:var(--surface); cursor:pointer; transition:all var(--t-fast); white-space:nowrap;
+}
+.filter-chip.active{background:var(--primary); color:#fff; border-color:var(--primary);}
+
+/* Course / PDF card */
+.grid-cards{display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:6px 18px 18px;}
+.course-card{padding:15px; display:flex; flex-direction:column; gap:9px; cursor:pointer;}
+.course-card:active{transform:scale(.97);}
+.course-ic{width:38px; height:38px; border-radius:11px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:17px;}
+.course-card h5{font-size:13px; font-weight:800; line-height:1.35; min-height:34px;}
+.course-card p{font-size:11px; color:var(--text-secondary); line-height:1.5;}
+
+.pdf-list{padding:6px 18px 18px;}
+.pdf-card{display:flex; align-items:center; gap:13px; padding:14px; margin-bottom:11px;}
+.pdf-ic{width:44px; height:44px; border-radius:13px; background:var(--danger-bg); color:var(--danger); display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; font-weight:800;}
+.pdf-info{flex:1; min-width:0;}
+.pdf-info h5{font-size:13.3px; font-weight:800; line-height:1.3; margin-bottom:3px;}
+.pdf-info span{font-size:10.8px; color:var(--text-secondary);}
+.pdf-dl{width:38px; height:38px; border-radius:11px; background:var(--primary); color:#fff; border:none; display:flex; align-items:center; justify-content:center; font-size:15px; cursor:pointer; flex-shrink:0;}
+.pdf-dl:active{transform:scale(.9);}
+.archive-stats{display:flex; gap:10px; padding:14px 18px 4px;}
+.stat-box{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; text-align:center; box-shadow:var(--shadow-sm);}
+.stat-box b{font-size:20px; font-weight:800; color:var(--primary); display:block;}
+.stat-box span{font-size:10.5px; color:var(--text-secondary); font-weight:700;}
+
+/* Timeline (calendar page) */
+.timeline{padding:8px 18px 20px; position:relative;}
+.timeline::before{content:''; position:absolute; left:38px; top:14px; bottom:14px; width:2px; background:var(--border);}
+.tl-item{display:flex; gap:14px; margin-bottom:20px; position:relative;}
+.tl-dot{width:22px; height:22px; border-radius:50%; background:var(--surface); border:3px solid var(--primary); flex-shrink:0; margin-top:2px; z-index:1; position:relative;}
+.tl-item.ongoing .tl-dot{background:var(--primary); box-shadow:0 0 0 5px var(--primary-light);}
+.tl-item.past .tl-dot{border-color:var(--text-tertiary); background:var(--border);}
+.tl-card{flex:1; padding:14px 16px;}
+.tl-card h5{font-size:14px; font-weight:800; margin-bottom:5px;}
+.tl-card .rng{font-size:12px; color:var(--text-secondary); font-weight:600;}
+.fee-banner{
+  margin:6px 18px 4px; padding:18px; border-radius:var(--radius-md); background:linear-gradient(135deg,#1a1d29,#2c3040); color:#fff;
+  display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow-md);
+}
+[data-theme="dark"] .fee-banner{background:linear-gradient(135deg,#232833,#171a21);}
+.fee-banner div span{display:block; font-size:11px; opacity:.7; font-weight:700; text-transform:uppercase; letter-spacing:.5px;}
+.fee-banner div b{font-size:22px; font-weight:800;}
+.fee-banner .fee-emoji{font-size:30px;}
+
+/* About page */
+.about-card{margin:16px 18px; padding:22px; text-align:center;}
+.about-logo{width:64px; height:64px; margin:0 auto 16px; border-radius:18px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:26px; font-weight:800; color:#fff;}
+.about-card h3{font-size:16px; font-weight:800; margin-bottom:10px;}
+.about-card p{font-size:13px; color:var(--text-secondary); line-height:1.7;}
+.about-tags{display:flex; gap:8px; justify-content:center; margin-top:16px; flex-wrap:wrap;}
+
+/* Profile page */
+.profile-hero{padding:26px 18px 20px; text-align:center; background:linear-gradient(180deg,var(--primary-light),transparent);}
+.profile-avatar{width:82px; height:82px; border-radius:50%; margin:0 auto 12px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:800; color:#fff; box-shadow:var(--shadow-primary);}
+.profile-hero h3{font-size:17px; font-weight:800;}
+.profile-hero span{font-size:12.5px; color:var(--text-secondary);}
+.info-list{margin:6px 18px 18px;}
+.info-row{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border);}
+.info-row:last-child{border-bottom:none;}
+.info-row .lab{font-size:12.5px; color:var(--text-secondary); font-weight:600;}
+.info-row .val{font-size:13.5px; font-weight:700; text-align:right;}
+.settings-list{margin:0 18px 18px;}
+.settings-row{display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid var(--border); cursor:pointer;}
+.settings-row:last-child{border-bottom:none;}
+.settings-row:active{background:var(--bg);}
+.settings-left{display:flex; align-items:center; gap:12px;}
+.settings-ic{width:36px; height:36px; border-radius:10px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:16px;}
+.settings-row span.label{font-size:13.5px; font-weight:700;}
+
+/* Toggle switch */
+.switch{position:relative; width:46px; height:26px; flex-shrink:0;}
+.switch input{opacity:0; width:0; height:0;}
+.switch .track{position:absolute; inset:0; background:var(--border); border-radius:99px; transition:background var(--t-fast); cursor:pointer;}
+.switch .track::before{content:''; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:transform var(--t-fast); box-shadow:0 1px 4px rgba(0,0,0,0.25);}
+.switch input:checked + .track{background:var(--primary);}
+.switch input:checked + .track::before{transform:translateX(20px);}
+
+/* Bottom nav */
+.bottomnav{
+  position:fixed; left:0; right:0; bottom:0; height:var(--navbar-h); display:flex; z-index:80;
+  border-top:1px solid var(--border); padding-bottom:env(safe-area-inset-bottom);
+}
+#appFrame .bottomnav{position:absolute;}
+.nav-btn{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:none; border:none;
+  cursor:pointer; color:var(--text-tertiary); font-size:9.5px; font-weight:700; position:relative; padding-top:6px;
+}
+.nav-btn .nic{font-size:20px; transition:transform var(--t-fast);}
+.nav-btn.active{color:var(--primary);}
+.nav-btn.active .nic{transform:translateY(-2px) scale(1.08);}
+.nav-btn.active::before{content:''; position:absolute; top:0; width:26px; height:3px; border-radius:0 0 4px 4px; background:var(--primary);}
+
+/* Modal / overlay */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(10,10,15,0.55); z-index:200; display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity var(--t-base); backdrop-filter:blur(2px);
+}
+.modal-overlay.open{opacity:1; pointer-events:auto;}
+.modal-sheet{
+  width:100%; max-width:428px; background:var(--surface); border-radius:26px 26px 0 0; padding:22px 20px calc(26px + env(safe-area-inset-bottom));
+  transform:translateY(100%); transition:transform var(--t-base); max-height:86vh; overflow-y:auto;
+}
+.modal-overlay.open .modal-sheet{transform:translateY(0);}
+.modal-handle{width:40px; height:4px; background:var(--border); border-radius:99px; margin:0 auto 16px;}
+.modal-title{font-size:17px; font-weight:800; margin-bottom:4px;}
+.modal-sub{font-size:12.5px; color:var(--text-secondary); margin-bottom:18px;}
+.form-group{margin-bottom:14px;}
+.form-group label{font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:block;}
+.form-group input, .form-group textarea, .form-group select{
+  width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border); background:var(--bg); font-size:14px;
+  transition:border-color var(--t-fast);
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus{border-color:var(--primary);}
+.form-group textarea{resize:vertical; min-height:80px;}
+.form-row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.modal-actions{display:flex; gap:10px; margin-top:8px;}
+.modal-close-x{position:absolute; right:16px; top:16px; width:32px; height:32px; border-radius:50%; background:var(--bg); border:none; font-size:15px; cursor:pointer;}
+
+/* Admin */
+.admin-tabs{display:flex; gap:8px; padding:14px 18px 4px; overflow-x:auto;}
+.admin-tabs::-webkit-scrollbar{display:none;}
+.admin-panel-body{padding:6px 18px 24px;}
+.admin-item{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px; margin-bottom:10px;}
+.admin-item-info{flex:1; min-width:0;}
+.admin-item-info h5{font-size:13px; font-weight:800; margin-bottom:2px;}
+.admin-item-info span{font-size:11px; color:var(--text-secondary);}
+.admin-item-actions{display:flex; gap:6px; flex-shrink:0;}
+.icon-sm-btn{width:32px; height:32px; border-radius:9px; border:none; cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center;}
+.fab{
+  position:fixed; bottom:calc(var(--navbar-h) + 18px); right:18px; z-index:50; width:54px; height:54px; border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; border:none; font-size:24px; box-shadow:var(--shadow-primary); cursor:pointer;
+}
+#appFrame .fab{position:absolute;}
+.fab:active{transform:scale(.9);}
+.admin-lock-note{margin:16px 18px; padding:14px; border-radius:var(--radius-md); background:var(--info-bg); color:var(--info); font-size:12.5px; display:flex; gap:10px; align-items:flex-start; line-height:1.5;}
+
+/* Toasts */
+.toast-container{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:400; display:flex; flex-direction:column; gap:8px; width:min(90%,380px); align-items:center;}
+.toast{
+  background:var(--text); color:var(--bg); padding:12px 18px; border-radius:14px; font-size:13px; font-weight:600; box-shadow:var(--shadow-lg);
+  display:flex; align-items:center; gap:9px; animation:toastIn .35s cubic-bezier(.34,1.56,.64,1); max-width:100%;
+}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--danger);}
+[data-theme="dark"] .toast{color:var(--bg);}
+@keyframes toastIn{from{opacity:0; transform:translateY(-14px) scale(.95);} to{opacity:1; transform:translateY(0) scale(1);}}
+.toast.out{animation:toastOut .3s ease forwards;}
+@keyframes toastOut{to{opacity:0; transform:translateY(-10px) scale(.95);}}
+
+@media (min-width:640px){ .modal-overlay{align-items:center;} .modal-sheet{border-radius:26px; max-width:380px;} }
+</style>
+</head>
+<body>
+<div id="appFrame">
+
+  <!-- ============ AÇILIŞ (SPLASH) EKRANI ============ -->
+  <div id="splash">
+    <div class="splash-logo">&lt;/&gt;</div>
+    <div class="splash-title">Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama Portalı</div>
+    <div class="splash-sub">Öğrenci topluluğu tarafından hazırlandı</div>
+    <div class="splash-loader"></div>
+  </div>
+
+  <!-- ============ GİRİŞ EKRANI ============ -->
+  <div id="loginScreen">
+    <div class="login-hero">
+      <div class="login-logo">&lt;/&gt;</div>
+      <h1>Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama<br>Öğrenci Portalı</h1>
+      <p>Bu platform bölüm öğrencileri tarafından oluşturulmuş bağımsız bir topluluk platformudur.</p>
+    </div>
+    <div class="login-body">
+      <div class="login-card">
+        <span class="field-label">Öğrenci Şifresi</span>
+        <div class="pw-wrap">
+          <input type="password" id="loginPassword" placeholder="Şifrenizi girin" autocomplete="off" maxlength="20">
+          <button class="pw-toggle" id="togglePw" type="button" aria-label="Şifreyi göster/gizle">👁️</button>
+        </div>
+        <div class="remember-row">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">Beni hatırla</label>
+        </div>
+        <button class="btn btn-primary" id="loginBtn">Giriş Yap</button>
+        <div class="error-card" id="loginError">⚠️ <span id="loginErrorText">Şifre hatalı. Lütfen tekrar deneyin.</span></div>
+      </div>
+      <div class="login-footer-note">Bu, Ankara Üniversitesi'nin resmî bir platformu değildir. Şifreyi bölüm topluluk kanallarından edinebilirsiniz.</div>
+    </div>
+  </div>
+
+  <!-- ============ UYGULAMA GÖVDESİ ============ -->
+  <div id="app" class="hidden">
+
+    <!-- Üst çubuk -->
+    <header class="topbar glass">
+      <div class="topbar-left">
+        <div class="topbar-logo">&lt;/&gt;</div>
+        <div class="topbar-titles">
+          <div class="t1">WTK Öğrenci Portalı</div>
+          <div class="t2">Ankara Üniversitesi Açıköğretim</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" id="darkToggleBtn" aria-label="Karanlık mod" title="Karanlık mod">🌙</button>
+        <button class="icon-btn" id="notifBtn" aria-label="Bildirimler" title="Bildirimler">
+          🔔<span class="badge-dot hidden" id="notifDot"></span>
+        </button>
+        <div class="avatar-mini" id="avatarBtn" title="Profil">Ö</div>
+      </div>
+    </header>
+
+    <div class="notif-panel glass" id="notifPanel">
+      <h4>Son Duyurular</h4>
+      <div id="notifList"></div>
+    </div>
+
+    <!-- İçerik alanı -->
+    <main class="content" id="content">
+
+      <!-- ---- ANA SAYFA ---- -->
+      <section id="page-home" class="page active">
+        <div class="welcome-block">
+          <div class="greet" id="homeGreet">Hoş Geldin 👋</div>
+          <div class="date" id="homeDate"></div>
+          <div class="welcome-note">
+            <b id="homeHighlightTitle">Hızlı Bilgi</b>
+            <span id="homeHighlightText">E-Kayıt süreci başladı, tarihleri Akademik Takvim sayfasından takip edebilirsin.</span>
+          </div>
+        </div>
+
+        <div class="quick-grid" id="quickGrid"></div>
+
+        <div class="section-head container-pad">
+          <div class="section-title">Yaklaşan Tarihler</div>
+          <button class="link-more" data-nav="page-calendar">Takvimi Gör</button>
+        </div>
+        <div class="hscroll" id="homeCalendarPreview"></div>
+
+        <div class="section-head container-pad">
+          <div class="section-title">Son Duyurular</div>
+          <button class="link-more" data-nav="page-announcements">Tümü</button>
+        </div>
+        <div id="homeAnnPreview"></div>
+
+        <div class="section-head container-pad">
+          <div class="section-title">Faydalı Bağlantılar</div>
+          <button class="link-more" data-nav="page-links">Tümü</button>
+        </div>
+        <div id="homeLinksPreview"></div>
+      </section>
+
+      <!-- ---- DERS NOTLARI ---- -->
+      <section id="page-courses" class="page">
+        <div class="page-header"><h2>📚 Ders Notları</h2><p>Bölüm derslerine ait notlar ve kaynaklar</p></div>
+        <div class="search-bar"><span class="sic">🔍</span><input type="text" id="courseSearch" placeholder="Ders ara..."></div>
+        <div class="filter-row" id="courseFilters"></div>
+        <div class="grid-cards" id="courseGrid"></div>
+      </section>
+
+      <!-- ---- PDF ARŞİVİ ---- -->
+      <section id="page-pdf" class="page">
+        <div class="page-header"><h2>📄 PDF Arşivi</h2><p>Ders materyalleri ve doküman arşivi</p></div>
+        <div class="archive-stats">
+          <div class="stat-box"><b id="pdfCountStat">0</b><span>TOPLAM DOSYA</span></div>
+          <div class="stat-box"><b id="pdfCatStat">0</b><span>KATEGORİ</span></div>
+        </div>
+        <div class="search-bar"><span class="sic">🔍</span><input type="text" id="pdfSearch" placeholder="PDF ara..."></div>
+        <div class="pdf-list" id="pdfList"></div>
+      </section>
+
+      <!-- ---- DUYURULAR ---- -->
+      <section id="page-announcements" class="page">
+        <div class="page-header"><h2>📢 Duyurular</h2><p>Bölüm ve topluluk duyuruları</p></div>
+        <div id="annList" style="padding-top:8px;"></div>
+      </section>
+
+      <!-- ---- AKADEMİK TAKVİM ---- -->
+      <section id="page-calendar" class="page">
+        <div class="page-header"><h2>📅 Akademik Takvim</h2><p>2026–2027 dönemi önemli tarihler</p></div>
+        <div class="fee-banner">
+          <div><span>Dönem Ücreti</span><b id="feeAmount">6.250₺</b></div>
+          <div class="fee-emoji">💳</div>
+        </div>
+        <div class="timeline" id="calendarTimeline"></div>
+      </section>
+
+      <!-- ---- FAYDALI BAĞLANTILAR ---- -->
+      <section id="page-links" class="page">
+        <div class="page-header"><h2>🎓 Faydalı Bağlantılar</h2><p>Sık kullanılan üniversite sistemleri</p></div>
+        <div id="linksList" style="padding-top:8px;"></div>
+      </section>
+
+      <!-- ---- HAKKINDA ---- -->
+      <section id="page-about" class="page">
+        <div class="page-header"><h2>ℹ️ Hakkında</h2></div>
+        <div class="about-card card">
+          <div class="about-logo">&lt;/&gt;</div>
+          <h3>WTK Öğrenci Portalı</h3>
+          <p>Bu platform Ankara Üniversitesi Açıköğretim Web Tasarımı ve Kodlama öğrencileri için hazırlanmış bağımsız bir topluluk platformudur. Üniversitenin resmî web sitesi değildir.</p>
+          <div class="about-tags">
+            <span class="chip chip-orange">Topluluk Projesi</span>
+            <span class="chip chip-blue">Gayriresmî</span>
+            <span class="chip chip-green">v1.0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- PROFİL ---- -->
+      <section id="page-profile" class="page">
+        <div class="profile-hero">
+          <div class="profile-avatar">Ö</div>
+          <h3>Öğrenci</h3>
+          <span>Ankara Üniversitesi Açıköğretim</span>
+        </div>
+        <div class="info-list card">
+          <div class="info-row"><span class="lab">Bölüm</span><span class="val">Web Tasarımı ve Kodlama</span></div>
+          <div class="info-row"><span class="lab">Üniversite</span><span class="val">Ankara Üniversitesi Açıköğretim Fakültesi</span></div>
+          <div class="info-row"><span class="lab">Tema</span><span class="val" id="profileThemeVal">Açık Mod</span></div>
+        </div>
+
+        <div class="settings-list card">
+          <div class="settings-row">
+            <div class="settings-left"><div class="settings-ic">🌙</div><span class="label">Karanlık Mod</span></div>
+            <label class="switch"><input type="checkbox" id="darkSwitch"><span class="track"></span></label>
+          </div>
+          <div class="settings-row" id="openAdminLoginBtn">
+            <div class="settings-left"><div class="settings-ic">🛠️</div><span class="label">Yönetici Girişi</span></div>
+            <span class="link-arrow">›</span>
+          </div>
+          <div class="settings-row" id="goAboutBtn">
+            <div class="settings-left"><div class="settings-ic">ℹ️</div><span class="label">Hakkında</span></div>
+            <span class="link-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="container-pad" style="margin-top:8px;">
+          <button class="btn btn-danger-ghost btn-block" id="logoutBtn">🚪 Çıkış Yap</button>
+        </div>
+      </section>
+
+      <!-- ---- YÖNETİCİ PANELİ ---- -->
+      <section id="page-admin" class="page">
+        <div class="page-header"><h2>🛠️ Yönetici Paneli</h2><p>İçerik yönetimi</p></div>
+        <div class="admin-lock-note">🔐 <span>Bu panelde yaptığınız değişiklikler bu cihazda saklanır ve tüm öğrencilerin gördüğü içerikleri günceller.</span></div>
+        <div class="admin-tabs" id="adminTabs"></div>
+        <div class="admin-panel-body" id="adminBody"></div>
+      </section>
+
+    </main>
+
+    <!-- Alt gezinme menüsü -->
+    <nav class="bottomnav glass">
+      <button class="nav-btn active" data-nav="page-home"><span class="nic">🏠</span>Ana Sayfa</button>
+      <button class="nav-btn" data-nav="page-courses"><span class="nic">📚</span>Dersler</button>
+      <button class="nav-btn" data-nav="page-pdf"><span class="nic">📄</span>PDF</button>
+      <button class="nav-btn" data-nav="page-announcements"><span class="nic">📢</span>Duyurular</button>
+      <button class="nav-btn" data-nav="page-profile"><span class="nic">👤</span>Profil</button>
+    </nav>
+
+    <button class="fab hidden" id="adminFab" title="Ekle">＋</button>
+  </div>
+
+  <!-- ============ YÖNETİCİ GİRİŞ MODALI ============ -->
+  <div class="modal-overlay" id="adminLoginModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <button class="modal-close-x" data-close-modal="adminLoginModal">✕</button>
+      <div class="modal-title">Yönetici Girişi</div>
+      <div class="modal-sub">Devam etmek için yönetici şifresini girin.</div>
+      <div class="form-group">
+        <label>Yönetici Şifresi</label>
+        <div class="pw-wrap">
+          <input type="password" id="adminPassword" placeholder="••••••••••••">
+          <button class="pw-toggle" id="toggleAdminPw" type="button">👁️</button>
+        </div>
+      </div>
+      <div class="error-card" id="adminLoginError">⚠️ <span>Yönetici şifresi hatalı.</span></div>
+      <div class="modal-actions"><button class="btn btn-primary" id="adminLoginBtn">Giriş Yap</button></div>
+    </div>
+  </div>
+
+  <!-- ============ GENEL FORM MODALI (Admin ekle/düzenle) ============ -->
+  <div class="modal-overlay" id="formModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <button class="modal-close-x" data-close-modal="formModal">✕</button>
+      <div class="modal-title" id="formModalTitle">Ekle</div>
+      <div class="modal-sub" id="formModalSub"></div>
+      <div id="formModalBody"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" data-close-modal="formModal" style="flex:1;">Vazgeç</button>
+        <button class="btn btn-primary" id="formModalSave" style="flex:2;">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+</div>
+
+<script>
+/* ============================================================
+   WTK PORTAL — UYGULAMA MANTIĞI (JavaScript)
+   Tüm veriler tarayıcının localStorage'ında saklanır.
+   ============================================================ */
+(function(){
+"use strict";
+
+/* ---------------- Sabitler ---------------- */
+const STUDENT_PASSWORD = "WTK2026AU";
+const ADMIN_PASSWORD   = "WTKADMIN2026";
+const LS = {
+  authLocal:'wtk_auth_local', authSession:'wtk_auth_session', adminAuth:'wtk_admin_auth',
+  theme:'wtk_theme', remember:'wtk_remember_flag',
+  announcements:'wtk_announcements', pdfs:'wtk_pdfs', links:'wtk_links',
+  calendar:'wtk_calendar', fee:'wtk_fee', home:'wtk_home_content', notifSeen:'wtk_notif_seen'
+};
+
+/* ---------------- Depolama yardımcıları ---------------- */
+function lsGet(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw === null ? fallback : JSON.parse(raw);
+  }catch(e){ return fallback; }
+}
+function lsSet(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){ console.warn('Depolama hatası', e); }
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ---------------- Varsayılan veriler ---------------- */
+const DEFAULTS = {
+  announcements:[
+    {id:uid(), title:"2026–2027 Güz Dönemi E-Kayıt Süreci Başladı", date:"2026-08-24", content:"Güz dönemi e-kayıt işlemleri başlamıştır. Kayıt yenileme ve ders seçimlerinizi belirtilen tarihler arasında OBS üzerinden tamamlamayı unutmayın."},
+    {id:uid(), title:"Yeni Ders Notları Yüklendi", date:"2026-08-20", content:"JavaScript Programlama ve UI/UX Tasarım İlkeleri derslerine ait güncel notlar Ders Notları sayfasına eklendi."},
+    {id:uid(), title:"Topluluk WhatsApp Grubu Güncellendi", date:"2026-08-14", content:"Bölüm öğrencileri arası dayanışma grubumuzun bağlantısı güncellenmiştir. Güncel bağlantı için sınıf temsilcinizle iletişime geçebilirsiniz."},
+    {id:uid(), title:"Vize Sınav Sonuçları Açıklandı", date:"2026-06-02", content:"Bahar dönemi vize sınav sonuçları OBS sistemi üzerinden görüntülenebilir. İtiraz süreci için öğrenci işlerine başvurabilirsiniz."}
+  ],
+  pdfs:[
+    {id:uid(), title:"HTML5 & CSS3 Ders Notu - Ünite 1", category:"HTML/CSS", url:"#", size:"2.4 MB", date:"2026-08-18"},
+    {id:uid(), title:"JavaScript Temelleri Sunumu", category:"JavaScript", url:"#", size:"3.1 MB", date:"2026-08-15"},
+    {id:uid(), title:"Responsive Tasarım Uygulama Rehberi", category:"Tasarım", url:"#", size:"1.8 MB", date:"2026-08-10"},
+    {id:uid(), title:"Veritabanı Yönetimi - SQL Özet", category:"Veritabanı", url:"#", size:"2.0 MB", date:"2026-07-29"},
+    {id:uid(), title:"UI/UX Tasarım İlkeleri Kitapçığı", category:"Tasarım", url:"#", size:"4.6 MB", date:"2026-07-20"},
+    {id:uid(), title:"PHP ile Web Programlama Notları", category:"Diğer", url:"#", size:"2.9 MB", date:"2026-07-05"}
+  ],
+  links:[
+    {id:uid(), title:"OBS", desc:"Öğrenci Bilgi Sistemi", url:"https://obs.ankara.edu.tr/account/login?returnurl=/Preparation/HazirlikDonemKayit", icon:"🖥️"},
+    {id:uid(), title:"Öğrenci İşleri", desc:"Ankara Üniversitesi Öğrenci İşleri", url:"https://ankuzef.ankara.edu.tr/tr/24-ogrenci-isleri", icon:"🏛️"},
+    {id:uid(), title:"ÖYS", desc:"Öğrenme Yönetim Sistemi", url:"https://oys.ankara.edu.tr", icon:"📖"}
+  ],
+  calendar:[
+    {id:uid(), title:"E-Kayıt", start:"2026-08-24", end:"2026-08-26"},
+    {id:uid(), title:"Öğrenim ve Materyal Ücreti", start:"2026-09-16", end:"2026-09-27"},
+    {id:uid(), title:"Güz Yarıyılı Ücret Yatırma", start:"2026-09-16", end:"2026-09-27"},
+    {id:uid(), title:"Bahar Yarıyılı Ücret Yatırma", start:"2027-02-08", end:"2027-02-14"}
+  ],
+  fee:"6.250₺",
+  home:{ highlightTitle:"Hızlı Bilgi", highlightText:"E-Kayıt süreci başladı, tarihleri Akademik Takvim sayfasından takip edebilirsin." }
+};
+
+const COURSES = [
+  {title:"HTML5 ve CSS3 Temelleri", cat:"HTML/CSS", icon:"🌐", desc:"Web sayfası yapısı ve stil temelleri"},
+  {title:"JavaScript Programlama", cat:"JavaScript", icon:"⚡", desc:"Etkileşimli web uygulamaları geliştirme"},
+  {title:"PHP ve Veritabanı Yönetimi", cat:"Veritabanı", icon:"🗄️", desc:"Sunucu taraflı programlama ve MySQL"},
+  {title:"UI/UX Tasarım İlkeleri", cat:"Tasarım", icon:"🎨", desc:"Kullanıcı deneyimi ve arayüz tasarımı"},
+  {title:"Responsive Web Tasarım", cat:"Tasarım", icon:"📱", desc:"Çok cihazlı uyumlu tasarım teknikleri"},
+  {title:"WordPress ile Web Geliştirme", cat:"Diğer", icon:"🧩", desc:"CMS tabanlı site kurulumu ve özelleştirme"},
+  {title:"Grafik Tasarım Temelleri", cat:"Tasarım", icon:"🖌️", desc:"Görsel tasarım ve kompozisyon ilkeleri"},
+  {title:"Web Sunucu ve Barındırma", cat:"Diğer", icon:"🛰️", desc:"Hosting, domain ve yayınlama süreçleri"}
+];
+
+/* ---------------- Veri erişim katmanı ---------------- */
+const Data = {
+  init(){
+    if(lsGet(LS.announcements,null)===null) lsSet(LS.announcements, DEFAULTS.announcements);
+    if(lsGet(LS.pdfs,null)===null) lsSet(LS.pdfs, DEFAULTS.pdfs);
+    if(lsGet(LS.links,null)===null) lsSet(LS.links, DEFAULTS.links);
+    if(lsGet(LS.calendar,null)===null) lsSet(LS.calendar, DEFAULTS.calendar);
+    if(lsGet(LS.fee,null)===null) lsSet(LS.fee, DEFAULTS.fee);
+    if(lsGet(LS.home,null)===null) lsSet(LS.home, DEFAULTS.home);
+  },
+  get ann(){ return lsGet(LS.announcements, []).sort((a,b)=> new Date(b.date)-new Date(a.date)); },
+  get pdfs(){ return lsGet(LS.pdfs, []); },
+  get links(){ return lsGet(LS.links, []); },
+  get cal(){ return lsGet(LS.calendar, []).sort((a,b)=> new Date(a.start)-new Date(b.start)); },
+  get fee(){ return lsGet(LS.fee, DEFAULTS.fee); },
+  get home(){ return lsGet(LS.home, DEFAULTS.home); },
+  save(key, val){ lsSet(key, val); }
+};
+Data.init();
+
+/* ---------------- Yardımcı biçimlendiriciler ---------------- */
+function fmtDateTR(iso){
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
+}
+function fmtDateShort(iso){
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString('tr-TR', {day:'numeric', month:'short'});
+}
+function dateStatus(startIso, endIso){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const s = new Date(startIso+"T00:00:00"), e = new Date(endIso+"T00:00:00");
+  if(today < s) return 'upcoming';
+  if(today >= s && today <= e) return 'ongoing';
+  return 'past';
+}
+function daysUntil(iso){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(iso+"T00:00:00");
+  return Math.round((d-today)/86400000);
+}
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ---------------- Toast bildirimleri ---------------- */
+function toast(msg, type){
+  const c = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' '+type : '');
+  el.innerHTML = (type==='success'?'✅ ':type==='error'?'⚠️ ':'ℹ️ ') + escapeHtml(msg);
+  c.appendChild(el);
+  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(), 300); }, 2600);
+}
+
+/* ---------------- Tema (Karanlık Mod) ---------------- */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  const dark = theme === 'dark';
+  document.getElementById('darkToggleBtn').textContent = dark ? '☀️' : '🌙';
+  const sw = document.getElementById('darkSwitch');
+  if(sw) sw.checked = dark;
+  const pv = document.getElementById('profileThemeVal');
+  if(pv) pv.textContent = dark ? 'Koyu Mod' : 'Açık Mod';
+}
+function initTheme(){
+  const saved = lsGet(LS.theme, null) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(saved);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  lsSet(LS.theme, next);
+  applyTheme(next);
+}
+
+/* ---------------- Kimlik doğrulama ---------------- */
+function isLoggedIn(){
+  return localStorage.getItem(LS.authLocal) === '1' || sessionStorage.getItem(LS.authSession) === '1';
+}
+function doLogin(remember){
+  if(remember){ localStorage.setItem(LS.authLocal, '1'); }
+  else{ sessionStorage.setItem(LS.authSession, '1'); }
+}
+function doLogout(){
+  localStorage.removeItem(LS.authLocal);
+  sessionStorage.removeItem(LS.authSession);
+  localStorage.removeItem(LS.adminAuth);
+  document.getElementById('app').classList.add('hidden');
+  const ls = document.getElementById('loginScreen');
+  ls.classList.remove('hidden');
+  requestAnimationFrame(()=> ls.classList.add('show'));
+  document.getElementById('loginPassword').value = '';
+  switchPage('page-home', true);
+}
+function isAdmin(){ return sessionStorage.getItem(LS.adminAuth) === '1'; }
+
+/* ---------------- Sayfa geçişleri ---------------- */
+function switchPage(pageId, silent){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const target = document.getElementById(pageId);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.nav === pageId);
+  });
+  document.getElementById('content').scrollTo({top:0, behavior: silent ? 'auto' : 'smooth'});
+  document.getElementById('adminFab').classList.toggle('hidden', pageId !== 'page-admin');
+  closeNotifPanel();
+}
+
+/* ---------------- Render: Ana Sayfa ---------------- */
+const QUICK_ITEMS = [
+  {icon:'📚', label:'Ders Notları', nav:'page-courses'},
+  {icon:'📄', label:'PDF Arşivi', nav:'page-pdf'},
+  {icon:'📅', label:'Akademik Takvim', nav:'page-calendar'},
+  {icon:'📢', label:'Duyurular', nav:'page-announcements'},
+  {icon:'🎓', label:'Faydalı Bağlantılar', nav:'page-links'},
+  {icon:'👤', label:'Profil', nav:'page-profile'},
+  {icon:'ℹ️', label:'Hakkında', nav:'page-about'}
+];
+
+function renderHome(){
+  document.getElementById('homeDate').textContent = new Date().toLocaleDateString('tr-TR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const home = Data.home;
+  document.getElementById('homeHighlightTitle').textContent = home.highlightTitle;
+  document.getElementById('homeHighlightText').textContent = home.highlightText;
+
+  document.getElementById('quickGrid').innerHTML = QUICK_ITEMS.map(q => `
+    <div class="quick-item" data-nav="${q.nav}">
+      <div class="quick-icon">${q.icon}</div>
+      <span>${q.label}</span>
+    </div>`).join('');
+
+  const upcoming = Data.cal.filter(c => dateStatus(c.start,c.end) !== 'past').slice(0,4);
+  document.getElementById('homeCalendarPreview').innerHTML = (upcoming.length ? upcoming : Data.cal.slice(0,2)).map(c=>{
+    const st = dateStatus(c.start,c.end);
+    const label = st==='ongoing' ? 'DEVAM EDİYOR' : st==='upcoming' ? 'YAKLAŞIYOR' : 'SONA ERDİ';
+    const color = st==='ongoing' ? 'var(--success)' : st==='upcoming' ? 'var(--primary)' : 'var(--text-tertiary)';
+    return `<div class="mini-cal-card"><div class="status" style="color:${color}">${label}</div><h5>${escapeHtml(c.title)}</h5><div class="rng">${fmtDateShort(c.start)} – ${fmtDateShort(c.end)}</div></div>`;
+  }).join('');
+
+  document.getElementById('homeAnnPreview').innerHTML = Data.ann.slice(0,2).map(annCardHtml).join('') || emptyStateHtml('📢','Henüz duyuru yok');
+  document.getElementById('homeLinksPreview').innerHTML = Data.links.slice(0,3).map(linkCardHtml).join('') || emptyStateHtml('🎓','Bağlantı yok');
+}
+
+function emptyStateHtml(emoji, text){
+  return `<div class="empty-state"><span class="emoji">${emoji}</span>${escapeHtml(text)}</div>`;
+}
+
+/* ---------------- Render: Duyurular ---------------- */
+function annCardHtml(a){
+  return `<div class="card ann-card">
+    <div class="ann-top"><h5>${escapeHtml(a.title)}</h5><span class="ann-date">${fmtDateShort(a.date)}</span></div>
+    <p>${escapeHtml(a.content)}</p>
+  </div>`;
+}
+function renderAnnouncements(){
+  const list = Data.ann;
+  document.getElementById('annList').innerHTML = list.length ? list.map(annCardHtml).join('') : emptyStateHtml('📢','Henüz duyuru bulunmuyor');
+  lsSet(LS.notifSeen, list.length);
+  updateNotifDot();
+}
+
+/* ---------------- Render: Bildirim paneli ---------------- */
+function renderNotifPanel(){
+  const list = Data.ann.slice(0,4);
+  document.getElementById('notifList').innerHTML = list.length ? list.map(a=>`
+    <div class="notif-item"><b>${escapeHtml(a.title)}</b><span>${fmtDateShort(a.date)}</span></div>
+  `).join('') : `<div class="notif-empty">Bildirim yok</div>`;
+}
+function updateNotifDot(){
+  const seen = lsGet(LS.notifSeen, 0);
+  const total = Data.ann.length;
+  document.getElementById('notifDot').classList.toggle('hidden', total <= seen);
+}
+function closeNotifPanel(){ document.getElementById('notifPanel').classList.remove('open'); }
+
+/* ---------------- Render: Faydalı Bağlantılar ---------------- */
+function linkCardHtml(l){
+  return `<a class="card link-card" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer">
+    <div class="link-ic">${l.icon || '🔗'}</div>
+    <div class="link-info"><h5>${escapeHtml(l.title)}</h5><span>${escapeHtml(l.desc || l.url)}</span></div>
+    <div class="link-arrow">↗</div>
+  </a>`;
+}
+function renderLinks(){
+  const list = Data.links;
+  document.getElementById('linksList').innerHTML = list.length ? list.map(linkCardHtml).join('') : emptyStateHtml('🎓','Bağlantı eklenmedi');
+}
+
+/* ---------------- Render: Akademik Takvim ---------------- */
+function renderCalendar(){
+  document.getElementById('feeAmount').textContent = Data.fee;
+  const list = Data.cal;
+  document.getElementById('calendarTimeline').innerHTML = list.length ? list.map(c=>{
+    const st = dateStatus(c.start, c.end);
+    const badge = st==='ongoing' ? '<span class="chip chip-green">Devam Ediyor</span>' : st==='upcoming' ? `<span class="chip chip-orange">${daysUntil(c.start)} gün kaldı</span>` : '<span class="chip chip-gray">Sona Erdi</span>';
+    return `<div class="tl-item ${st}">
+      <div class="tl-dot"></div>
+      <div class="tl-card card">
+        <h5>${escapeHtml(c.title)}</h5>
+        <div class="rng">${fmtDateTR(c.start)} – ${fmtDateTR(c.end)}</div>
+        <div style="margin-top:8px;">${badge}</div>
+      </div>
+    </div>`;
+  }).join('') : emptyStateHtml('📅','Takvim kaydı yok');
+}
+
+/* ---------------- Render: Ders Notları ---------------- */
+let activeCourseFilter = 'Tümü';
+function renderCourseFilters(){
+  const cats = ['Tümü', ...new Set(COURSES.map(c=>c.cat))];
+  document.getElementById('courseFilters').innerHTML = cats.map(c=>`<button class="filter-chip ${c===activeCourseFilter?'active':''}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('');
+}
+function renderCourses(){
+  const q = (document.getElementById('courseSearch').value || '').toLowerCase().trim();
+  const filtered = COURSES.filter(c =>
+    (activeCourseFilter==='Tümü' || c.cat===activeCourseFilter) &&
+    (c.title.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q))
+  );
+  document.getElementById('courseGrid').innerHTML = filtered.length ? filtered.map(c=>`
+    <div class="card course-card" data-course-note>
+      <div class="course-ic">${c.icon}</div>
+      <h5>${escapeHtml(c.title)}</h5>
+      <p>${escapeHtml(c.desc)}</p>
+      <span class="chip chip-orange" style="align-self:flex-start;">${escapeHtml(c.cat)}</span>
+    </div>`).join('') : `<div style="grid-column:1/-1;">${emptyStateHtml('📚','Sonuç bulunamadı')}</div>`;
+}
+
+/* ---------------- Render: PDF Arşivi ---------------- */
+function renderPdfs(){
+  const q = (document.getElementById('pdfSearch').value || '').toLowerCase().trim();
+  const list = Data.pdfs.filter(p => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+  document.getElementById('pdfCountStat').textContent = Data.pdfs.length;
+  document.getElementById('pdfCatStat').textContent = new Set(Data.pdfs.map(p=>p.category)).size;
+  document.getElementById('pdfList').innerHTML = list.length ? list.map(p=>`
+    <div class="card pdf-card">
+      <div class="pdf-ic">PDF</div>
+      <div class="pdf-info"><h5>${escapeHtml(p.title)}</h5><span>${escapeHtml(p.category)} · ${escapeHtml(p.size||'')} · ${fmtDateShort(p.date||new Date().toISOString().slice(0,10))}</span></div>
+      <button class="pdf-dl" data-pdf-url="${escapeHtml(p.url)}" title="İndir">⬇</button>
+    </div>`).join('') : emptyStateHtml('📄','Sonuç bulunamadı');
+}
+
+/* ---------------- Genel render tetikleyici ---------------- */
+function renderAll(){
+  renderHome();
+  renderAnnouncements();
+  renderLinks();
+  renderCalendar();
+  renderCourseFilters();
+  renderCourses();
+  renderPdfs();
+  renderNotifPanel();
+  updateNotifDot();
+  if(isAdmin()) renderAdminPanel();
+}
+
+/* ============================================================
+   YÖNETİCİ PANELİ
+   ============================================================ */
+const ADMIN_TABS = [
+  {id:'ann', label:'📢 Duyurular'},
+  {id:'pdf', label:'📄 PDF'},
+  {id:'links', label:'🎓 Bağlantılar'},
+  {id:'cal', label:'📅 Takvim'},
+  {id:'home', label:'🏠 Ana Sayfa'}
+];
+let activeAdminTab = 'ann';
+
+function renderAdminTabs(){
+  document.getElementById('adminTabs').innerHTML = ADMIN_TABS.map(t=>
+    `<button class="filter-chip ${t.id===activeAdminTab?'active':''}" data-admin-tab="${t.id}">${t.label}</button>`
+  ).join('');
+}
+
+function renderAdminPanel(){
+  renderAdminTabs();
+  const body = document.getElementById('adminBody');
+  if(activeAdminTab === 'ann'){
+    const list = Data.ann;
+    body.innerHTML = list.map(a=>`
+      <div class="card admin-item">
+        <div class="admin-item-info"><h5>${escapeHtml(a.title)}</h5><span>${fmtDateShort(a.date)}</span></div>
+        <div class="admin-item-actions">
+          <button class="icon-sm-btn btn-ghost" data-edit="ann" data-id="${a.id}">✏️</button>
+          <button class="icon-sm-btn btn-danger-ghost" data-del="ann" data-id="${a.id}">🗑️</button>
+        </div>
+      </div>`).join('') || emptyStateHtml('📢','Duyuru yok. Sağ alttaki + ile ekleyin.');
+  } else if(activeAdminTab === 'pdf'){
+    const list = Data.pdfs;
+    body.innerHTML = list.map(p=>`
+      <div class="card admin-item">
+        <div class="admin-item-info"><h5>${escapeHtml(p.title)}</h5><span>${escapeHtml(p.category)} · ${escapeHtml(p.size||'')}</span></div>
+        <div class="admin-item-actions">
+          <button class="icon-sm-btn btn-ghost" data-edit="pdf" data-id="${p.id}">✏️</button>
+          <button class="icon-sm-btn btn-danger-ghost" data-del="pdf" data-id="${p.id}">🗑️</button>
+        </div>
+      </div>`).join('') || emptyStateHtml('📄','PDF yok. Sağ alttaki + ile ekleyin.');
+  } else if(activeAdminTab === 'links'){
+    const list = Data.links;
+    body.innerHTML = list.map(l=>`
+      <div class="card admin-item">
+        <div class="admin-item-info"><h5>${escapeHtml(l.title)}</h5><span>${escapeHtml(l.url)}</span></div>
+        <div class="admin-item-actions">
+          <button class="icon-sm-btn btn-ghost" data-edit="links" data-id="${l.id}">✏️</button>
+          <button class="icon-sm-btn btn-danger-ghost" data-del="links" data-id="${l.id}">🗑️</button>
+        </div>
+      </div>`).join('') || emptyStateHtml('🎓','Bağlantı yok. Sağ alttaki + ile ekleyin.');
+  } else if(activeAdminTab === 'cal'){
+    const list = Data.cal;
+    body.innerHTML = `
+      <div class="card admin-item" style="margin-bottom:14px;">
+        <div class="admin-item-info"><h5>Dönem Ücreti</h5><span>${escapeHtml(Data.fee)}</span></div>
+        <div class="admin-item-actions"><button class="icon-sm-btn btn-ghost" id="editFeeBtn">✏️</button></div>
+      </div>` +
+      (list.map(c=>`
+      <div class="card admin-item">
+        <div class="admin-item-info"><h5>${escapeHtml(c.title)}</h5><span>${fmtDateShort(c.start)} – ${fmtDateShort(c.end)}</span></div>
+        <div class="admin-item-actions">
+          <button class="icon-sm-btn btn-ghost" data-edit="cal" data-id="${c.id}">✏️</button>
+          <button class="icon-sm-btn btn-danger-ghost" data-del="cal" data-id="${c.id}">🗑️</button>
+        </div>
+      </div>`).join('') || emptyStateHtml('📅','Takvim kaydı yok.'));
+  } else if(activeAdminTab === 'home'){
+    const h = Data.home;
+    body.innerHTML = `
+      <div class="form-group"><label>Vurgu Başlığı</label><input type="text" id="homeTitleInput" value="${escapeHtml(h.highlightTitle)}"></div>
+      <div class="form-group"><label>Vurgu Metni</label><textarea id="homeTextInput">${escapeHtml(h.highlightText)}</textarea></div>
+      <button class="btn btn-primary btn-block" id="saveHomeContentBtn">Ana Sayfa İçeriğini Kaydet</button>
+    `;
+  }
+  document.getElementById('adminFab').classList.toggle('hidden', activeAdminTab === 'home');
+}
+
+/* ---- Form modalı: Ekle / Düzenle ---- */
+let formCtx = { type:null, id:null };
+
+function openForm(type, id){
+  formCtx = {type, id: id || null};
+  const isEdit = !!id;
+  const titleMap = {ann:'Duyuru', pdf:'PDF', links:'Bağlantı', cal:'Takvim Kaydı'};
+  document.getElementById('formModalTitle').textContent = (isEdit?'Düzenle: ':'Yeni ') + titleMap[type];
+  document.getElementById('formModalSub').textContent = isEdit ? 'Mevcut kaydı güncelleyin.' : 'Aşağıdaki alanları doldurun.';
+  const body = document.getElementById('formModalBody');
+
+  let record = {};
+  if(isEdit){
+    const map = {ann:Data.ann, pdf:Data.pdfs, links:Data.links, cal:Data.cal};
+    record = map[type].find(r=>r.id===id) || {};
+  }
+
+  if(type==='ann'){
+    body.innerHTML = `
+      <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
+      <div class="form-group"><label>Tarih</label><input type="date" id="f_date" value="${record.date||new Date().toISOString().slice(0,10)}"></div>
+      <div class="form-group"><label>İçerik</label><textarea id="f_content">${escapeHtml(record.content||'')}</textarea></div>`;
+  } else if(type==='pdf'){
+    body.innerHTML = `
+      <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
+      <div class="form-row2">
+        <div class="form-group"><label>Kategori</label><input type="text" id="f_category" value="${escapeHtml(record.category||'')}" placeholder="ör. JavaScript"></div>
+        <div class="form-group"><label>Boyut</label><input type="text" id="f_size" value="${escapeHtml(record.size||'')}" placeholder="ör. 2.4 MB"></div>
+      </div>
+      <div class="form-group"><label>PDF Bağlantısı</label><input type="text" id="f_url" value="${escapeHtml(record.url||'')}" placeholder="https:// veya # (yakında)"></div>`;
+  } else if(type==='links'){
+    body.innerHTML = `
+      <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
+      <div class="form-group"><label>Açıklama</label><input type="text" id="f_desc" value="${escapeHtml(record.desc||'')}"></div>
+      <div class="form-group"><label>Bağlantı (URL)</label><input type="text" id="f_url" value="${escapeHtml(record.url||'')}" placeholder="https://"></div>
+      <div class="form-group"><label>İkon (emoji)</label><input type="text" id="f_icon" value="${escapeHtml(record.icon||'🔗')}" maxlength="4"></div>`;
+  } else if(type==='cal'){
+    body.innerHTML = `
+      <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
+      <div class="form-row2">
+        <div class="form-group"><label>Başlangıç</label><input type="date" id="f_start" value="${record.start||''}"></div>
+        <div class="form-group"><label>Bitiş</label><input type="date" id="f_end" value="${record.end||''}"></div>
+      </div>`;
+  }
+  document.getElementById('formModal').classList.add('open');
+}
+
+function saveForm(){
+  const {type, id} = formCtx;
+  const isEdit = !!id;
+  const val = sel => (document.getElementById(sel) ? document.getElementById(sel).value.trim() : '');
+
+  const dataMap = {ann:LS.announcements, pdf:LS.pdfs, links:LS.links, cal:LS.calendar};
+  let list = lsGet(dataMap[type], []);
+
+  if(type==='ann'){
+    const title = val('f_title'), date = val('f_date'), content = val('f_content');
+    if(!title || !date){ toast('Lütfen başlık ve tarih girin','error'); return; }
+    if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, date, content} : r); }
+    else{ list.push({id:uid(), title, date, content}); }
+  } else if(type==='pdf'){
+    const title = val('f_title'), category = val('f_category')||'Diğer', size = val('f_size'), url = val('f_url')||'#';
+    if(!title){ toast('Lütfen başlık girin','error'); return; }
+    if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, category, size, url} : r); }
+    else{ list.push({id:uid(), title, category, size, url, date:new Date().toISOString().slice(0,10)}); }
+  } else if(type==='links'){
+    const title = val('f_title'), desc = val('f_desc'), url = val('f_url'), icon = val('f_icon')||'🔗';
+    if(!title || !url){ toast('Lütfen başlık ve bağlantı girin','error'); return; }
+    if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, desc, url, icon} : r); }
+    else{ list.push({id:uid(), title, desc, url, icon}); }
+  } else if(type==='cal'){
+    const title = val('f_title'), start = val('f_start'), end = val('f_end');
+    if(!title || !start || !end){ toast('Lütfen tüm alanları doldurun','error'); return; }
+    if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, start, end} : r); }
+    else{ list.push({id:uid(), title, start, end}); }
+  }
+
+  lsSet(dataMap[type], list);
+  closeModal('formModal');
+  toast(isEdit ? 'Güncellendi' : 'Eklendi', 'success');
+  renderAll();
+}
+
+function deleteRecord(type, id){
+  const dataMap = {ann:LS.announcements, pdf:LS.pdfs, links:LS.links, cal:LS.calendar};
+  const list = lsGet(dataMap[type], []).filter(r=>r.id!==id);
+  lsSet(dataMap[type], list);
+  toast('Silindi', 'success');
+  renderAll();
+}
+
+/* ---------------- Modal yardımcıları ---------------- */
+function openModal(id){ document.getElementById(id).classList.add('open'); document.body.classList.add('scroll-lock'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); document.body.classList.remove('scroll-lock'); }
+
+/* ============================================================
+   OLAY DİNLEYİCİLERİ (Event Listeners)
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* ---- Açılış ekranı ---- */
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('fade-out');
+    if(isLoggedIn()){
+      showApp();
+    } else {
+      const ls = document.getElementById('loginScreen');
+      ls.classList.remove('hidden');
+      requestAnimationFrame(()=> ls.classList.add('show'));
+    }
+  }, 1500);
+
+  initTheme();
+
+  /* ---- Giriş ekranı: şifre göster/gizle ---- */
+  document.getElementById('togglePw').addEventListener('click', function(){
+    const inp = document.getElementById('loginPassword');
+    const showing = inp.type === 'text';
+    inp.type = showing ? 'password' : 'text';
+    this.textContent = showing ? '👁️' : '🙈';
+  });
+
+  /* ---- Giriş yap ---- */
+  function attemptLogin(){
+    const pass = document.getElementById('loginPassword').value;
+    const remember = document.getElementById('rememberMe').checked;
+    const errCard = document.getElementById('loginError');
+    if(pass === STUDENT_PASSWORD){
+      errCard.classList.remove('show','shake');
+      doLogin(remember);
+      const ls = document.getElementById('loginScreen');
+      ls.classList.remove('show');
+      setTimeout(()=>{ ls.classList.add('hidden'); showApp(); }, 480);
+    } else {
+      document.getElementById('loginErrorText').textContent = 'Şifre hatalı. Lütfen tekrar deneyin.';
+      errCard.classList.add('show');
+      errCard.classList.remove('shake'); void errCard.offsetWidth; errCard.classList.add('shake');
+    }
+  }
+  document.getElementById('loginBtn').addEventListener('click', attemptLogin);
+  document.getElementById('loginPassword').addEventListener('keydown', e=>{ if(e.key==='Enter') attemptLogin(); });
+
+  /* ---- Uygulamayı göster ---- */
+  window.showApp = function(){
+    document.getElementById('app').classList.remove('hidden');
+    renderAll();
+  };
+
+  /* ---- Alt menü + genel nav yönlendirme ---- */
+  document.body.addEventListener('click', (e)=>{
+    const navEl = e.target.closest('[data-nav]');
+    if(navEl){ switchPage(navEl.dataset.nav); }
+  });
+
+  /* ---- Karanlık mod ---- */
+  document.getElementById('darkToggleBtn').addEventListener('click', toggleTheme);
+  document.getElementById('darkSwitch').addEventListener('change', toggleTheme);
+
+  /* ---- Bildirim paneli ---- */
+  document.getElementById('notifBtn').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    document.getElementById('notifPanel').classList.toggle('open');
+  });
+  document.addEventListener('click', (e)=>{
+    const panel = document.getElementById('notifPanel');
+    if(panel.classList.contains('open') && !panel.contains(e.target) && e.target.id!=='notifBtn'){ closeNotifPanel(); }
+  });
+
+  /* ---- Avatar -> profil ---- */
+  document.getElementById('avatarBtn').addEventListener('click', ()=> switchPage('page-profile'));
+  document.getElementById('goAboutBtn').addEventListener('click', ()=> switchPage('page-about'));
+
+  /* ---- Çıkış yap ---- */
+  document.getElementById('logoutBtn').addEventListener('click', doLogout);
+
+  /* ---- Arama & filtreler ---- */
+  document.getElementById('courseSearch').addEventListener('input', renderCourses);
+  document.getElementById('pdfSearch').addEventListener('input', renderPdfs);
+  document.getElementById('courseFilters').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-cat]');
+    if(!btn) return;
+    activeCourseFilter = btn.dataset.cat;
+    renderCourseFilters(); renderCourses();
+  });
+
+  /* ---- Ders notu / PDF placeholder tıklamaları ---- */
+  document.getElementById('courseGrid').addEventListener('click', (e)=>{
+    if(e.target.closest('[data-course-note]')) toast('Bu dersin notu yakında eklenecek', 'info');
+  });
+  document.getElementById('pdfList').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-pdf-url]');
+    if(!btn) return;
+    const url = btn.dataset.pdfUrl;
+    if(url && url !== '#'){ window.open(url, '_blank', 'noopener'); }
+    else{ toast('Bu dosya yakında eklenecek', 'info'); }
+  });
+
+  /* ---- Modal kapatma (X ve dış alan) ---- */
+  document.body.addEventListener('click', (e)=>{
+    const closer = e.target.closest('[data-close-modal]');
+    if(closer){ closeModal(closer.dataset.closeModal); }
+    if(e.target.classList.contains('modal-overlay')){ e.target.classList.remove('open'); document.body.classList.remove('scroll-lock'); }
+  });
+
+  /* ---- Yönetici girişi (Profil sayfasından) ---- */
+  document.getElementById('openAdminLoginBtn').addEventListener('click', ()=>{
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminLoginError').classList.remove('show');
+    openModal('adminLoginModal');
+  });
+  document.getElementById('toggleAdminPw').addEventListener('click', function(){
+    const inp = document.getElementById('adminPassword');
+    const showing = inp.type === 'text';
+    inp.type = showing ? 'password' : 'text';
+    this.textContent = showing ? '👁️' : '🙈';
+  });
+  function attemptAdminLogin(){
+    const pass = document.getElementById('adminPassword').value;
+    const errCard = document.getElementById('adminLoginError');
+    if(pass === ADMIN_PASSWORD){
+      sessionStorage.setItem(LS.adminAuth, '1');
+      closeModal('adminLoginModal');
+      toast('Yönetici olarak giriş yapıldı', 'success');
+      switchPage('page-admin');
+      activeAdminTab = 'ann';
+      renderAdminPanel();
+    } else {
+      errCard.classList.add('show');
+      errCard.classList.remove('shake'); void errCard.offsetWidth; errCard.classList.add('shake');
+    }
+  }
+  document.getElementById('adminLoginBtn').addEventListener('click', attemptAdminLogin);
+  document.getElementById('adminPassword').addEventListener('keydown', e=>{ if(e.key==='Enter') attemptAdminLogin(); });
+
+  /* ---- Yönetici paneli sekmeleri ---- */
+  document.getElementById('adminTabs').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-admin-tab]');
+    if(!btn) return;
+    activeAdminTab = btn.dataset.adminTab;
+    renderAdminPanel();
+  });
+
+  /* ---- Yönetici: ekle / düzenle / sil (delegasyon) ---- */
+  document.getElementById('adminBody').addEventListener('click', (e)=>{
+    const editBtn = e.target.closest('[data-edit]');
+    const delBtn = e.target.closest('[data-del]');
+    const feeBtn = e.target.closest('#editFeeBtn');
+    const saveHomeBtn = e.target.closest('#saveHomeContentBtn');
+    if(editBtn){ openForm(editBtn.dataset.edit, editBtn.dataset.id); }
+    if(delBtn){ if(confirm('Bu kaydı silmek istediğinize emin misiniz?')){ deleteRecord(delBtn.dataset.del, delBtn.dataset.id); } }
+    if(feeBtn){
+      const newFee = prompt('Yeni dönem ücretini girin:', Data.fee);
+      if(newFee !== null && newFee.trim() !== ''){ lsSet(LS.fee, newFee.trim()); toast('Dönem ücreti güncellendi','success'); renderAll(); }
+    }
+    if(saveHomeBtn){
+      const h = { highlightTitle: document.getElementById('homeTitleInput').value.trim() || DEFAULTS.home.highlightTitle,
+                  highlightText: document.getElementById('homeTextInput').value.trim() || DEFAULTS.home.highlightText };
+      lsSet(LS.home, h);
+      toast('Ana sayfa içeriği güncellendi', 'success');
+      renderAll();
+    }
+  });
+
+  /* ---- Yönetici FAB (yeni kayıt ekle) ---- */
+  document.getElementById('adminFab').addEventListener('click', ()=>{
+    if(activeAdminTab === 'home') return;
+    openForm(activeAdminTab, null);
+  });
+  document.getElementById('formModalSave').addEventListener('click', saveForm);
+
+});
+})();
+</script>
+</body>
+</html>
