@@ -290,6 +290,7 @@ img{max-width:100%; display:block;}
 .ann-top h5{font-size:14.5px; font-weight:800; line-height:1.35;}
 .ann-date{font-size:10.5px; color:var(--text-tertiary); white-space:nowrap; font-weight:700; flex-shrink:0; margin-top:2px;}
 .ann-card p{font-size:12.8px; color:var(--text-secondary); line-height:1.6;}
+.ann-card .ann-author{display:block; margin-top:8px; font-size:10.5px; color:var(--text-tertiary); font-weight:700;}
 
 /* Links list */
 .link-card{
@@ -358,6 +359,24 @@ img{max-width:100%; display:block;}
 .fee-banner div span{display:block; font-size:11px; opacity:.7; font-weight:700; text-transform:uppercase; letter-spacing:.5px;}
 .fee-banner div b{font-size:22px; font-weight:800;}
 .fee-banner .fee-emoji{font-size:30px;}
+
+/* Sınavlar sayfası */
+.info-text-card{margin:16px 18px; padding:18px; text-align:left;}
+.info-text-card p{font-size:13px; color:var(--text-secondary); line-height:1.8;}
+.exam-center-card{margin:0 18px 12px; padding:16px; text-align:left;}
+.exam-center-card h5{font-size:13.5px; font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:6px;}
+.exam-center-card .chip-wrap{display:flex; flex-wrap:wrap; gap:7px;}
+.exam-center-card .note{font-size:12px; color:var(--text-secondary); line-height:1.65; margin-top:12px;}
+
+/* Dersler ve İçerikleri sayfası */
+.curr-card{margin:0 18px 14px; padding:6px 16px;}
+.curr-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 0; border-bottom:1px solid var(--border);}
+.curr-row:last-child{border-bottom:none;}
+.curr-row .curr-name-wrap{min-width:0;}
+.curr-row .curr-code{font-size:10px; color:var(--text-tertiary); font-weight:700; display:block; margin-bottom:2px; letter-spacing:.3px;}
+.curr-row .curr-name{font-size:12.6px; font-weight:700; line-height:1.35;}
+.curr-row .curr-akts{font-size:11px; font-weight:800; color:var(--primary); flex-shrink:0; background:var(--primary-light); padding:3px 9px; border-radius:99px;}
+.curr-row .curr-akts.elective{color:var(--info); background:var(--info-bg);}
 
 /* About page */
 .about-card{margin:16px 18px; padding:22px; text-align:center;}
@@ -605,6 +624,112 @@ img{max-width:100%; display:block;}
         <div id="linksList" style="padding-top:8px;"></div>
       </section>
 
+      <!-- ---- SINAVLAR ---- -->
+      <section id="page-exams" class="page">
+        <div class="page-header"><h2>📝 Sınavlar</h2><p>Sınav yapısı, merkezler ve süreç hakkında bilgilendirme</p></div>
+
+        <div class="card info-text-card">
+          <p>Fakültemizde bir akademik yıl içerisinde her yarıyıl için bir <b>Ara Sınav (Vize)</b>, <b>Yarıyıl Sonu Sınavı (Final)</b> ve <b>Bütünleme Sınavı</b> yapılmaktadır. Ayrıca kayıtlı olunan programda 2547 sayılı Kanunun 5. maddesinin birinci fıkrasının (ı) bendi kapsamında açılan dersler dâhil, başarısız olunan en çok üç ders dışındaki dersleri başarıyla tamamlayan ve programa ilişkin tüm yükümlülükleri yerine getiren sınava girme hakkını kazanmış olup son yarıyıldaki/yıldaki başarısız öğrencilere mezuniyete üç ders sınavı hakkı tanınmaktadır.</p>
+        </div>
+
+        <div class="section-head container-pad"><div class="section-title">Sınav Merkezleri</div></div>
+
+        <div class="card exam-center-card">
+          <h5>📍 Ara ve Final Sınavları</h5>
+          <div class="chip-wrap">
+            <span class="chip chip-orange">Adana</span><span class="chip chip-orange">Ankara</span><span class="chip chip-orange">Antalya</span>
+            <span class="chip chip-orange">Bursa</span><span class="chip chip-orange">Diyarbakır</span><span class="chip chip-orange">Gaziantep</span>
+            <span class="chip chip-orange">İstanbul (Avrupa)</span><span class="chip chip-orange">İstanbul (Anadolu)</span>
+            <span class="chip chip-orange">İzmir</span><span class="chip chip-orange">Konya</span><span class="chip chip-orange">Samsun</span><span class="chip chip-orange">Trabzon</span>
+          </div>
+        </div>
+
+        <div class="card exam-center-card">
+          <h5>📍 Bütünleme Sınavları</h5>
+          <div class="chip-wrap">
+            <span class="chip chip-blue">Adana</span><span class="chip chip-blue">Ankara</span><span class="chip chip-blue">Diyarbakır</span>
+            <span class="chip chip-blue">İstanbul (Avrupa)</span><span class="chip chip-blue">İstanbul (Anadolu)</span>
+            <span class="chip chip-blue">İzmir</span><span class="chip chip-blue">Samsun</span>
+          </div>
+          <p class="note">Cumartesi ve Pazar, sabah ve öğleden sonra olmak üzere 4 oturum şeklinde yüz yüze gerçekleştirilmektedir. Öğrenciler sınavlardan önce seçmiş oldukları merkezlerde sınava gireceklerdir.</p>
+        </div>
+
+        <div class="section-head container-pad"><div class="section-title">Sınav Formatı</div></div>
+        <div class="grid-cards" style="padding-top:0;">
+          <div class="card course-card" style="cursor:default;"><div class="course-ic">✅</div><h5>Çoktan Seçmeli</h5><p>Fakültemiz tarafından gerçekleştirilen sınavlarda sorular çoktan seçmelidir.</p></div>
+          <div class="card course-card" style="cursor:default;"><div class="course-ic">🔢</div><h5>20 Soru</h5><p>Her bir ders için 20 soru sorulmaktadır.</p></div>
+          <div class="card course-card" style="cursor:default;"><div class="course-ic">⏱️</div><h5>30 Dakika</h5><p>Sınav oturum süreleri her bir test için 30 dakika olacak şekilde uygulanır.</p></div>
+        </div>
+      </section>
+
+      <!-- ---- DERSLER VE İÇERİKLERİ ---- -->
+      <section id="page-course-content" class="page">
+        <div class="page-header"><h2>📖 Dersler ve İçerikleri</h2><p>Web Tasarımı ve Kodlama programı ders planı</p></div>
+
+        <div class="container-pad" style="margin:14px 0 4px;">
+          <a class="btn btn-primary btn-block" href="https://ankuzef.ankara.edu.tr/images/2026/dersicerikleri/acik/webt.pdf" target="_blank" rel="noopener noreferrer">📄 Resmi Ders İçerikleri PDF'ini Aç</a>
+        </div>
+
+        <div class="section-head container-pad"><div class="section-title">1. Sınıf / 1. Yarıyıl (Güz)</div><span class="chip chip-gray">30 AKTS</span></div>
+        <div class="card curr-card">
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1103</span><span class="curr-name">Temel İşletme</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1105</span><span class="curr-name">Matematik I</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1107</span><span class="curr-name">Elektronik Ticarete Giriş</span></div><span class="curr-akts">5</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1111</span><span class="curr-name">Dijital Dönüşüm</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AWEB1101</span><span class="curr-name">Ağ Temelleri</span></div><span class="curr-akts">5</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AATA107</span><span class="curr-name">Atatürk İlkeleri ve İnkılap Tarihi I</span></div><span class="curr-akts">2</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AYDİ111</span><span class="curr-name">Temel Yabancı Dil I (İngilizce)</span></div><span class="curr-akts">2</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">ATDİ107</span><span class="curr-name">Türk Dili I</span></div><span class="curr-akts">2</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">ABİT101</span><span class="curr-name">Bilgi ve İletişim Teknolojileri I</span></div><span class="curr-akts">2</span></div>
+        </div>
+
+        <div class="section-head container-pad"><div class="section-title">1. Sınıf / 2. Yarıyıl (Bahar)</div><span class="chip chip-gray">30 AKTS</span></div>
+        <div class="card curr-card">
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1100</span><span class="curr-name">Programlamaya Giriş</span></div><span class="curr-akts">5</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1102</span><span class="curr-name">Grafik Tasarım</span></div><span class="curr-akts">5</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1104</span><span class="curr-name">Medya, İletişim ve Teknoloji</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1106</span><span class="curr-name">Web Tasarımı</span></div><span class="curr-akts">6</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AWEB1100</span><span class="curr-name">Web Sunucu Yönetimi</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AATA108</span><span class="curr-name">Atatürk İlkeleri ve İnkılap Tarihi II</span></div><span class="curr-akts">2</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AYDİ112</span><span class="curr-name">Temel Yabancı Dil II (İngilizce)</span></div><span class="curr-akts">2</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">ATDİ108</span><span class="curr-name">Türk Dili II</span></div><span class="curr-akts">2</span></div>
+        </div>
+
+        <div class="section-head container-pad"><div class="section-title">2. Sınıf / 3. Yarıyıl (Güz)</div><span class="chip chip-gray">30 AKTS</span></div>
+        <div class="card curr-card">
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1203</span><span class="curr-name">İnternet Programcılığı I</span></div><span class="curr-akts">6</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1209</span><span class="curr-name">Bilişim Hukuku</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1211</span><span class="curr-name">Algoritmalar ve Programlama</span></div><span class="curr-akts">5</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1213</span><span class="curr-name">Arama Motoru Optimizasyonu</span></div><span class="curr-akts">6</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1215</span><span class="curr-name">Sistem Analizi ve Tasarımı</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1217</span><span class="curr-name">Pazarlama</span></div><span class="curr-akts">5</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1257</span><span class="curr-name">İleri Bilgi Teknolojileri (Seçmeli)</span></div><span class="curr-akts elective">2</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1251</span><span class="curr-name">Finansal Okur Yazarlık (Seçmeli)</span></div><span class="curr-akts elective">3</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1253</span><span class="curr-name">İşçi Sağlığı ve İş Güvenliği (Seçmeli)</span></div><span class="curr-akts elective">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1255</span><span class="curr-name">İlk Yardım (Seçmeli)</span></div><span class="curr-akts elective">5</span></div>
+        </div>
+
+        <div class="section-head container-pad"><div class="section-title">2. Sınıf / 4. Yarıyıl (Bahar)</div><span class="chip chip-gray">30 AKTS</span></div>
+        <div class="card curr-card">
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1200</span><span class="curr-name">Veritabanı Yönetimi</span></div><span class="curr-akts">5</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1202</span><span class="curr-name">Girişimcilik</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1204</span><span class="curr-name">Ağ Yönetimi ve Bilgi Güvenliği</span></div><span class="curr-akts">6</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1210</span><span class="curr-name">Kullanıcı Deneyimi ve Tasarım</span></div><span class="curr-akts">5</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1212</span><span class="curr-name">İçerik Yönetim Sistemleri</span></div><span class="curr-akts">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1214</span><span class="curr-name">İnternet Programcılığı II</span></div><span class="curr-akts">6</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1252</span><span class="curr-name">Araştırma Yöntem ve Teknikleri (Seçmeli)</span></div><span class="curr-akts elective">2</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1254</span><span class="curr-name">Sosyal Güvenlik (Seçmeli)</span></div><span class="curr-akts elective">3</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1256</span><span class="curr-name">Finansal Yatırım Araçları (Seçmeli)</span></div><span class="curr-akts elective">4</span></div>
+          <div class="curr-row"><div class="curr-name-wrap"><span class="curr-code">AAUF1258</span><span class="curr-name">Temel Afet Bilgisi (Seçmeli)</span></div><span class="curr-akts elective">5</span></div>
+        </div>
+
+        <div class="fee-banner" style="margin:6px 18px 4px;">
+          <div><span>Mezuniyet İçin Gerekli</span><b>120 AKTS</b></div>
+          <div class="fee-emoji">🎓</div>
+        </div>
+        <p style="font-size:11.5px; color:var(--text-tertiary); line-height:1.6; margin:0 18px 4px;">Seçmeli ders grubundan alınabilecek AKTS miktarı Genel Akademik Başarı Not Ortalamanıza (GABNO) göre değişir. Detaylı içerik ve intibak bilgileri için yukarıdaki resmi PDF'i inceleyin.</p>
+      </section>
+
       <!-- ---- HAKKINDA ---- -->
       <section id="page-about" class="page">
         <div class="page-header"><h2>ℹ️ Hakkında</h2></div>
@@ -712,21 +837,55 @@ img{max-width:100%; display:block;}
   <div class="toast-container" id="toastContainer"></div>
 </div>
 
-<script>
+<script type="module">
 /* ============================================================
    WTK PORTAL — UYGULAMA MANTIĞI (JavaScript)
-   Tüm veriler tarayıcının localStorage'ında saklanır.
+   Duyurular Firebase Firestore'da saklanır (gerçek zamanlı, tüm
+   kullanıcılar arasında paylaşılır). Diğer tüm veriler (PDF, takvim,
+   bağlantılar, ana sayfa içeriği) hâlâ localStorage'da saklanır.
    ============================================================ */
+
+/* ---------------- FIREBASE (Modular SDK, CDN üzerinden ESM) ----------------
+   GitHub Pages statik bir barındırma olduğu için burada bir bundler/npm
+   kurulumu yok; Firebase'in resmi CDN üzerinden sunduğu ES module
+   derlemeleri doğrudan import ediliyor. Bu satırlar internet bağlantısı
+   gerektirir (gstatic.com CORS'a izin veriyor, GitHub Pages'te sorunsuz çalışır). */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, updateDoc, deleteDoc, doc,
+  onSnapshot, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD15b4znteEZtIxmFzD_QwXAHj4Mk60As0",
+  authDomain: "wtk-au-portal.firebaseapp.com",
+  projectId: "wtk-au-portal",
+  storageBucket: "wtk-au-portal.firebasestorage.app",
+  messagingSenderId: "1055966883084",
+  appId: "1:1055966883084:web:708ebbaa9479491a6c2d29",
+  measurementId: "G-SJQQ41E7EN"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
+/* NOT: apiKey burada gizli bir anahtar değildir, Firebase Web SDK'da her
+   zaman istemci tarafında görünür olması normaldir. Gerçek erişim kontrolü
+   Firestore Güvenlik Kuralları + Firebase Authentication ile sağlanır —
+   bkz. teslimat notları. */
+
 (function(){
 "use strict";
 
 /* ---------------- Sabitler ---------------- */
 const STUDENT_PASSWORD = "WTK2026AU";
-const ADMIN_PASSWORD   = "WTKADMIN2026";
+const ADMIN_EMAIL       = "admin@wtkauportal.local"; // Firebase Console > Authentication'da oluşturacağınız hesabın e-postası ile AYNI olmalı
 const LS = {
-  authLocal:'wtk_auth_local', authSession:'wtk_auth_session', adminAuth:'wtk_admin_auth',
+  authLocal:'wtk_auth_local', authSession:'wtk_auth_session',
   theme:'wtk_theme', remember:'wtk_remember_flag',
-  announcements:'wtk_announcements', pdfs:'wtk_pdfs', links:'wtk_links',
+  pdfs:'wtk_pdfs', links:'wtk_links',
   calendar:'wtk_calendar', fee:'wtk_fee', home:'wtk_home_content', notifSeen:'wtk_notif_seen'
 };
 
@@ -742,14 +901,10 @@ function lsSet(key, value){
 }
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
-/* ---------------- Varsayılan veriler ---------------- */
+/* ---------------- Varsayılan veriler ----------------
+   NOT: "announcements" (duyurular) artık Firestore'dan geldiği için
+   burada yerel bir varsayılan/seed dizisi TUTULMUYOR. */
 const DEFAULTS = {
-  announcements:[
-    {id:uid(), title:"2026–2027 Güz Dönemi E-Kayıt Süreci Başladı", date:"2026-08-24", content:"Güz dönemi e-kayıt işlemleri başlamıştır. Kayıt yenileme ve ders seçimlerinizi belirtilen tarihler arasında OBS üzerinden tamamlamayı unutmayın."},
-    {id:uid(), title:"Yeni Ders Notları Yüklendi", date:"2026-08-20", content:"JavaScript Programlama ve UI/UX Tasarım İlkeleri derslerine ait güncel notlar Ders Notları sayfasına eklendi."},
-    {id:uid(), title:"Topluluk WhatsApp Grubu Güncellendi", date:"2026-08-14", content:"Bölüm öğrencileri arası dayanışma grubumuzun bağlantısı güncellenmiştir. Güncel bağlantı için sınıf temsilcinizle iletişime geçebilirsiniz."},
-    {id:uid(), title:"Vize Sınav Sonuçları Açıklandı", date:"2026-06-02", content:"Bahar dönemi vize sınav sonuçları OBS sistemi üzerinden görüntülenebilir. İtiraz süreci için öğrenci işlerine başvurabilirsiniz."}
-  ],
   pdfs:[
     {id:uid(), title:"HTML5 & CSS3 Ders Notu - Ünite 1", category:"HTML/CSS", url:"#", size:"2.4 MB", date:"2026-08-18"},
     {id:uid(), title:"JavaScript Temelleri Sunumu", category:"JavaScript", url:"#", size:"3.1 MB", date:"2026-08-15"},
@@ -787,14 +942,15 @@ const COURSES = [
 /* ---------------- Veri erişim katmanı ---------------- */
 const Data = {
   init(){
-    if(lsGet(LS.announcements,null)===null) lsSet(LS.announcements, DEFAULTS.announcements);
     if(lsGet(LS.pdfs,null)===null) lsSet(LS.pdfs, DEFAULTS.pdfs);
     if(lsGet(LS.links,null)===null) lsSet(LS.links, DEFAULTS.links);
     if(lsGet(LS.calendar,null)===null) lsSet(LS.calendar, DEFAULTS.calendar);
     if(lsGet(LS.fee,null)===null) lsSet(LS.fee, DEFAULTS.fee);
     if(lsGet(LS.home,null)===null) lsSet(LS.home, DEFAULTS.home);
   },
-  get ann(){ return lsGet(LS.announcements, []).sort((a,b)=> new Date(b.date)-new Date(a.date)); },
+  // Duyurular artık localStorage'dan değil, canlı Firestore önbelleğinden
+  // (announcementsCache) okunuyor — bkz. aşağıdaki "FIRESTORE: DUYURULAR" bölümü.
+  get ann(){ return announcementsCache; },
   get pdfs(){ return lsGet(LS.pdfs, []); },
   get links(){ return lsGet(LS.links, []); },
   get cal(){ return lsGet(LS.calendar, []).sort((a,b)=> new Date(a.start)-new Date(b.start)); },
@@ -803,6 +959,62 @@ const Data = {
   save(key, val){ lsSet(key, val); }
 };
 Data.init();
+
+/* ---------------- FIRESTORE: DUYURULAR ----------------
+   announcements koleksiyonu: { title, content, author, createdAt }
+   onSnapshot ile canlı dinleniyor — herhangi bir kullanıcı duyuru
+   ekleyip sildiğinde TÜM açık sekmelerde anında güncellenir. */
+let announcementsCache = [];
+let announcementsLoaded = false;
+
+function toJsDateSafe(value){
+  if(!value) return null;
+  if(typeof value.toDate === 'function') return value.toDate(); // Firestore Timestamp
+  return null;
+}
+function annDateLabel(createdAt){
+  // serverTimestamp() sunucudan onay dönene kadar bir anlığına null olabilir.
+  if(!createdAt) return 'Az önce';
+  return createdAt.toLocaleDateString('tr-TR', {day:'numeric', month:'short'});
+}
+function startAnnouncementsListener(){
+  try{
+    const annQuery = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'));
+    onSnapshot(annQuery,
+      (snapshot) => {
+        announcementsCache = snapshot.docs.map(d => {
+          const data = d.data();
+          return {
+            id: d.id,
+            title: data.title || '',
+            content: data.content || '',
+            author: data.author || '',
+            createdAt: toJsDateSafe(data.createdAt)
+          };
+        });
+        announcementsLoaded = true;
+        renderHome();
+        renderAnnouncements();
+        renderNotifPanel();
+        updateNotifDot();
+        if(isAdmin() && activeAdminTab === 'ann') renderAdminPanel();
+      },
+      (error) => {
+        console.error('Firestore duyuru bağlantı hatası:', error);
+        announcementsLoaded = true;
+        toast('Duyurular yüklenemedi. İnternet bağlantınızı kontrol edin.', 'error');
+        const errHtml = emptyStateHtml('⚠️','Duyurulara ulaşılamadı. Bağlantınızı kontrol edip sayfayı yenileyin.');
+        const annListEl = document.getElementById('annList');
+        const homePrevEl = document.getElementById('homeAnnPreview');
+        if(annListEl) annListEl.innerHTML = errHtml;
+        if(homePrevEl) homePrevEl.innerHTML = errHtml;
+      }
+    );
+  }catch(err){
+    console.error('Firestore başlatma hatası:', err);
+    toast('Duyuru sistemi başlatılamadı', 'error');
+  }
+}
 
 /* ---------------- Yardımcı biçimlendiriciler ---------------- */
 function fmtDateTR(iso){
@@ -871,7 +1083,7 @@ function doLogin(remember){
 function doLogout(){
   localStorage.removeItem(LS.authLocal);
   sessionStorage.removeItem(LS.authSession);
-  localStorage.removeItem(LS.adminAuth);
+  signOut(auth).catch(err => console.warn('Firebase çıkış hatası:', err));
   document.getElementById('app').classList.add('hidden');
   const ls = document.getElementById('loginScreen');
   ls.classList.remove('hidden');
@@ -879,7 +1091,27 @@ function doLogout(){
   document.getElementById('loginPassword').value = '';
   switchPage('page-home', true);
 }
-function isAdmin(){ return sessionStorage.getItem(LS.adminAuth) === '1'; }
+
+/* ---- Yönetici oturumu: GERÇEK Firebase Authentication durumu ----
+   isAdmin() artık istemci tarafı bir bayrağa değil, Firebase'in kendi
+   doğrulanmış oturum durumuna bakar. Firestore Güvenlik Kuralları da
+   aynı oturumu (request.auth) kontrol ettiği için, admin paneli
+   arayüzde gizli olsa bile şifresiz kimse Firestore'a yazamaz. */
+let currentAdminUser = null;
+function isAdmin(){ return !!currentAdminUser; }
+function startAdminAuthListener(){
+  onAuthStateChanged(auth, (user) => {
+    currentAdminUser = user;
+    const adminPage = document.getElementById('page-admin');
+    if(!user && adminPage && adminPage.classList.contains('active')){
+      // Oturum başka bir sekmede kapatıldıysa admin panelinden çıkar
+      switchPage('page-profile');
+    }
+    if(document.getElementById('app') && !document.getElementById('app').classList.contains('hidden')){
+      renderAdminPanel();
+    }
+  });
+}
 
 /* ---------------- Sayfa geçişleri ---------------- */
 function switchPage(pageId, silent){
@@ -900,6 +1132,8 @@ const QUICK_ITEMS = [
   {icon:'📄', label:'PDF Arşivi', nav:'page-pdf'},
   {icon:'📅', label:'Akademik Takvim', nav:'page-calendar'},
   {icon:'📢', label:'Duyurular', nav:'page-announcements'},
+  {icon:'📝', label:'Sınavlar', nav:'page-exams'},
+  {icon:'📖', label:'Ders İçerikleri', nav:'page-course-content'},
   {icon:'🎓', label:'Faydalı Bağlantılar', nav:'page-links'},
   {icon:'👤', label:'Profil', nav:'page-profile'},
   {icon:'ℹ️', label:'Hakkında', nav:'page-about'}
@@ -935,14 +1169,19 @@ function emptyStateHtml(emoji, text){
 
 /* ---------------- Render: Duyurular ---------------- */
 function annCardHtml(a){
+  const authorLine = a.author ? `<span class="ann-author">— ${escapeHtml(a.author)}</span>` : '';
   return `<div class="card ann-card">
-    <div class="ann-top"><h5>${escapeHtml(a.title)}</h5><span class="ann-date">${fmtDateShort(a.date)}</span></div>
+    <div class="ann-top"><h5>${escapeHtml(a.title)}</h5><span class="ann-date">${annDateLabel(a.createdAt)}</span></div>
     <p>${escapeHtml(a.content)}</p>
+    ${authorLine}
   </div>`;
 }
 function renderAnnouncements(){
   const list = Data.ann;
-  document.getElementById('annList').innerHTML = list.length ? list.map(annCardHtml).join('') : emptyStateHtml('📢','Henüz duyuru bulunmuyor');
+  const annListEl = document.getElementById('annList');
+  annListEl.innerHTML = !announcementsLoaded
+    ? emptyStateHtml('⏳','Duyurular yükleniyor...')
+    : (list.length ? list.map(annCardHtml).join('') : emptyStateHtml('📢','Henüz duyuru bulunmuyor'));
   lsSet(LS.notifSeen, list.length);
   updateNotifDot();
 }
@@ -951,8 +1190,8 @@ function renderAnnouncements(){
 function renderNotifPanel(){
   const list = Data.ann.slice(0,4);
   document.getElementById('notifList').innerHTML = list.length ? list.map(a=>`
-    <div class="notif-item"><b>${escapeHtml(a.title)}</b><span>${fmtDateShort(a.date)}</span></div>
-  `).join('') : `<div class="notif-empty">Bildirim yok</div>`;
+    <div class="notif-item"><b>${escapeHtml(a.title)}</b><span>${annDateLabel(a.createdAt)}</span></div>
+  `).join('') : `<div class="notif-empty">${announcementsLoaded ? 'Bildirim yok' : 'Yükleniyor...'}</div>`;
 }
 function updateNotifDot(){
   const seen = lsGet(LS.notifSeen, 0);
@@ -1084,14 +1323,14 @@ function renderAdminPanel(){
   const body = document.getElementById('adminBody');
   if(activeAdminTab === 'ann'){
     const list = Data.ann;
-    body.innerHTML = list.map(a=>`
+    body.innerHTML = (!announcementsLoaded ? emptyStateHtml('⏳','Duyurular yükleniyor...') : (list.map(a=>`
       <div class="card admin-item">
-        <div class="admin-item-info"><h5>${escapeHtml(a.title)}</h5><span>${fmtDateShort(a.date)}</span></div>
+        <div class="admin-item-info"><h5>${escapeHtml(a.title)}</h5><span>${annDateLabel(a.createdAt)}${a.author ? ' · '+escapeHtml(a.author) : ''}</span></div>
         <div class="admin-item-actions">
           <button class="icon-sm-btn btn-ghost" data-edit="ann" data-id="${a.id}">✏️</button>
           <button class="icon-sm-btn btn-danger-ghost" data-del="ann" data-id="${a.id}">🗑️</button>
         </div>
-      </div>`).join('') || emptyStateHtml('📢','Duyuru yok. Sağ alttaki + ile ekleyin.');
+      </div>`).join('') || emptyStateHtml('📢','Duyuru yok. Sağ alttaki + ile ekleyin.')));
   } else if(activeAdminTab === 'pdf'){
     const list = Data.pdfs;
     body.innerHTML = list.map(p=>`
@@ -1158,7 +1397,7 @@ function openForm(type, id){
   if(type==='ann'){
     body.innerHTML = `
       <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
-      <div class="form-group"><label>Tarih</label><input type="date" id="f_date" value="${record.date||new Date().toISOString().slice(0,10)}"></div>
+      <div class="form-group"><label>Yazar</label><input type="text" id="f_author" value="${escapeHtml(record.author||'')}" placeholder="ör. Bölüm Başkanlığı"></div>
       <div class="form-group"><label>İçerik</label><textarea id="f_content">${escapeHtml(record.content||'')}</textarea></div>`;
   } else if(type==='pdf'){
     body.innerHTML = `
@@ -1185,9 +1424,9 @@ function openForm(type, id){
   document.getElementById('formModal').classList.add('open');
 }
 
-function saveForm(){
+async function saveForm(){
   try{
-    saveFormInner();
+    await saveFormInner();
   }catch(err){
     // Beklenmeyen bir hata modalı/scroll kilidini sonsuza dek açık bırakmasın.
     console.error('Form kaydetme hatası:', err);
@@ -1195,20 +1434,42 @@ function saveForm(){
     toast('Beklenmeyen bir hata oluştu, lütfen tekrar deneyin', 'error');
   }
 }
-function saveFormInner(){
+async function saveFormInner(){
   const {type, id} = formCtx;
   const isEdit = !!id;
   const val = sel => (document.getElementById(sel) ? document.getElementById(sel).value.trim() : '');
 
-  const dataMap = {ann:LS.announcements, pdf:LS.pdfs, links:LS.links, cal:LS.calendar};
+  /* ---- DUYURU: Firestore'a yazılır (localStorage KULLANILMAZ) ---- */
+  if(type === 'ann'){
+    const title = val('f_title'), author = val('f_author'), content = val('f_content');
+    if(!title || !content){ toast('Lütfen başlık ve içerik girin','error'); return; }
+    const saveBtn = document.getElementById('formModalSave');
+    const originalLabel = saveBtn.textContent;
+    saveBtn.disabled = true; saveBtn.textContent = 'Kaydediliyor...';
+    try{
+      if(isEdit){
+        await updateDoc(doc(db, 'announcements', id), { title, author, content });
+      } else {
+        await addDoc(collection(db, 'announcements'), { title, author, content, createdAt: serverTimestamp() });
+      }
+      closeModal('formModal');
+      toast(isEdit ? 'Duyuru güncellendi' : 'Duyuru eklendi', 'success');
+      // Liste onSnapshot ile TÜM kullanıcılarda otomatik güncellenir, ayrıca render gerekmez.
+    }catch(err){
+      console.error('Duyuru kaydetme hatası:', err);
+      toast('Duyuru kaydedilemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
+      // Modalı KAPATMIYORUZ ki kullanıcı yazdığını kaybetmeden tekrar denesin.
+    }finally{
+      saveBtn.disabled = false; saveBtn.textContent = originalLabel;
+    }
+    return;
+  }
+
+  /* ---- PDF / Bağlantı / Takvim: değişmedi, localStorage'da kalmaya devam ediyor ---- */
+  const dataMap = {pdf:LS.pdfs, links:LS.links, cal:LS.calendar};
   let list = lsGet(dataMap[type], []);
 
-  if(type==='ann'){
-    const title = val('f_title'), date = val('f_date'), content = val('f_content');
-    if(!title || !date){ toast('Lütfen başlık ve tarih girin','error'); return; }
-    if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, date, content} : r); }
-    else{ list.push({id:uid(), title, date, content}); }
-  } else if(type==='pdf'){
+  if(type==='pdf'){
     const title = val('f_title'), category = val('f_category')||'Diğer', size = val('f_size'), url = val('f_url')||'#';
     if(!title){ toast('Lütfen başlık girin','error'); return; }
     if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, category, size, url} : r); }
@@ -1231,8 +1492,21 @@ function saveFormInner(){
   renderAll();
 }
 
-function deleteRecord(type, id){
-  const dataMap = {ann:LS.announcements, pdf:LS.pdfs, links:LS.links, cal:LS.calendar};
+async function deleteRecord(type, id){
+  /* ---- DUYURU: Firestore'dan silinir ---- */
+  if(type === 'ann'){
+    try{
+      await deleteDoc(doc(db, 'announcements', id));
+      toast('Duyuru silindi', 'success');
+      // Liste onSnapshot ile TÜM kullanıcılarda otomatik güncellenir.
+    }catch(err){
+      console.error('Duyuru silme hatası:', err);
+      toast('Duyuru silinemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
+    }
+    return;
+  }
+  /* ---- PDF / Bağlantı / Takvim: değişmedi ---- */
+  const dataMap = {pdf:LS.pdfs, links:LS.links, cal:LS.calendar};
   const list = lsGet(dataMap[type], []).filter(r=>r.id!==id);
   lsSet(dataMap[type], list);
   toast('Silindi', 'success');
@@ -1247,6 +1521,12 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); d
    OLAY DİNLEYİCİLERİ (Event Listeners)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
+
+  /* ---- Duyurular: Firestore dinleyicisini hemen başlat (giriş ekranı
+     açıkken bile arka planda çeksin, admin/duyurular sayfasına
+     gelindiğinde veri zaten hazır olsun) ---- */
+  startAnnouncementsListener();
+  startAdminAuthListener();
 
   /* ---- Açılış ekranı ---- */
   setTimeout(() => {
@@ -1385,17 +1665,40 @@ document.addEventListener('DOMContentLoaded', () => {
   function attemptAdminLogin(){
     const pass = document.getElementById('adminPassword').value;
     const errCard = document.getElementById('adminLoginError');
-    if(pass === ADMIN_PASSWORD){
-      sessionStorage.setItem(LS.adminAuth, '1');
-      closeModal('adminLoginModal');
-      toast('Yönetici olarak giriş yapıldı', 'success');
-      switchPage('page-admin');
-      activeAdminTab = 'ann';
-      renderAdminPanel();
-    } else {
-      errCard.classList.add('show');
-      errCard.classList.remove('shake'); void errCard.offsetWidth; errCard.classList.add('shake');
+    const errText = errCard.querySelector('span');
+    const loginBtn = document.getElementById('adminLoginBtn');
+    if(!pass){
+      errText.textContent = 'Lütfen şifrenizi girin.';
+      errCard.classList.add('show'); errCard.classList.remove('shake'); void errCard.offsetWidth; errCard.classList.add('shake');
+      return;
     }
+    const originalLabel = loginBtn.textContent;
+    loginBtn.disabled = true; loginBtn.textContent = 'Giriş yapılıyor...';
+    signInWithEmailAndPassword(auth, ADMIN_EMAIL, pass)
+      .then(() => {
+        // onAuthStateChanged tetiklenip currentAdminUser'ı otomatik güncelleyecek.
+        errCard.classList.remove('show');
+        closeModal('adminLoginModal');
+        toast('Yönetici olarak giriş yapıldı', 'success');
+        switchPage('page-admin');
+        activeAdminTab = 'ann';
+        renderAdminPanel();
+      })
+      .catch((err) => {
+        console.error('Yönetici girişi hatası:', err);
+        const codeMap = {
+          'auth/invalid-credential': 'Şifre hatalı.',
+          'auth/wrong-password': 'Şifre hatalı.',
+          'auth/user-not-found': 'Yönetici hesabı bulunamadı. Firebase Console\'da oluşturuldu mu?',
+          'auth/too-many-requests': 'Çok fazla hatalı deneme yapıldı. Lütfen biraz sonra tekrar deneyin.',
+          'auth/network-request-failed': 'İnternet bağlantınızı kontrol edin.'
+        };
+        errText.textContent = codeMap[err.code] || 'Giriş başarısız oldu. Lütfen tekrar deneyin.';
+        errCard.classList.add('show'); errCard.classList.remove('shake'); void errCard.offsetWidth; errCard.classList.add('shake');
+      })
+      .finally(() => {
+        loginBtn.disabled = false; loginBtn.textContent = originalLabel;
+      });
   }
   document.getElementById('adminLoginBtn').addEventListener('click', attemptAdminLogin);
   document.getElementById('adminPassword').addEventListener('keydown', e=>{ if(e.key==='Enter') attemptAdminLogin(); });
