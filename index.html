@@ -484,6 +484,85 @@ img{max-width:100%; display:block;}
 @keyframes toastOut{to{opacity:0; transform:translateY(-10px) scale(.95);}}
 
 @media (min-width:640px){ .modal-overlay{align-items:center;} .modal-sheet{border-radius:26px; max-width:380px;} }
+
+/* ============================================================
+   KAMPÜS KART BİLGİLENDİRME KARTI (info-notice-card bileşeni)
+   ============================================================ */
+.info-notice-card{
+  position:relative; width:100%; max-width:440px; margin:16px auto 4px;
+  background:var(--surface-glass);
+  backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%);
+  border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg);
+  padding:26px 22px 22px; overflow:hidden;
+  opacity:0; transform:translateY(24px);
+  transition:transform .6s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, opacity .6s ease, background .3s ease, border-color .3s ease;
+}
+.info-notice-card.in-view{ opacity:1; transform:translateY(0); }
+@media (hover:hover){
+  .info-notice-card:hover{ transform:translateY(-6px); box-shadow:0 24px 60px rgba(0,0,0,0.18); }
+}
+.info-notice-card::before{
+  content:''; position:absolute; top:-70px; right:-60px; width:220px; height:220px; border-radius:50%;
+  background:radial-gradient(circle, rgba(var(--primary-rgb),0.22), transparent 70%); pointer-events:none;
+}
+.info-notice-card .top-badge{
+  position:absolute; top:18px; right:18px; z-index:2; display:flex; align-items:center; gap:6px;
+  background:var(--primary-light); color:var(--primary-dark); font-size:10.5px; font-weight:800;
+  padding:5px 11px 5px 8px; border-radius:999px; letter-spacing:.3px;
+}
+.info-notice-card .top-badge .dot{ width:6px; height:6px; border-radius:50%; background:var(--primary); animation:wtkPulseDot 1.8s ease-in-out infinite; }
+@keyframes wtkPulseDot{ 0%,100%{box-shadow:0 0 0 0 rgba(var(--primary-rgb),.55);} 50%{box-shadow:0 0 0 5px rgba(var(--primary-rgb),0);} }
+.info-notice-card .card-header{ position:relative; z-index:1; display:flex; align-items:flex-start; gap:14px; padding-right:64px; margin-bottom:18px; }
+.info-notice-card .icon-badge{
+  width:52px; height:52px; border-radius:16px; flex-shrink:0; position:relative; overflow:hidden;
+  background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+  display:flex; align-items:center; justify-content:center; color:#fff; box-shadow:var(--shadow-primary);
+}
+.info-notice-card .icon-badge svg{ width:26px; height:26px; position:relative; z-index:1; }
+.info-notice-card .icon-badge::after{
+  content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.55), transparent);
+  transform:skewX(-20deg); animation:wtkShimmer 3.2s ease-in-out infinite;
+}
+@keyframes wtkShimmer{ 0%{left:-60%;} 45%{left:120%;} 100%{left:120%;} }
+.info-notice-card h3{ margin:0; font-size:16.5px; font-weight:800; letter-spacing:-.2px; line-height:1.35; }
+.info-notice-card .card-sub{ display:block; margin-top:4px; font-size:12px; color:var(--text-secondary); font-weight:600; }
+.info-notice-card .info-rows{ position:relative; z-index:1; display:flex; flex-direction:column; gap:2px; margin-bottom:20px; }
+.info-notice-card .info-row-item{
+  display:flex; align-items:flex-start; gap:12px; padding:11px 10px; border-radius:14px; cursor:default;
+  transition:background var(--t-fast), transform var(--t-fast);
+}
+@media (hover:hover){
+  .info-notice-card .info-row-item:hover{ background:var(--primary-light); transform:translateX(3px); }
+  .info-notice-card .info-row-item:hover .row-icon{ transform:scale(1.1) rotate(-4deg); background:var(--primary); color:#fff; }
+}
+.info-notice-card .row-icon{
+  width:36px; height:36px; border-radius:11px; flex-shrink:0;
+  background:var(--primary-light); color:var(--primary-dark);
+  display:flex; align-items:center; justify-content:center; transition:transform .3s ease, background .3s ease, color .3s ease;
+}
+.info-notice-card .row-icon svg{ width:18px; height:18px; }
+.info-notice-card .row-text b{ display:block; font-size:12.8px; font-weight:800; margin-bottom:2px; }
+.info-notice-card .row-text p{ font-size:11.8px; color:var(--text-secondary); line-height:1.55; margin:0; }
+.info-notice-card .card-actions{ position:relative; z-index:1; display:flex; gap:10px; flex-wrap:wrap; }
+.info-notice-card .card-btn{
+  flex:1; min-width:150px; display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:12px 14px; border-radius:12px; font-size:12.8px; font-weight:700; cursor:pointer; border:none;
+  font-family:inherit; text-decoration:none; transition:transform .18s ease, box-shadow .18s ease, background .2s ease, border-color .2s ease, color .2s ease;
+}
+.info-notice-card .card-btn:active{ transform:scale(.96); }
+.info-notice-card .card-btn svg{ width:15px; height:15px; flex-shrink:0; }
+.info-notice-card .card-btn.primary{ background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff; box-shadow:var(--shadow-primary); }
+.info-notice-card .card-btn.outline{ background:transparent; border:1.5px solid var(--border); color:var(--text); }
+@media (hover:hover){
+  .info-notice-card .card-btn.primary:hover{ box-shadow:0 16px 34px rgba(var(--primary-rgb),.4); transform:translateY(-2px); }
+  .info-notice-card .card-btn.outline:hover{ border-color:var(--primary); color:var(--primary-dark); background:var(--primary-light); transform:translateY(-2px); }
+}
+@media (max-width:380px){
+  .info-notice-card{ padding:22px 16px 18px; }
+  .info-notice-card .card-header{ padding-right:0; }
+  .info-notice-card .top-badge{ position:static; display:inline-flex; margin-bottom:12px; }
+}
 </style>
 </head>
 <body>
@@ -559,6 +638,102 @@ img{max-width:100%; display:block;}
           <div class="welcome-note">
             <b id="homeHighlightTitle">Hızlı Bilgi</b>
             <span id="homeHighlightText">E-Kayıt süreci başladı, tarihleri Akademik Takvim sayfasından takip edebilirsin.</span>
+          </div>
+        </div>
+
+        <!-- ---- Kampüs Kart Bilgilendirme Kartı ---- -->
+        <div class="info-notice-card" id="campusCardNotice" data-animate-in>
+          <span class="top-badge"><span class="dot"></span>Güncel</span>
+
+          <div class="card-header">
+            <div class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect>
+                <rect x="5" y="8" width="4.5" height="4.5" rx="1"></rect>
+                <line x1="11.5" y1="9" x2="18.5" y2="9"></line>
+                <line x1="11.5" y1="12" x2="17" y2="12"></line>
+                <line x1="5" y1="15.5" x2="10" y2="15.5"></line>
+              </svg>
+            </div>
+            <div>
+              <h3>Kampüs Kart Başvurusu ve Fotoğraf Güncelleme</h3>
+              <span class="card-sub">OBS &amp; Öğrenci İşleri Bilgilendirmesi</span>
+            </div>
+          </div>
+
+          <div class="info-rows">
+            <div class="info-row-item">
+              <div class="row-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect>
+                  <rect x="5" y="8" width="4.5" height="4.5" rx="1"></rect>
+                  <line x1="11.5" y1="9" x2="18.5" y2="9"></line>
+                  <line x1="11.5" y1="12" x2="17" y2="12"></line>
+                </svg>
+              </div>
+              <div class="row-text">
+                <b>Kampüs Kart Başvurusu</b>
+                <p>Ankara Üniversitesi öğrencileri Kampüs Kart başvurularını OBS üzerinden yapabilir. OBS'ye giriş yaptıktan sonra Kampüs Kart bölümünden başvurunuzu tamamlayabilirsiniz.</p>
+              </div>
+            </div>
+
+            <div class="info-row-item">
+              <div class="row-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 8.5a1.5 1.5 0 0 1 1.5-1.5h2l1.2-1.8a1.5 1.5 0 0 1 1.25-.7h4.1a1.5 1.5 0 0 1 1.25.7L16.5 7h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5z"></path>
+                  <circle cx="12" cy="13" r="3.4"></circle>
+                </svg>
+              </div>
+              <div class="row-text">
+                <b>Kart Üzerindeki Fotoğraf</b>
+                <p>Kampüs Kart üzerindeki fotoğraf, üniversite sisteminde kayıtlı olan fotoğraftır.</p>
+              </div>
+            </div>
+
+            <div class="info-row-item">
+              <div class="row-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 21V5.5A1.5 1.5 0 0 1 5.5 4h6A1.5 1.5 0 0 1 13 5.5V21"></path>
+                  <path d="M13 10h5.5A1.5 1.5 0 0 1 20 11.5V21"></path>
+                  <line x1="2" y1="21" x2="22" y2="21"></line>
+                  <line x1="6.5" y1="8" x2="8.5" y2="8"></line>
+                  <line x1="6.5" y1="12" x2="8.5" y2="12"></line>
+                  <line x1="6.5" y1="16" x2="8.5" y2="16"></line>
+                  <line x1="15.5" y1="14" x2="17" y2="14"></line>
+                  <line x1="15.5" y1="17.5" x2="17" y2="17.5"></line>
+                </svg>
+              </div>
+              <div class="row-text">
+                <b>Fotoğraf Güncelleme</b>
+                <p>Fotoğrafınızı değiştirmek veya güncellemek isterseniz Öğrenci İşleri Daire Başkanlığı ya da bağlı olduğunuz öğrenci işleri birimiyle iletişime geçmelisiniz.</p>
+              </div>
+            </div>
+
+            <div class="info-row-item">
+              <div class="row-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 13v-1a8 8 0 0 1 16 0v1"></path>
+                  <rect x="3" y="13" width="4" height="6" rx="1.5"></rect>
+                  <rect x="17" y="13" width="4" height="6" rx="1.5"></rect>
+                  <path d="M20 19v.5A3.5 3.5 0 0 1 16.5 23H13"></path>
+                </svg>
+              </div>
+              <div class="row-text">
+                <b>Destek</b>
+                <p>Sorun yaşayan öğrenciler ilgili öğrenci işleri birimlerinden destek alabilir.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <a class="card-btn primary" href="https://obs.ankara.edu.tr/account/login?returnurl=/Preparation/HazirlikDonemKayit" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg>
+              OBS'ye Git
+            </a>
+            <a class="card-btn outline" href="https://ankuzef.ankara.edu.tr/tr/24-ogrenci-isleri" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg>
+              Öğrenci İşleri
+            </a>
           </div>
         </div>
 
@@ -852,7 +1027,7 @@ img{max-width:100%; display:block;}
    gerektirir (gstatic.com CORS'a izin veriyor, GitHub Pages'te sorunsuz çalışır). */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, updateDoc, deleteDoc, doc,
+  getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, setDoc,
   onSnapshot, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 import {
@@ -946,7 +1121,8 @@ const Data = {
     if(lsGet(LS.links,null)===null) lsSet(LS.links, DEFAULTS.links);
     if(lsGet(LS.calendar,null)===null) lsSet(LS.calendar, DEFAULTS.calendar);
     if(lsGet(LS.fee,null)===null) lsSet(LS.fee, DEFAULTS.fee);
-    if(lsGet(LS.home,null)===null) lsSet(LS.home, DEFAULTS.home);
+    // NOT: "home" (Ana Sayfa Hızlı Bilgi) artık Firestore'dan geldiği için
+    // burada localStorage'a seed edilmiyor — bkz. homeContentCache.
   },
   // Duyurular artık localStorage'dan değil, canlı Firestore önbelleğinden
   // (announcementsCache) okunuyor — bkz. aşağıdaki "FIRESTORE: DUYURULAR" bölümü.
@@ -955,7 +1131,7 @@ const Data = {
   get links(){ return lsGet(LS.links, []); },
   get cal(){ return lsGet(LS.calendar, []).sort((a,b)=> new Date(a.start)-new Date(b.start)); },
   get fee(){ return lsGet(LS.fee, DEFAULTS.fee); },
-  get home(){ return lsGet(LS.home, DEFAULTS.home); },
+  get home(){ return homeContentCache; },
   save(key, val){ lsSet(key, val); }
 };
 Data.init();
@@ -1013,6 +1189,42 @@ function startAnnouncementsListener(){
   }catch(err){
     console.error('Firestore başlatma hatası:', err);
     toast('Duyuru sistemi başlatılamadı', 'error');
+  }
+}
+
+/* ---------------- FIRESTORE: ANA SAYFA HIZLI BİLGİ ----------------
+   settings koleksiyonu içindeki TEK belge: settings/homeContent
+   { highlightTitle, highlightText }
+   Liste değil tekil bir belge olduğu için doc() + onSnapshot(doc,...)
+   kullanılır. Belge henüz oluşturulmamışsa (ilk kurulum) DEFAULTS.home
+   içeriği gösterilir; yönetici panelden ilk kayıt yapıldığında belge
+   otomatik oluşur (setDoc + merge). onSnapshot ile canlı dinleniyor —
+   yönetici içeriği güncellediğinde TÜM açık sekmelerde anında değişir. */
+let homeContentCache = DEFAULTS.home;
+let homeContentLoaded = false;
+function startHomeContentListener(){
+  try{
+    const homeRef = doc(db, 'settings', 'homeContent');
+    onSnapshot(homeRef,
+      (snap) => {
+        const data = snap.exists() ? snap.data() : {};
+        homeContentCache = {
+          highlightTitle: data.highlightTitle || DEFAULTS.home.highlightTitle,
+          highlightText: data.highlightText || DEFAULTS.home.highlightText
+        };
+        homeContentLoaded = true;
+        renderHome();
+        if(isAdmin() && activeAdminTab === 'home') renderAdminPanel();
+      },
+      (error) => {
+        console.error('Firestore Ana Sayfa içerik hatası:', error);
+        homeContentLoaded = true;
+        toast('Ana sayfa içeriği yüklenemedi. İnternet bağlantınızı kontrol edin.', 'error');
+      }
+    );
+  }catch(err){
+    console.error('Firestore başlatma hatası:', err);
+    toast('Ana sayfa içerik sistemi başlatılamadı', 'error');
   }
 }
 
@@ -1091,6 +1303,7 @@ function doLogout(){
   document.getElementById('loginPassword').value = '';
   switchPage('page-home', true);
 }
+function isAdmin(){ return !!currentAdminUser; }
 
 /* ---- Yönetici oturumu: GERÇEK Firebase Authentication durumu ----
    isAdmin() artık istemci tarafı bir bayrağa değil, Firebase'in kendi
@@ -1098,7 +1311,6 @@ function doLogout(){
    aynı oturumu (request.auth) kontrol ettiği için, admin paneli
    arayüzde gizli olsa bile şifresiz kimse Firestore'a yazamaz. */
 let currentAdminUser = null;
-function isAdmin(){ return !!currentAdminUser; }
 function startAdminAuthListener(){
   onAuthStateChanged(auth, (user) => {
     currentAdminUser = user;
@@ -1522,10 +1734,31 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); d
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ---- Duyurular: Firestore dinleyicisini hemen başlat (giriş ekranı
-     açıkken bile arka planda çeksin, admin/duyurular sayfasına
-     gelindiğinde veri zaten hazır olsun) ---- */
+  /* ---- Bilgilendirme kartları ekrana girince yumuşak belirsin (örn.
+     Kampüs Kart kartı) — [data-animate-in] taşıyan her öğeye uygulanır ---- */
+  (function initAnimateInCards(){
+    const cards = document.querySelectorAll('[data-animate-in]');
+    if(!cards.length) return;
+    if(!('IntersectionObserver' in window)){
+      cards.forEach(c => c.classList.add('in-view'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15});
+    cards.forEach(c => io.observe(c));
+  })();
+
+  /* ---- Duyurular ve Ana Sayfa Hızlı Bilgi: Firestore dinleyicilerini
+     hemen başlat (giriş ekranı açıkken bile arka planda çeksin, ilgili
+     sayfaya gelindiğinde veri zaten hazır olsun) ---- */
   startAnnouncementsListener();
+  startHomeContentListener();
   startAdminAuthListener();
 
   /* ---- Açılış ekranı ---- */
@@ -1724,11 +1957,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if(newFee !== null && newFee.trim() !== ''){ lsSet(LS.fee, newFee.trim()); toast('Dönem ücreti güncellendi','success'); renderAll(); }
     }
     if(saveHomeBtn){
-      const h = { highlightTitle: document.getElementById('homeTitleInput').value.trim() || DEFAULTS.home.highlightTitle,
-                  highlightText: document.getElementById('homeTextInput').value.trim() || DEFAULTS.home.highlightText };
-      lsSet(LS.home, h);
-      toast('Ana sayfa içeriği güncellendi', 'success');
-      renderAll();
+      const highlightTitle = document.getElementById('homeTitleInput').value.trim() || DEFAULTS.home.highlightTitle;
+      const highlightText = document.getElementById('homeTextInput').value.trim() || DEFAULTS.home.highlightText;
+      const originalLabel = saveHomeBtn.textContent;
+      saveHomeBtn.disabled = true; saveHomeBtn.textContent = 'Kaydediliyor...';
+      setDoc(doc(db, 'settings', 'homeContent'), { highlightTitle, highlightText }, { merge:true })
+        .then(()=> toast('Ana sayfa içeriği güncellendi', 'success'))
+        .catch(err=>{
+          console.error('Ana sayfa içeriği güncelleme hatası:', err);
+          toast('Ana sayfa içeriği güncellenemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
+        })
+        .finally(()=>{ saveHomeBtn.disabled = false; saveHomeBtn.textContent = originalLabel; });
+      // Liste onSnapshot ile TÜM kullanıcılarda otomatik güncellenir, ayrıca renderAll() gerekmez.
     }
   });
 
