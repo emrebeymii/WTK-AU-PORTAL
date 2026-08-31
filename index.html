@@ -1408,6 +1408,7 @@ function doLogout(){
   requestAnimationFrame(()=> ls.classList.add('show'));
   document.getElementById('loginPassword').value = '';
   switchPage('page-home', true);
+  resetPortalHoleSession(); // 🌀 bir sonraki giriş bağımsız bir %15 şansı alsın
 }
 function isAdmin(){ return !!currentAdminUser; }
 
@@ -1976,7 +1977,8 @@ const PORTAL_HOLE_DUCK_CHANCE    = 0.01;              // %1 — bonus "ördek bo
 const PORTAL_HOLE_PULL_RADIUS_PX = 260;               // deliğe hangi mesafedeki elemanlar etkilensin
 const PORTAL_HOLE_MAX_TARGETS    = 14;                // performans için üst sınır
 
-let portalHoleSessionRolled = false; // aynı oturumda ikinci kez zar atılmasın
+let portalHoleSessionRolled = false; // AYNI GİRİŞ oturumunda ikinci kez zar atılmasın
+let portalHoleTimeoutId = null;      // bekleyen zamanlayıcı — çıkış yapılırsa iptal edilir
 
 function schedulePortalHoleEvent(){
   if(portalHoleSessionRolled) return;
@@ -1987,11 +1989,19 @@ function schedulePortalHoleEvent(){
   if(Math.random() >= PORTAL_HOLE_SESSION_CHANCE) return;      // %15 kurası tutmadı
 
   const delay = PORTAL_HOLE_MIN_DELAY_MS + Math.random() * (PORTAL_HOLE_MAX_DELAY_MS - PORTAL_HOLE_MIN_DELAY_MS);
-  setTimeout(()=>{
+  portalHoleTimeoutId = setTimeout(()=>{
+    portalHoleTimeoutId = null;
     // Sekme arka plandaysa, çıkış yapılmışsa veya bir modal açıksa gösterme
     if(document.hidden || !isLoggedIn() || document.querySelector('.modal-overlay.open')) return;
     triggerPortalHoleEvent();
   }, delay);
+}
+
+// Çıkış yapıldığında bir sonraki girişin BAĞIMSIZ bir %15 şansı olsun diye
+// bayrağı sıfırlar ve o oturuma ait bekleyen zamanlayıcıyı iptal eder.
+function resetPortalHoleSession(){
+  portalHoleSessionRolled = false;
+  if(portalHoleTimeoutId){ clearTimeout(portalHoleTimeoutId); portalHoleTimeoutId = null; }
 }
 
 function triggerPortalHoleEvent(){
