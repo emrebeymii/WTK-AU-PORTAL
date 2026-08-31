@@ -563,6 +563,38 @@ img{max-width:100%; display:block;}
   .info-notice-card .card-header{ padding-right:0; }
   .info-notice-card .top-badge{ position:static; display:inline-flex; margin-bottom:12px; }
 }
+/* ============================================================
+   🦆 GİZLİ EASTER EGG: ÖRDEK MODU
+   Logoya art arda 5 kez tıklanınca tetiklenir. Sadece görsel/eğlence
+   amaçlıdır, mevcut tasarımı/akışı etkilemez. Tamamı bu blokta ve
+   ilgili JS bölümünde izole edilmiştir — kaldırmak istenirse sadece
+   bu CSS bloğu + HTML overlay div'i + JS bölümü silinir.
+   ============================================================ */
+.duck-egg-overlay{
+  position:fixed; inset:0; z-index:9999;
+  pointer-events:none; overflow:hidden;
+}
+.duck-egg{
+  position:absolute; left:100%; top:0;
+  font-size:38px; line-height:1;
+  animation-name:duckFlyAcross; animation-timing-function:linear; animation-fill-mode:forwards;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));
+  will-change:transform, opacity;
+  user-select:none;
+}
+.duck-egg.golden{
+  font-size:56px;
+  filter:sepia(1) saturate(7) hue-rotate(-12deg) brightness(1.15) drop-shadow(0 0 14px gold);
+}
+@keyframes duckFlyAcross{
+  0%{ transform:translate(0, 0); opacity:0; }
+  8%{ opacity:1; }
+  92%{ opacity:1; }
+  100%{ transform:translate(-120vw, var(--duck-drift, 0px)); opacity:0; }
+}
+@media (prefers-reduced-motion: reduce){
+  .duck-egg{ animation-duration:.01ms !important; }
+}
 </style>
 </head>
 <body>
@@ -607,7 +639,7 @@ img{max-width:100%; display:block;}
     <!-- Üst çubuk -->
     <header class="topbar glass">
       <div class="topbar-left">
-        <div class="topbar-logo">&lt;/&gt;</div>
+        <div class="topbar-logo" id="appLogo" title="WTK Portal">&lt;/&gt;</div>
         <div class="topbar-titles">
           <div class="t1">WTK Öğrenci Portalı</div>
           <div class="t2">Ankara Üniversitesi Açıköğretim</div>
@@ -1010,6 +1042,9 @@ img{max-width:100%; display:block;}
   </div>
 
   <div class="toast-container" id="toastContainer"></div>
+
+  <!-- 🦆 Gizli Easter Egg: Ördek Modu overlay konteyneri (boş, JS ile doldurulur) -->
+  <div class="duck-egg-overlay" id="duckEggOverlay" aria-hidden="true"></div>
 </div>
 
 <script type="module">
@@ -1056,12 +1091,13 @@ const auth = getAuth(firebaseApp);
 
 /* ---------------- Sabitler ---------------- */
 const STUDENT_PASSWORD = "WTK2026AU";
-const ADMIN_EMAIL       = "emre.dmre0@gmail.com"; // Firebase Console > Authentication'da oluşturacağınız hesabın e-postası ile AYNI olmalı
+const ADMIN_EMAIL       = "admin@wtkauportal.local"; // Firebase Console > Authentication'da oluşturacağınız hesabın e-postası ile AYNI olmalı
 const LS = {
   authLocal:'wtk_auth_local', authSession:'wtk_auth_session',
   theme:'wtk_theme', remember:'wtk_remember_flag',
   pdfs:'wtk_pdfs', links:'wtk_links',
-  calendar:'wtk_calendar', fee:'wtk_fee', home:'wtk_home_content', notifSeen:'wtk_notif_seen'
+  calendar:'wtk_calendar', fee:'wtk_fee', home:'wtk_home_content', notifSeen:'wtk_notif_seen',
+  duckBadge:'wtk_duck_badge_golden'
 };
 
 /* ---------------- Depolama yardımcıları ---------------- */
@@ -1730,6 +1766,128 @@ function openModal(id){ document.getElementById(id).classList.add('open'); docum
 function closeModal(id){ document.getElementById(id).classList.remove('open'); document.body.classList.remove('scroll-lock'); }
 
 /* ============================================================
+   🦆 GİZLİ EASTER EGG: ÖRDEK MODU
+   Logoya art arda 5 kez (1.5sn içinde) tıklanınca tetiklenir.
+   Tamamen izole bir modüldür — mevcut render/state akışına dokunmaz,
+   yalnızca kendi overlay'ini kullanır. Kaldırmak isterseniz bu blok +
+   ilgili HTML (#duckEggOverlay, #appLogo id'si) + CSS bloğu yeterlidir.
+   ============================================================ */
+const DUCK_TRIGGER_CLICKS   = 5;     // kaç tıklamada tetiklensin
+const DUCK_CLICK_WINDOW_MS  = 1500;  // tıklamalar bu süre içinde art arda olmalı
+const DUCK_COUNT_NORMAL     = 16;    // normal modda uçacak ördek sayısı
+const DUCK_GOLDEN_CHANCE    = 0.01;  // %1 ihtimalle Altın Ördek
+const DUCK_MODE_CLEANUP_MS  = 4200;  // bu süre sonunda ördekler DOM'dan tamamen silinir
+
+let duckClickTimestamps = [];
+let duckModeRunning = false; // aynı anda birden fazla kez tetiklenmeyi engeller
+
+function handleLogoClick(){
+  const now = Date.now();
+  duckClickTimestamps.push(now);
+  duckClickTimestamps = duckClickTimestamps.filter(t => now - t <= DUCK_CLICK_WINDOW_MS);
+  if(duckClickTimestamps.length >= DUCK_TRIGGER_CLICKS){
+    duckClickTimestamps = [];
+    triggerDuckMode();
+  }
+}
+
+function triggerDuckMode(){
+  if(duckModeRunning) return; // animasyon sürerken tekrar tetiklenemez
+  duckModeRunning = true;
+
+  const overlay = document.getElementById('duckEggOverlay');
+  overlay.innerHTML = '';
+
+  const isGolden = Math.random() < DUCK_GOLDEN_CHANCE;
+  const duckCount = isGolden ? 1 : DUCK_COUNT_NORMAL;
+  const fragment = document.createDocumentFragment();
+
+  for(let i=0; i<duckCount; i++){
+    const duck = document.createElement('div');
+    duck.className = 'duck-egg' + (isGolden ? ' golden' : '');
+    duck.textContent = '🦆';
+    const topPercent = 5 + Math.random()*85;          // %5–%90 arası rastgele yükseklik
+    const duration   = (1.7 + Math.random()*1.6).toFixed(2); // 1.7s – 3.3s arası hız çeşitliliği
+    const delay      = (Math.random()*0.8).toFixed(2);       // 0–0.8s gecikme, hepsi aynı anda çıkmasın
+    const drift      = Math.round(Math.random()*50 - 25);    // hafif dikey sapma, robotik durmasın
+    duck.style.top = topPercent + '%';
+    duck.style.animationDuration = duration + 's';
+    duck.style.animationDelay = delay + 's';
+    duck.style.setProperty('--duck-drift', drift + 'px');
+    fragment.appendChild(duck);
+  }
+  overlay.appendChild(fragment);
+
+  toast(isGolden ? '✨🦆 EFSANE! ALTIN ÖRDEK GÖRÜLDÜ! 🦆✨' : '🦆 ÖRDEK MODU AKTİF 🦆', isGolden ? 'success' : 'info');
+  playQuackSound(isGolden);
+  if(isGolden) unlockGoldenDuckBadge();
+
+  // Animasyon (gecikme + süre) tamamen bittikten sonra ördekleri DOM'dan temizle
+  setTimeout(()=>{
+    overlay.innerHTML = '';
+    duckModeRunning = false;
+  }, DUCK_MODE_CLEANUP_MS);
+}
+
+/* "Vak vak" sesi Web Audio API ile anlık üretilir — harici ses dosyasına
+   ihtiyaç duymaz, tamamen offline çalışır. Gerçek bir .mp3/.ogg ses
+   dosyanız varsa bu fonksiyonun içini `new Audio('sesler/vak.mp3').play()`
+   ile değiştirmeniz yeterlidir. */
+function playQuackSound(isGolden){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+
+    if(!isGolden){
+      // Normal ördek: kısa, hızlı düşen "vak vak vak" tonu (3 tekrar)
+      for(let i=0; i<3; i++){
+        const t = now + i*0.18;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(620, t);
+        osc.frequency.exponentialRampToValueAtTime(180, t + 0.12);
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(t); osc.stop(t + 0.16);
+      }
+    } else {
+      // Altın Ördek: parlak, büyülü çan arpeji (C5-E5-G5-C6)
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i)=>{
+        const t = now + i*0.11;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.2, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(t); osc.stop(t + 0.55);
+      });
+    }
+    setTimeout(()=>ctx.close(), 1500);
+  }catch(err){
+    console.warn('Ördek sesi çalınamadı:', err);
+  }
+}
+
+function unlockGoldenDuckBadge(){
+  const alreadyUnlocked = lsGet(LS.duckBadge, false);
+  lsSet(LS.duckBadge, true);
+  // İlk bildirimle çakışmaması için kısa bir gecikmeyle gösterilir
+  setTimeout(()=>{
+    toast(alreadyUnlocked
+      ? '🏆 Altın Ördek yine seninle! Rozet zaten cebinde.'
+      : '🏆 Gizli Rozet Kazandın: "Altın Ördek Avcısı" 🥇', 'success');
+  }, 900);
+}
+
+/* ============================================================
    OLAY DİNLEYİCİLERİ (Event Listeners)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1836,6 +1994,9 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---- Karanlık mod ---- */
   document.getElementById('darkToggleBtn').addEventListener('click', toggleTheme);
   document.getElementById('darkSwitch').addEventListener('change', toggleTheme);
+
+  /* ---- 🦆 Gizli Easter Egg: logoya art arda 5 tık = Ördek Modu ---- */
+  document.getElementById('appLogo').addEventListener('click', handleLogoClick);
 
   /* ---- Bildirim paneli ---- */
   document.getElementById('notifBtn').addEventListener('click', (e)=>{
