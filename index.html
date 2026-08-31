@@ -596,6 +596,71 @@ img{max-width:100%; display:block;}
 @media (prefers-reduced-motion: reduce){
   .duck-egg{ animation-duration:.01ms !important; }
 }
+
+/* ============================================================
+   🌀 GİZLİ RASTGELE OLAY: PORTAL DELİĞİ
+   Kaldırmak isterseniz bu CSS bloğu + #portalHoleOverlay HTML div'i +
+   ilgili JS bölümü (schedulePortalHoleEvent ve yardımcıları) yeterlidir.
+   ============================================================ */
+@keyframes portalHoleShake{
+  0%,100%{ transform:translate(0,0); }
+  20%{ transform:translate(-3px,2px); }
+  40%{ transform:translate(3px,-2px); }
+  60%{ transform:translate(-2px,-2px); }
+  80%{ transform:translate(2px,2px); }
+}
+.portal-hole-shake{ animation:portalHoleShake .5s ease-in-out; }
+
+.portal-hole-overlay{
+  position:fixed; inset:0; z-index:9997;
+  pointer-events:none; overflow:hidden;
+}
+.portal-hole{
+  position:absolute;
+  width:clamp(90px, 30vmin, 170px); height:clamp(90px, 30vmin, 170px);
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 50%, #000 0%, #1a0a2e 35%, #3d1a5c 58%, rgba(0,0,0,0) 74%);
+  box-shadow:0 0 40px 14px rgba(120,60,220,.55), 0 0 90px 30px rgba(0,0,0,.5);
+  transform:translate(-50%,-50%) scale(0);
+  animation:portalHoleAppear .45s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+.portal-hole::before{
+  content:''; position:absolute; inset:-30%; border-radius:50%;
+  background:conic-gradient(from 0deg, rgba(168,85,247,.35), rgba(0,0,0,0) 30%, rgba(168,85,247,.35) 60%, rgba(0,0,0,0) 90%);
+  animation:portalHoleSpin 1.4s linear infinite;
+}
+.portal-hole.closing{ animation:portalHoleDisappear .5s cubic-bezier(.6,-0.28,.74,.05) forwards; }
+@keyframes portalHoleAppear{
+  from{ transform:translate(-50%,-50%) scale(0); opacity:0; }
+  to{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+}
+@keyframes portalHoleDisappear{
+  from{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+  to{ transform:translate(-50%,-50%) scale(0); opacity:0; }
+}
+@keyframes portalHoleSpin{ to{ transform:rotate(360deg); } }
+
+.portal-pull-target{
+  transition:transform 1.05s cubic-bezier(.22,.61,.36,1), opacity 1.05s ease;
+  will-change:transform, opacity;
+}
+
+.portal-hole-duck{
+  position:absolute; font-size:34px;
+  animation-name:portalHoleDuckSuck; animation-timing-function:ease-in; animation-fill-mode:forwards;
+  will-change:transform, opacity;
+}
+@keyframes portalHoleDuckSuck{
+  0%{ opacity:0; transform:translate(0,0) scale(1); }
+  15%{ opacity:1; }
+  100%{ opacity:0; transform:var(--duck-suck-transform); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .portal-hole-shake{ animation:none; }
+  .portal-hole, .portal-hole::before, .portal-hole-duck{ animation-duration:.01ms !important; }
+  .portal-pull-target{ transition-duration:.01ms !important; }
+}
 </style>
 </head>
 <body>
@@ -1047,6 +1112,9 @@ img{max-width:100%; display:block;}
 
   <!-- 🦆 Gizli Easter Egg: Ördek Modu overlay konteyneri (boş, JS ile doldurulur) -->
   <div class="duck-egg-overlay" id="duckEggOverlay" aria-hidden="true"></div>
+
+  <!-- 🌀 Gizli Rastgele Olay: Portal Deliği overlay konteyneri (boş, JS ile doldurulur) -->
+  <div class="portal-hole-overlay" id="portalHoleOverlay" aria-hidden="true"></div>
 </div>
 
 <script type="module">
@@ -1099,7 +1167,7 @@ const LS = {
   theme:'wtk_theme', remember:'wtk_remember_flag',
   pdfs:'wtk_pdfs', links:'wtk_links',
   calendar:'wtk_calendar', fee:'wtk_fee', home:'wtk_home_content', notifSeen:'wtk_notif_seen',
-  duckBadge:'wtk_duck_badge_golden'
+  duckBadge:'wtk_duck_badge_golden', portalHoleLast:'wtk_portal_hole_last_shown'
 };
 
 /* ---------------- Depolama yardımcıları ---------------- */
@@ -1292,13 +1360,13 @@ function escapeHtml(str){
 }
 
 /* ---------------- Toast bildirimleri ---------------- */
-function toast(msg, type){
+function toast(msg, type, durationMs){
   const c = document.getElementById('toastContainer');
   const el = document.createElement('div');
   el.className = 'toast' + (type ? ' '+type : '');
   el.innerHTML = (type==='success'?'✅ ':type==='error'?'⚠️ ':'ℹ️ ') + escapeHtml(msg);
   c.appendChild(el);
-  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(), 300); }, 2600);
+  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(), 300); }, durationMs || 2600);
 }
 
 /* ---------------- Tema (Karanlık Mod) ---------------- */
@@ -1890,6 +1958,142 @@ function unlockGoldenDuckBadge(){
 }
 
 /* ============================================================
+   🌀 GİZLİ RASTGELE OLAY: PORTAL DELİĞİ
+   Her oturum başladığında (showApp() çağrıldığında) %15 ihtimalle
+   kullanıcı seçilir. Seçilirse, girişten 30sn–5dk arasında rastgele
+   bir anda, ekranda hangi sayfada olursa olsun kısa süreli bir "kara
+   delik" efekti oynatılır. Aynı tarayıcı/cihaza (localStorage bazlı —
+   portalda henüz bireysel öğrenci hesapları olmadığı için "kullanıcı"
+   burada cihaz anlamına gelir) 24 saat içinde tekrar gösterilmez.
+   Tamamen izole bir modüldür — kaldırmak için bu blok + ilgili CSS +
+   #portalHoleOverlay HTML div'i yeterlidir.
+   ============================================================ */
+const PORTAL_HOLE_SESSION_CHANCE = 0.15;              // %15 — oturum başına tetiklenme ihtimali
+const PORTAL_HOLE_MIN_DELAY_MS   = 30 * 1000;         // 30 sn
+const PORTAL_HOLE_MAX_DELAY_MS   = 5 * 60 * 1000;     // 5 dk
+const PORTAL_HOLE_COOLDOWN_MS    = 24 * 60 * 60 * 1000; // 24 saat
+const PORTAL_HOLE_DUCK_CHANCE    = 0.01;              // %1 — bonus "ördek boyutlu kara delik"
+const PORTAL_HOLE_PULL_RADIUS_PX = 260;               // deliğe hangi mesafedeki elemanlar etkilensin
+const PORTAL_HOLE_MAX_TARGETS    = 14;                // performans için üst sınır
+
+let portalHoleSessionRolled = false; // aynı oturumda ikinci kez zar atılmasın
+
+function schedulePortalHoleEvent(){
+  if(portalHoleSessionRolled) return;
+  portalHoleSessionRolled = true;
+
+  const lastShown = Number(localStorage.getItem(LS.portalHoleLast) || 0);
+  if(Date.now() - lastShown < PORTAL_HOLE_COOLDOWN_MS) return; // 24 saat kuralı
+  if(Math.random() >= PORTAL_HOLE_SESSION_CHANCE) return;      // %15 kurası tutmadı
+
+  const delay = PORTAL_HOLE_MIN_DELAY_MS + Math.random() * (PORTAL_HOLE_MAX_DELAY_MS - PORTAL_HOLE_MIN_DELAY_MS);
+  setTimeout(()=>{
+    // Sekme arka plandaysa, çıkış yapılmışsa veya bir modal açıksa gösterme
+    if(document.hidden || !isLoggedIn() || document.querySelector('.modal-overlay.open')) return;
+    triggerPortalHoleEvent();
+  }, delay);
+}
+
+function triggerPortalHoleEvent(){
+  const overlay = document.getElementById('portalHoleOverlay');
+  if(!overlay) return;
+
+  const isDuckVariant = Math.random() < PORTAL_HOLE_DUCK_CHANCE;
+
+  // 1) Ekran hafifçe titresin
+  document.body.classList.add('portal-hole-shake');
+  setTimeout(()=> document.body.classList.remove('portal-hole-shake'), 520);
+
+  // 2) Portal, kenarlara çok yakın olmayacak şekilde rastgele bir konumda açılsın
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const px = vw * (0.18 + Math.random()*0.64);
+  const py = vh * (0.18 + Math.random()*0.50) + 10;
+
+  const hole = document.createElement('div');
+  hole.className = 'portal-hole';
+  hole.style.left = px + 'px';
+  hole.style.top  = py + 'px';
+  overlay.appendChild(hole);
+
+  // 3) Yakındaki kart/buton/ikon gibi UI elemanları deliğe doğru çekilsin
+  const pulledEls = pullNearbyElementsTowards(px, py);
+
+  // 4) Üstte uyarı mesajı — "Sorun Çözüldü" gelene kadar ekranda kalsın
+  const holdMs = 3000 + Math.random()*2000; // 3–5 sn sonra ikinci mesaj gösterilir
+  toast(isDuckVariant ? 'Ördek Boyutlu Kara Delik Tespit Edildi' : 'Uzaysal Anormallik Algılandı', 'error', holdMs);
+
+  // Bonus: %1 ihtimalle tek bir ördek portalın içinden geçip kaybolsun
+  if(isDuckVariant){
+    setTimeout(()=> spawnPortalDuck(overlay, px, py), 500 + Math.random()*400);
+  }
+
+  // 5) 3–5 sn sonra "Sorun Çözüldü" mesajı
+  setTimeout(()=>{
+    toast('Sorun Çözüldü', 'success');
+
+    // 6) Kısa bir an sonra elemanlar eski konumuna dönsün, portal kaybolsun
+    setTimeout(()=>{
+      releasePulledElements(pulledEls);
+      hole.classList.add('closing');
+      setTimeout(()=> hole.remove(), 520);
+    }, 550);
+  }, holdMs);
+
+  // Bu an itibarıyla 24 saatlik "tekrar gösterme" sayacı başlar
+  localStorage.setItem(LS.portalHoleLast, String(Date.now()));
+}
+
+function pullNearbyElementsTowards(px, py){
+  const selector = '.card, .quick-item, .nav-btn, .chip, .pdf-dl, .topbar-logo, button, a.link-card';
+  const candidates = document.querySelectorAll(selector);
+  const targets = [];
+
+  for(const el of candidates){
+    if(targets.length >= PORTAL_HOLE_MAX_TARGETS) break;
+    const rect = el.getBoundingClientRect();
+    if(rect.width === 0 || rect.height === 0) continue; // aktif olmayan sayfadaki (görünmeyen) elemanları atla
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    const dist = Math.hypot(cx - px, cy - py);
+    if(dist > PORTAL_HOLE_PULL_RADIUS_PX) continue;
+    targets.push({el, dist, cx, cy});
+  }
+
+  targets.forEach(({el, dist, cx, cy})=>{
+    const strength = 1 - (dist / PORTAL_HOLE_PULL_RADIUS_PX); // deliğe yakın olan daha güçlü çekilir
+    const dx = (px - cx) * 0.35 * strength;
+    const dy = (py - cy) * 0.35 * strength;
+    el.classList.add('portal-pull-target');
+    el.style.transform = `translate(${dx}px, ${dy}px) scale(${(1 - 0.25*strength).toFixed(3)})`;
+    el.style.opacity = (1 - 0.55*strength).toFixed(3);
+  });
+
+  return targets.map(t => t.el);
+}
+
+function releasePulledElements(elements){
+  elements.forEach(el=>{
+    el.style.transform = '';
+    el.style.opacity = '';
+    setTimeout(()=> el.classList.remove('portal-pull-target'), 1150);
+  });
+}
+
+function spawnPortalDuck(overlay, px, py){
+  const duck = document.createElement('div');
+  duck.className = 'portal-hole-duck';
+  duck.textContent = '🦆';
+  const startX = px - 220;
+  const startY = py + (Math.random()*30 - 15);
+  duck.style.left = startX + 'px';
+  duck.style.top  = startY + 'px';
+  duck.style.animationDuration = '900ms';
+  duck.style.setProperty('--duck-suck-transform', `translate(${px-startX}px, ${py-startY}px) scale(.1)`);
+  overlay.appendChild(duck);
+  setTimeout(()=> duck.remove(), 950);
+}
+
+/* ============================================================
    OLAY DİNLEYİCİLERİ (Event Listeners)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1970,6 +2174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('app').classList.remove('hidden');
     reconcileUIState();
     renderAll();
+    schedulePortalHoleEvent(); // 🌀 Gizli rastgele olay: her oturumda %15 ihtimalle zar atılır
   };
 
   /* ---- Sekme arka plandan öne geldiğinde / bfcache'den geri geldiğinde
