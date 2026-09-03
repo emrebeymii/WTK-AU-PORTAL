@@ -661,6 +661,80 @@ img{max-width:100%; display:block;}
   .portal-hole, .portal-hole::before, .portal-hole-duck{ animation-duration:.01ms !important; }
   .portal-pull-target{ transition-duration:.01ms !important; }
 }
+#wtkChatBtn{
+position:fixed;
+right:20px;
+bottom:20px;
+z-index:9999;
+width:60px;
+height:60px;
+border:none;
+border-radius:50%;
+cursor:pointer;
+font-size:24px;
+background:#ff7a00;
+color:white;
+}
+
+#wtkChatWindow{
+position:fixed;
+right:20px;
+bottom:90px;
+width:320px;
+max-width:90vw;
+height:450px;
+background:white;
+border-radius:16px;
+display:none;
+flex-direction:column;
+box-shadow:0 10px 30px rgba(0,0,0,.3);
+z-index:9999;
+}
+
+#wtkChatHeader{
+padding:12px;
+font-weight:bold;
+display:flex;
+justify-content:space-between;
+border-bottom:1px solid #ddd;
+color:black;
+}
+
+#wtkMessages{
+flex:1;
+overflow-y:auto;
+padding:10px;
+color:black;
+}
+
+#wtkInputArea{
+display:flex;
+gap:8px;
+padding:10px;
+border-top:1px solid #ddd;
+}
+
+#wtkInput{
+flex:1;
+padding:8px;
+}
+
+.wtk-bot{
+background:#f2f2f2;
+padding:8px;
+border-radius:10px;
+margin-bottom:8px;
+color:black;
+}
+
+.wtk-user{
+background:#d9f5ff;
+padding:8px;
+border-radius:10px;
+margin-bottom:8px;
+text-align:right;
+color:black;
+}
 </style>
 </head>
 <body>
@@ -2349,7 +2423,39 @@ document.addEventListener('DOMContentLoaded', () => {
       // Liste onSnapshot ile TÜM kullanıcılarda otomatik güncellenir, ayrıca renderAll() gerekmez.
     }
   });
+const chatBtn = document.getElementById('wtkChatBtn');
+const chatWindow = document.getElementById('wtkChatWindow');
+const closeBtn = document.getElementById('wtkCloseBtn');
+const sendBtn = document.getElementById('wtkSendBtn');
+const input = document.getElementById('wtkInput');
+const messages = document.getElementById('wtkMessages');
 
+chatBtn.addEventListener('click', ()=>{
+  chatWindow.style.display='flex';
+});
+
+closeBtn.addEventListener('click', ()=>{
+  chatWindow.style.display='none';
+});
+
+function addMessage(text,type){
+  const div=document.createElement('div');
+  div.className=type;
+  div.textContent=text;
+  messages.appendChild(div);
+  messages.scrollTop=messages.scrollHeight;
+}
+
+sendBtn.addEventListener('click', ()=>{
+  const q=input.value.trim();
+
+  if(!q) return;
+
+  addMessage(q,'wtk-user');
+  addMessage('Portal kaynaklarında bu konuda bilgi bulamadım.','wtk-bot');
+
+  input.value='';
+});
   /* ---- Yönetici FAB (yeni kayıt ekle) ---- */
   document.getElementById('adminFab').addEventListener('click', ()=>{
     if(activeAdminTab === 'home') return;
@@ -2360,5 +2466,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 })();
 </script>
+<button id="wtkChatBtn">🤖</button>
+
+<div id="wtkChatWindow">
+  <div id="wtkChatHeader">
+    WTK Yardımcı
+    <button id="wtkCloseBtn">✕</button>
+  </div>
+
+  <div id="wtkMessages">
+    <div class="wtk-bot">
+      Merhaba 👋 Ben WTK Yardımcı.
+    </div>
+  </div>
+
+  <div id="wtkInputArea">
+    <input type="text" id="wtkInput" placeholder="Sorunu yaz...">
+    <button id="wtkSendBtn">Gönder</button>
+  </div>
+</div>
 </body>
 </html>
