@@ -744,6 +744,41 @@ margin-bottom:8px;
 text-align:right;
 color:black;
 }
+
+.wtk-source-tag{
+display:block;
+font-size:10px;
+font-weight:700;
+letter-spacing:.3px;
+margin-bottom:4px;
+opacity:.6;
+text-transform:uppercase;
+}
+.wtk-typing{
+display:inline-flex;
+gap:4px;
+background:#f2f2f2;
+padding:10px 12px;
+border-radius:10px;
+margin-bottom:8px;
+}
+.wtk-typing span{
+width:6px;
+height:6px;
+border-radius:50%;
+background:#999;
+animation:wtkTypingBounce 1.1s infinite ease-in-out;
+}
+.wtk-typing span:nth-child(2){animation-delay:.15s;}
+.wtk-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes wtkTypingBounce{
+0%,60%,100%{transform:translateY(0); opacity:.5;}
+30%{transform:translateY(-4px); opacity:1;}
+}
+#wtkSendBtn:disabled, #wtkInput:disabled{
+opacity:.5;
+cursor:not-allowed;
+}
 </style>
 </head>
 <body>
@@ -2432,6 +2467,16 @@ document.addEventListener('DOMContentLoaded', () => {
       // Liste onSnapshot ile TÜM kullanıcılarda otomatik güncellenir, ayrıca renderAll() gerekmez.
     }
   });
+/* ============================================================
+   WTK YARDIMCI — TAMAMEN YEREL, API'SİZ SOHBET ASİSTANI
+   GitHub Pages statik barındırma olduğu için ve dış bir API
+   anahtarı kullanılamadığı için bu asistan HİÇBİR ağ isteği
+   ATMAZ. Tüm cevaplar; SSS veri tabanı + portalın kendi verileri
+   (duyurular, PDF arşivi, dersler, müfredat, bağlantılar,
+   akademik takvim, ücret) üzerinde anahtar kelime + hafif Türkçe
+   kök eşleştirmesiyle üretilir. Cevap bulunamazsa asistan bunu
+   açıkça söyler, ASLA bilgi uydurmaz.
+   ============================================================ */
 const chatBtn = document.getElementById('wtkChatBtn');
 const chatWindow = document.getElementById('wtkChatWindow');
 const closeBtn = document.getElementById('wtkCloseBtn');
@@ -2441,29 +2486,334 @@ const messages = document.getElementById('wtkMessages');
 
 chatBtn.addEventListener('click', ()=>{
   chatWindow.style.display='flex';
+  input.focus();
 });
 
 closeBtn.addEventListener('click', ()=>{
   chatWindow.style.display='none';
 });
 
-function addMessage(text,type){
+function addMessage(text, type, sourceLabel){
   const div=document.createElement('div');
   div.className=type;
-  div.textContent=text;
+  if(sourceLabel){
+    const tag=document.createElement('span');
+    tag.className='wtk-source-tag';
+    tag.textContent=sourceLabel;
+    div.appendChild(tag);
+  }
+  const body=document.createElement('span');
+  body.textContent=text;
+  div.appendChild(body);
+  messages.appendChild(div);
+  messages.scrollTop=messages.scrollHeight;
+  return div;
+}
+
+function showTyping(){
+  const div=document.createElement('div');
+  div.className='wtk-typing';
+  div.id='wtkTypingIndicator';
+  div.innerHTML='<span></span><span></span><span></span>';
   messages.appendChild(div);
   messages.scrollTop=messages.scrollHeight;
 }
+function hideTyping(){
+  const el=document.getElementById('wtkTypingIndicator');
+  if(el) el.remove();
+}
 
-sendBtn.addEventListener('click', ()=>{
+/* ---------------- Sohbet geçmişi (yalnızca son 10 mesaj tutulur) ----------------
+   Gemini/dış API kaldırıldığı için geçmiş şu an bir sunucuya
+   gönderilmiyor; yine de bellek şişmesin ve ileride bir "önceki
+   sorunu hatırla" özelliği eklenmek istenirse hazır olsun diye
+   son 10 mesajla sınırlı tutuluyor. */
+let wtkChatHistory=[];
+function pushHistory(role, text){
+  wtkChatHistory.push({role, text});
+  if(wtkChatHistory.length>10) wtkChatHistory=wtkChatHistory.slice(-10);
+}
+
+/* ---------------- SSS (Sık Sorulan Sorular) veri seti ----------------
+   Portal içeriğinden (Sınavlar, Dersler, Ana Sayfa bilgilendirme
+   kartı vb. sayfalardaki metinlerden) türetilmiştir. Yeni bir SSS
+   eklemek için buraya {keywords:[...], answer:'...'} formatında
+   bir satır eklemeniz yeterlidir — answer bir fonksiyon da olabilir
+   (o an güncel bir veriyi, örn. ücreti, göstermek için). */
+const FAQ_DATA=[
+  {
+    keywords:['merhaba','selam','iyi günler','naber','nasılsın'],
+    answer:'Merhaba 👋 Ben WTK Yardımcı. Sana sınavlar, dersler, ders içerikleri/müfredat, PDF arşivi, duyurular, akademik takvim, dönem ücreti ve faydalı bağlantılar (OBS, ÖYS) hakkında portal içeriğinden yanıt verebilirim. Ne öğrenmek istersin?'
+  },
+  {
+    keywords:['teşekkür','sağol','saol','sagol','eyvallah'],
+    answer:'Rica ederim! Başka bir sorun olursa buradayım. 🙂'
+  },
+  {
+    keywords:['sınav','vize','final','bütünleme','çoktan seçmeli','kaç soru','sınav süresi','sınav yapısı'],
+    answer:'Her yarıyılda bir Ara Sınav (Vize), bir Yarıyıl Sonu Sınavı (Final) ve bir Bütünleme Sınavı yapılır. Sınavlar çoktan seçmeli, ders başına 20 soru ve 30 dakika süreli olarak uygulanır. Son yarıyıldaki başarısız öğrencilere mezuniyete üç ders sınavı hakkı tanınır. Detaylar için Sınavlar sayfasına bakabilirsin.'
+  },
+  {
+    keywords:['sınav merkezi','sınav merkezleri','nerede sınav','hangi il sınav','sınava nerede girerim','sınav şehirleri'],
+    answer:'Ara ve Final sınavları Adana, Ankara, Antalya, Bursa, Diyarbakır, Gaziantep, İstanbul (Avrupa/Anadolu), İzmir, Konya, Samsun ve Trabzon\'da yapılır. Bütünleme sınavları ise Adana, Ankara, Diyarbakır, İstanbul (Avrupa/Anadolu), İzmir ve Samsun\'da, hafta sonu 4 oturum halinde yapılır.'
+  },
+  {
+    keywords:['ücret','fiyat','ne kadar','kaç para','harç','ödeme','dönem ücreti','ücreti'],
+    answer:()=>`Bu dönemin öğrenim ve materyal ücreti ${Data.fee}. Kesin ödeme tarihleri için Akademik Takvim sayfasına bakabilirsin.`
+  },
+  {
+    keywords:['akts','mezuniyet','kaç ders','ders planı','müfredat','program kaç yıl','kaç yarıyıl'],
+    answer:'Programdan mezun olmak için toplam 120 AKTS tamamlanması gerekir (4 yarıyıl, her biri 30 AKTS). Seçmeli derslerden alınabilecek AKTS miktarı Genel Akademik Başarı Not Ortalamana (GABNO) göre değişir. Tüm ders listesi ve resmi PDF için Dersler ve İçerikleri sayfasına bakabilirsin.'
+  },
+  {
+    keywords:['obs','öğrenci bilgi sistemi','e-kayıt','kayıt nasıl'],
+    answer:'OBS (Öğrenci Bilgi Sistemi) üzerinden kayıt, ders ve not işlemlerine ulaşabilirsin: https://obs.ankara.edu.tr — bağlantı Faydalı Bağlantılar sayfasında da mevcut.'
+  },
+  {
+    keywords:['öys','öğrenme yönetim sistemi','ders videoları'],
+    answer:'ÖYS (Öğrenme Yönetim Sistemi) ders materyallerine ve videolarına erişmek için kullanılır: https://oys.ankara.edu.tr'
+  },
+  {
+    keywords:['kampüs kart','öğrenci kartı','kart fotoğrafı','fotoğraf güncelleme'],
+    answer:'Kampüs Kart başvurusu OBS üzerinden yapılır; kart üzerindeki fotoğraf üniversite sisteminde kayıtlı olan fotoğraftır. Fotoğraf güncellemesi için Öğrenci İşleri Daire Başkanlığı ile iletişime geçmen gerekir. Detaylar Ana Sayfa\'daki bilgilendirme kartında var.'
+  },
+  {
+    keywords:['öğrenci işleri','iletişim','destek al','sorun yaşıyorum'],
+    answer:'Öğrenci işleriyle ilgili sorunlarda Ankara Üniversitesi Öğrenci İşleri sayfasına başvurabilirsin: https://ankuzef.ankara.edu.tr/tr/24-ogrenci-isleri — bağlantı Faydalı Bağlantılar sayfasında da mevcut.'
+  },
+  {
+    keywords:['şifre','parola','giriş yapamıyorum','giriş şifresi'],
+    answer:'Bu portala giriş şifresini paylaşamam. Şifreyi bölümün topluluk kanallarından (sınıf grubu vb.) edinebilirsin — bu bilgi güvenlik nedeniyle asistanda tutulmuyor.'
+  },
+  {
+    keywords:['bu portal ne','portal hakkında','resmi mi','portalı kim yaptı','bu uygulama ne'],
+    answer:'Bu, Ankara Üniversitesi Açıköğretim Web Tasarımı ve Kodlama bölümü öğrencileri tarafından hazırlanmış bağımsız bir topluluk portalıdır; üniversitenin resmî bir sistemi değildir.'
+  },
+  {
+    keywords:['karanlık mod','tema değiştir','dark mode'],
+    answer:'Karanlık moda geçmek için sağ üstteki 🌙 simgesine ya da Profil sayfasındaki "Karanlık Mod" anahtarına dokunabilirsin.'
+  },
+  {
+    keywords:['bildirim','bildirimler','duyuru geldi mi'],
+    answer:'En güncel duyurular üst çubuktaki 🔔 simgesine dokununca açılan panelde listelenir; tüm duyurular için Duyurular sayfasına bakabilirsin.'
+  },
+  {
+    keywords:['yönetici','admin','duyuru nasıl eklenir','içerik nasıl güncellenir'],
+    answer:'İçerik güncellemeleri (duyuru, PDF, bağlantı, takvim vb.) Profil sayfasındaki "Yönetici Girişi" üzerinden, yönetici şifresiyle giriş yapan yetkili kişiler tarafından yapılabilir.'
+  },
+  {
+    keywords:['hangi sayfalar var','neler yapabilirim','menü','uygulamada ne var'],
+    answer:'Alt menüden Ana Sayfa, Dersler, PDF Arşivi, Duyurular ve Profil sayfalarına ulaşabilirsin. Profil sayfasından ayrıca Akademik Takvim, Faydalı Bağlantılar, Sınavlar, Dersler ve İçerikleri ile Hakkında bölümlerine de erişebilirsin.'
+  }
+];
+
+/* ---------------- Müfredat (Dersler ve İçerikleri sayfasındaki
+   ders kodu / AKTS bilgisiyle birebir aynıdır) ---------------- */
+const CURRICULUM=[
+  {code:'AAUF1103', name:'Temel İşletme', semester:'1. Yarıyıl (Güz)', akts:4, elective:false},
+  {code:'AAUF1105', name:'Matematik I', semester:'1. Yarıyıl (Güz)', akts:4, elective:false},
+  {code:'AAUF1107', name:'Elektronik Ticarete Giriş', semester:'1. Yarıyıl (Güz)', akts:5, elective:false},
+  {code:'AAUF1111', name:'Dijital Dönüşüm', semester:'1. Yarıyıl (Güz)', akts:4, elective:false},
+  {code:'AWEB1101', name:'Ağ Temelleri', semester:'1. Yarıyıl (Güz)', akts:5, elective:false},
+  {code:'AATA107', name:'Atatürk İlkeleri ve İnkılap Tarihi I', semester:'1. Yarıyıl (Güz)', akts:2, elective:false},
+  {code:'AYDİ111', name:'Temel Yabancı Dil I (İngilizce)', semester:'1. Yarıyıl (Güz)', akts:2, elective:false},
+  {code:'ATDİ107', name:'Türk Dili I', semester:'1. Yarıyıl (Güz)', akts:2, elective:false},
+  {code:'ABİT101', name:'Bilgi ve İletişim Teknolojileri I', semester:'1. Yarıyıl (Güz)', akts:2, elective:false},
+  {code:'AAUF1100', name:'Programlamaya Giriş', semester:'2. Yarıyıl (Bahar)', akts:5, elective:false},
+  {code:'AAUF1102', name:'Grafik Tasarım', semester:'2. Yarıyıl (Bahar)', akts:5, elective:false},
+  {code:'AAUF1104', name:'Medya, İletişim ve Teknoloji', semester:'2. Yarıyıl (Bahar)', akts:4, elective:false},
+  {code:'AAUF1106', name:'Web Tasarımı', semester:'2. Yarıyıl (Bahar)', akts:6, elective:false},
+  {code:'AWEB1100', name:'Web Sunucu Yönetimi', semester:'2. Yarıyıl (Bahar)', akts:4, elective:false},
+  {code:'AATA108', name:'Atatürk İlkeleri ve İnkılap Tarihi II', semester:'2. Yarıyıl (Bahar)', akts:2, elective:false},
+  {code:'AYDİ112', name:'Temel Yabancı Dil II (İngilizce)', semester:'2. Yarıyıl (Bahar)', akts:2, elective:false},
+  {code:'ATDİ108', name:'Türk Dili II', semester:'2. Yarıyıl (Bahar)', akts:2, elective:false},
+  {code:'AAUF1203', name:'İnternet Programcılığı I', semester:'3. Yarıyıl (Güz)', akts:6, elective:false},
+  {code:'AAUF1209', name:'Bilişim Hukuku', semester:'3. Yarıyıl (Güz)', akts:4, elective:false},
+  {code:'AAUF1211', name:'Algoritmalar ve Programlama', semester:'3. Yarıyıl (Güz)', akts:5, elective:false},
+  {code:'AAUF1213', name:'Arama Motoru Optimizasyonu', semester:'3. Yarıyıl (Güz)', akts:6, elective:false},
+  {code:'AAUF1215', name:'Sistem Analizi ve Tasarımı', semester:'3. Yarıyıl (Güz)', akts:4, elective:false},
+  {code:'AAUF1217', name:'Pazarlama', semester:'3. Yarıyıl (Güz)', akts:5, elective:false},
+  {code:'AAUF1257', name:'İleri Bilgi Teknolojileri', semester:'3. Yarıyıl (Güz)', akts:2, elective:true},
+  {code:'AAUF1251', name:'Finansal Okur Yazarlık', semester:'3. Yarıyıl (Güz)', akts:3, elective:true},
+  {code:'AAUF1253', name:'İşçi Sağlığı ve İş Güvenliği', semester:'3. Yarıyıl (Güz)', akts:4, elective:true},
+  {code:'AAUF1255', name:'İlk Yardım', semester:'3. Yarıyıl (Güz)', akts:5, elective:true},
+  {code:'AAUF1200', name:'Veritabanı Yönetimi', semester:'4. Yarıyıl (Bahar)', akts:5, elective:false},
+  {code:'AAUF1202', name:'Girişimcilik', semester:'4. Yarıyıl (Bahar)', akts:4, elective:false},
+  {code:'AAUF1204', name:'Ağ Yönetimi ve Bilgi Güvenliği', semester:'4. Yarıyıl (Bahar)', akts:6, elective:false},
+  {code:'AAUF1210', name:'Kullanıcı Deneyimi ve Tasarım', semester:'4. Yarıyıl (Bahar)', akts:5, elective:false},
+  {code:'AAUF1212', name:'İçerik Yönetim Sistemleri', semester:'4. Yarıyıl (Bahar)', akts:4, elective:false},
+  {code:'AAUF1214', name:'İnternet Programcılığı II', semester:'4. Yarıyıl (Bahar)', akts:6, elective:false},
+  {code:'AAUF1252', name:'Araştırma Yöntem ve Teknikleri', semester:'4. Yarıyıl (Bahar)', akts:2, elective:true},
+  {code:'AAUF1254', name:'Sosyal Güvenlik', semester:'4. Yarıyıl (Bahar)', akts:3, elective:true},
+  {code:'AAUF1256', name:'Finansal Yatırım Araçları', semester:'4. Yarıyıl (Bahar)', akts:4, elective:true},
+  {code:'AAUF1258', name:'Temel Afet Bilgisi', semester:'4. Yarıyıl (Bahar)', akts:5, elective:true}
+];
+
+/* ---------------- Türkçe-duyarlı normalize + hafif kök bulma ----------------
+   Tam bir Türkçe morfolojik analiz yerine, en sık karşılaşılan ek
+   takılarını (çoğul/hal ekleri) kabaca kırpan pratik bir yaklaşım.
+   Amaç "dersler", "dersin", "derste" gibi farklı çekimlerin aynı
+   kök üzerinden ("ders") eşleşebilmesini sağlamaktır. */
+function normalizeTr(str){
+  return String(str||'')
+    .toLocaleLowerCase('tr')
+    .replace(/ı/g,'i').replace(/İ/g,'i')
+    .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+    .replace(/ö/g,'o').replace(/ç/g,'c')
+    .replace(/[^a-z0-9\s]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+const TR_SUFFIXES=['lerinin','larinin','lerini','larini','lerine','larina','leriyle','lariyla',
+  'lerde','larda','lerden','lardan','lerin','larin','leri','lari','nin','nin','nun','nun',
+  'den','dan','de','da','ye','ya','yi','yi','yu','yu','ler','lar','in','un','i','u','e','a'];
+function trStem(word){
+  for(const suf of TR_SUFFIXES){
+    if(word.length - suf.length>=3 && word.endsWith(suf)){
+      return word.slice(0, word.length-suf.length);
+    }
+  }
+  return word;
+}
+function scoreMatch(queryNorm, textNorm){
+  const qWords=queryNorm.split(' ').filter(w=>w.length>=3);
+  if(!qWords.length) return 0;
+  let score=0;
+  qWords.forEach(w=>{
+    const stem=trStem(w);
+    if(textNorm.includes(w) || (stem.length>=3 && textNorm.includes(stem))) score++;
+  });
+  return score;
+}
+
+/* ---------------- Portal içi arama ----------------
+   Sırasıyla: SSS -> Müfredat -> Duyurular -> PDF Arşivi -> Dersler
+   -> Bağlantılar -> Akademik Takvim içinde en yüksek anahtar
+   kelime skoruna sahip içerik döndürülür. Hiçbir yerde eşleşme
+   skoru >=1 değilse null döner (bilgi uydurulmaz). */
+function searchPortalKnowledge(query){
+  const qNorm=normalizeTr(query);
+  const qRaw=String(query||'').toLocaleUpperCase('tr');
+  let best=null; let bestScore=0;
+
+  FAQ_DATA.forEach(item=>{
+    const kwNorm=normalizeTr(item.keywords.join(' '));
+    const score=scoreMatch(qNorm, kwNorm);
+    if(score>bestScore){
+      bestScore=score;
+      best={ text: typeof item.answer==='function' ? item.answer() : item.answer, source:'🔎 Portal SSS' };
+    }
+  });
+
+  // Ders kodu ile birebir eşleşme (örn. "AWEB1101 nedir") en güvenilir
+  // eşleşmedir; bulunursa doğrudan bunu döndür.
+  const codeHit=CURRICULUM.find(c=> qRaw.includes(c.code));
+  if(codeHit){
+    return {
+      text:`${codeHit.code} — ${codeHit.name}: ${codeHit.semester}, ${codeHit.akts} AKTS${codeHit.elective?' (seçmeli ders grubu)':''}. Tüm ders planı için Dersler ve İçerikleri sayfasına bakabilirsin.`,
+      source:'🔎 Portal Müfredatı'
+    };
+  }
+  CURRICULUM.forEach(c=>{
+    const textNorm=normalizeTr(c.name+' '+c.code);
+    const score=scoreMatch(qNorm, textNorm);
+    if(score>bestScore){
+      bestScore=score;
+      best={ text:`${c.name} (${c.code}) dersi ${c.semester} döneminde okutulur ve ${c.akts} AKTS'dir${c.elective?' (seçmeli ders grubunda yer alır)':''}.`, source:'🔎 Portal Müfredatı' };
+    }
+  });
+
+  Data.ann.forEach(a=>{
+    const textNorm=normalizeTr((a.title||'')+' '+(a.content||''));
+    const score=scoreMatch(qNorm, textNorm);
+    if(score>bestScore){
+      bestScore=score;
+      const excerpt=(a.content||'').slice(0,180);
+      best={ text:`📢 ${a.title}: ${excerpt}${(a.content||'').length>180?'…':''}`, source:'🔎 Portal Duyuruları' };
+    }
+  });
+
+  Data.pdfs.forEach(p=>{
+    const textNorm=normalizeTr((p.title||'')+' '+(p.category||''));
+    const score=scoreMatch(qNorm, textNorm);
+    if(score>bestScore){
+      bestScore=score;
+      best={ text:`📄 "${p.title}" (${p.category}) PDF Arşivi sayfasında mevcut — boyut: ${p.size}.`, source:'🔎 Portal PDF Arşivi' };
+    }
+  });
+
+  COURSES.forEach(c=>{
+    const textNorm=normalizeTr(c.title+' '+c.desc+' '+c.cat);
+    const score=scoreMatch(qNorm, textNorm);
+    if(score>bestScore){
+      bestScore=score;
+      best={ text:`${c.icon} ${c.title}: ${c.desc}. Not ve kaynaklar için Ders Notları sayfasına bakabilirsin.`, source:'🔎 Portal Dersleri' };
+    }
+  });
+
+  Data.links.forEach(l=>{
+    const textNorm=normalizeTr((l.title||'')+' '+(l.desc||''));
+    const score=scoreMatch(qNorm, textNorm);
+    if(score>bestScore){
+      bestScore=score;
+      best={ text:`🔗 ${l.title} (${l.desc}): ${l.url}`, source:'🔎 Portal Bağlantıları' };
+    }
+  });
+
+  Data.cal.forEach(ev=>{
+    const textNorm=normalizeTr(ev.title||'');
+    const score=scoreMatch(qNorm, textNorm);
+    if(score>bestScore){
+      bestScore=score;
+      best={ text:`📅 ${ev.title}: ${ev.start} – ${ev.end}`, source:'🔎 Portal Akademik Takvimi' };
+    }
+  });
+
+  if(best && bestScore>=1) return best;
+  return null;
+}
+
+/* ---------------- Cevap bulunamadığında gösterilecek yönlendirme ----------------
+   Bilgi uydurmak yerine, kullanıcıyı ilgili olabilecek sayfalara
+   yönlendiren dürüst bir mesaj döndürülür. */
+function fallbackAnswer(){
+  return 'Bu konuda portal içeriğinde net bir bilgi bulamadım — bilgi uydurmak istemem. '
+    + 'Sorunu; Sınavlar, Dersler ve İçerikleri, PDF Arşivi, Duyurular, Akademik Takvim veya '
+    + 'Faydalı Bağlantılar sayfalarından kontrol edebilir ya da Öğrenci İşleri / bölüm '
+    + 'topluluk kanallarına iletebilirsin. İstersen soruyu birkaç farklı kelimeyle tekrar deneyebilirsin.';
+}
+
+function handleSend(){
   const q=input.value.trim();
-
-  if(!q) return;
+  if(!q || sendBtn.disabled) return;
 
   addMessage(q,'wtk-user');
-  addMessage('Portal kaynaklarında bu konuda bilgi bulamadım.','wtk-bot');
-
+  pushHistory('user', q);
   input.value='';
+  sendBtn.disabled=true; input.disabled=true;
+
+  // Küçük bir gecikme + "yazıyor..." animasyonu — hiçbir ağ isteği
+  // atılmıyor, sadece cevabın anında belirmesi yerine daha doğal bir
+  // sohbet hissi vermek için kozmetik bir bekleme.
+  showTyping();
+  setTimeout(()=>{
+    hideTyping();
+    const local=searchPortalKnowledge(q);
+    if(local){
+      addMessage(local.text,'wtk-bot', local.source);
+      pushHistory('model', local.text);
+    }else{
+      const msg=fallbackAnswer();
+      addMessage(msg,'wtk-bot','ℹ️ Bulunamadı');
+      pushHistory('model', msg);
+    }
+    sendBtn.disabled=false; input.disabled=false; input.focus();
+  }, 350);
+}
+
+sendBtn.addEventListener('click', handleSend);
+input.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter'){ e.preventDefault(); handleSend(); }
 });
   /* ---- Yönetici FAB (yeni kayıt ekle) ---- */
   document.getElementById('adminFab').addEventListener('click', ()=>{
