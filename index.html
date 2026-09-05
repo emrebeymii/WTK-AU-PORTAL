@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="light">
+<html lang="tr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
@@ -16,7 +16,8 @@
 :root{
   --bg:#f5f6f8;
   --surface:#ffffff;
-  --surface-glass:rgba(255,255,255,0.72);
+  --surface-2:#f0f1f4;
+  --surface-glass:rgba(255,255,255,0.86);
   --primary:#ff7a00;
   --primary-dark:#e06600;
   --primary-light:#fff1e0;
@@ -24,20 +25,20 @@
   --text:#1a1d29;
   --text-secondary:#6b7280;
   --text-tertiary:#9aa1ae;
-  --border:rgba(20,20,30,0.08);
+  --border:rgba(20,20,30,0.09);
   --success:#16a34a;
   --success-bg:#e9f9ee;
   --danger:#e11d48;
   --danger-bg:#fdeaee;
   --info:#2563eb;
   --info-bg:#eaf1fd;
-  --radius-sm:12px;
-  --radius-md:18px;
-  --radius-lg:26px;
-  --shadow-sm:0 2px 10px rgba(20,20,40,0.05);
-  --shadow-md:0 8px 24px rgba(20,20,40,0.08);
-  --shadow-lg:0 16px 40px rgba(20,20,40,0.14);
-  --shadow-primary:0 10px 24px rgba(255,122,0,0.28);
+  --radius-sm:10px;
+  --radius-md:14px;
+  --radius-lg:20px;
+  --shadow-sm:0 1px 3px rgba(20,20,40,0.05);
+  --shadow-md:0 4px 16px rgba(20,20,40,0.07);
+  --shadow-lg:0 10px 30px rgba(20,20,40,0.12);
+  --shadow-primary:0 6px 16px rgba(255,122,0,0.22);
   --font:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
   --t-fast:.18s cubic-bezier(.4,0,.2,1);
   --t-base:.32s cubic-bezier(.4,0,.2,1);
@@ -45,26 +46,31 @@
   --navbar-h:72px;
 }
 
+/* Koyu tema: siyaha yakın, düz (flat) zemin üzerine turuncu marka
+   vurgusu — cam/blur efektleri kaldırılmış, Discord/Linear/Notion
+   tarzı sade panel görünümü hedeflenmiştir. */
 [data-theme="dark"]{
-  --bg:#0d0f14;
-  --surface:#171a21;
-  --surface-glass:rgba(23,26,33,0.72);
-  --primary:#ff8c1f;
-  --primary-dark:#ff7a00;
-  --primary-light:#2a2013;
-  --text:#f2f3f5;
-  --text-secondary:#a4aab6;
-  --text-tertiary:#6b7280;
-  --border:rgba(255,255,255,0.08);
+  --bg:#08090d;
+  --surface:#121319;
+  --surface-2:#1a1c24;
+  --surface-glass:rgba(18,19,25,0.94);
+  --primary:#ff7a00;
+  --primary-dark:#cc6200;
+  --primary-light:#241a0e;
+  --text:#eef0f3;
+  --text-secondary:#9aa0ac;
+  --text-tertiary:#5c6270;
+  --border:rgba(255,255,255,0.07);
   --success:#22c55e;
-  --success-bg:#0f2417;
+  --success-bg:#10261a;
   --danger:#fb3f63;
   --danger-bg:#2a1219;
   --info:#5b8def;
-  --info-bg:#101f33;
-  --shadow-sm:0 2px 10px rgba(0,0,0,0.28);
-  --shadow-md:0 8px 24px rgba(0,0,0,0.36);
-  --shadow-lg:0 16px 40px rgba(0,0,0,0.5);
+  --info-bg:#111d30;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg:0 10px 30px rgba(0,0,0,0.5);
+  --shadow-primary:0 6px 18px rgba(255,122,0,0.18);
 }
 
 *{box-sizing:border-box; margin:0; padding:0;}
@@ -90,8 +96,8 @@ img{max-width:100%; display:block;}
 /* Masaüstünde uygulamayı telefon çerçevesi gibi ortala */
 @media (min-width:640px){
   body{display:flex; justify-content:center; align-items:flex-start; background:linear-gradient(160deg,#f0e6d8 0%,#eef1f5 45%,#e8ecf3 100%); padding:32px 0;}
-  [data-theme="dark"] body{background:linear-gradient(160deg,#050608 0%,#0d0f14 50%,#111319 100%);}
-  #appFrame{width:428px; min-height:calc(100vh - 64px); border-radius:40px; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,0.28), 0 0 0 10px #0d0f14, 0 0 0 12px #2a2d34; position:relative;}
+  [data-theme="dark"] body{background:#050609;}
+  #appFrame{width:428px; min-height:calc(100vh - 64px); border-radius:32px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.35), 0 0 0 8px #08090d, 0 0 0 9px #26282f; position:relative;}
   /* Tam ekran katmanlar masaüstünde tarayıcı penceresini değil, telefon çerçevesini kaplasın */
   #appFrame #splash, #appFrame #loginScreen, #appFrame .modal-overlay{ position:absolute; }
 }
@@ -128,7 +134,9 @@ img{max-width:100%; display:block;}
   box-shadow:var(--shadow-sm); transition:transform var(--t-fast), box-shadow var(--t-fast), background var(--t-base), border-color var(--t-base);
 }
 .glass{
-  background:var(--surface-glass); backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+  /* Cam/blur efekti minimuma indirildi: modern SaaS panellerindeki gibi
+     düz, opak yüzey + ince kenarlık kullanılıyor. */
+  background:var(--surface-glass); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
 }
 .section-title{font-size:19px; font-weight:800; letter-spacing:-.3px;}
 .section-head{display:flex; align-items:center; justify-content:space-between; margin:28px 0 14px;}
@@ -255,14 +263,54 @@ img{max-width:100%; display:block;}
 .welcome-block{padding:18px 18px 6px;}
 .welcome-block .greet{font-size:22px; font-weight:800; letter-spacing:-.4px;}
 .welcome-block .date{font-size:13px; color:var(--text-secondary); margin-top:3px; text-transform:capitalize;}
-.welcome-note{
-  margin-top:16px; border-radius:var(--radius-md); padding:16px 18px; background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-  color:#fff; box-shadow:var(--shadow-primary); font-size:13px; line-height:1.55; position:relative; overflow:hidden;
+/* Hızlı bilgi şeridi — eski gradyanlı/parlak "welcome-note" yerine
+   düz, az-parlamalı, sol kenarlığı turuncu vurgulu sade bir şerit. */
+.highlight-strip{
+  margin:14px 18px 0; padding:13px 15px; border-radius:var(--radius-sm);
+  background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--primary);
 }
-.welcome-note::after{content:'</>'; position:absolute; right:-6px; bottom:-14px; font-family:monospace; font-size:64px; font-weight:800; opacity:.15;}
-.welcome-note b{display:block; font-size:14.5px; margin-bottom:4px;}
+.highlight-strip b{display:block; font-size:12.6px; font-weight:800; margin-bottom:3px;}
+.highlight-strip span{font-size:12px; color:var(--text-secondary); line-height:1.55;}
 
-/* Quick access grid */
+/* ============================================================
+   WTK YARDIMCI ANA SAYFA KARTI
+   Ana sayfanın en görünür alanı — modern SaaS panel görünümü:
+   düz yüzey, ince kenarlık, üstte ince turuncu vurgu çizgisi.
+   ============================================================ */
+.assistant-card{
+  margin:16px 18px 4px; padding:20px 18px; border-radius:var(--radius-lg);
+  background:var(--surface); border:1px solid var(--border); box-shadow:var(--shadow-sm);
+  position:relative; overflow:hidden;
+}
+.assistant-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--primary), rgba(var(--primary-rgb),0));
+}
+.assistant-card-top{display:flex; align-items:center; gap:13px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+.assistant-card-top:active{opacity:.82;}
+.assistant-avatar{
+  width:50px; height:50px; border-radius:15px; flex-shrink:0; font-size:23px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  display:flex; align-items:center; justify-content:center;
+}
+.assistant-card-text{min-width:0;}
+.assistant-card-text h3{font-size:16px; font-weight:800; letter-spacing:-.2px;}
+.assistant-card-text p{font-size:12.5px; color:var(--text-secondary); margin-top:2px;}
+.assistant-quick-actions{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:16px;}
+.aq-btn{
+  display:flex; align-items:center; gap:9px; padding:12px 12px; border-radius:12px;
+  background:var(--bg); border:1px solid var(--border); color:var(--text);
+  font-size:12.2px; font-weight:700; font-family:inherit; cursor:pointer; text-align:left;
+  transition:transform var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+}
+.aq-btn .aq-ic{font-size:16px; flex-shrink:0;}
+.aq-btn:active{transform:scale(.96);}
+.aq-btn:nth-child(5){grid-column:1 / -1;}
+@media (hover:hover){
+  .aq-btn:hover{border-color:var(--primary); background:var(--primary-light);}
+}
+
+/* Quick access grid (Profil sayfasındaki "Kısayollar" için hâlâ kullanılabilir) */
 .quick-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:11px; padding:18px; }
 .quick-item{
   display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 4px; cursor:pointer;
@@ -272,25 +320,21 @@ img{max-width:100%; display:block;}
 .quick-icon{width:48px; height:48px; border-radius:16px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:22px;}
 .quick-item span{font-size:10.8px; font-weight:700; text-align:center; color:var(--text-secondary); line-height:1.2;}
 
-/* Horizontal scroller for calendar preview */
-.hscroll{display:flex; gap:12px; overflow-x:auto; padding:2px 18px 10px; scroll-snap-type:x mandatory;}
-.hscroll::-webkit-scrollbar{display:none;}
-.mini-cal-card{
-  scroll-snap-align:start; min-width:168px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
-  padding:14px; box-shadow:var(--shadow-sm); flex-shrink:0;
-}
-.mini-cal-card .status{font-size:10px; font-weight:800; margin-bottom:7px;}
-.mini-cal-card h5{font-size:13px; font-weight:800; line-height:1.3; margin-bottom:5px;}
-.mini-cal-card .rng{font-size:11px; color:var(--text-secondary);}
-
 /* Announcement card */
 .ann-card{margin:0 18px 12px; padding:16px; cursor:default;}
 .ann-card:hover{box-shadow:var(--shadow-md);}
 .ann-top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px;}
-.ann-top h5{font-size:14.5px; font-weight:800; line-height:1.35;}
+.ann-top h5{font-size:14.8px; font-weight:800; line-height:1.4; letter-spacing:-.1px;}
 .ann-date{font-size:10.5px; color:var(--text-tertiary); white-space:nowrap; font-weight:700; flex-shrink:0; margin-top:2px;}
-.ann-card p{font-size:12.8px; color:var(--text-secondary); line-height:1.6;}
+.ann-card p{font-size:13px; color:var(--text-secondary); line-height:1.65;}
 .ann-card .ann-author{display:block; margin-top:8px; font-size:10.5px; color:var(--text-tertiary); font-weight:700;}
+/* Öne çıkan (en yeni) duyuru vurgusu */
+.ann-card.featured{border-left:3px solid var(--primary); background:var(--surface);}
+.ann-card.featured .ann-top h5{font-size:15.3px;}
+.ann-featured-chip{
+  display:inline-flex; align-items:center; gap:4px; background:var(--primary-light); color:var(--primary-dark);
+  font-size:9.5px; font-weight:800; letter-spacing:.3px; padding:3px 8px; border-radius:999px; margin-bottom:8px;
+}
 
 /* Links list */
 .link-card{
@@ -355,7 +399,7 @@ img{max-width:100%; display:block;}
   margin:6px 18px 4px; padding:18px; border-radius:var(--radius-md); background:linear-gradient(135deg,#1a1d29,#2c3040); color:#fff;
   display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow-md);
 }
-[data-theme="dark"] .fee-banner{background:linear-gradient(135deg,#232833,#171a21);}
+[data-theme="dark"] .fee-banner{background:linear-gradient(135deg,#1e2028,#15161c);}
 .fee-banner div span{display:block; font-size:11px; opacity:.7; font-weight:700; text-transform:uppercase; letter-spacing:.5px;}
 .fee-banner div b{font-size:22px; font-weight:800;}
 .fee-banner .fee-emoji{font-size:30px;}
@@ -490,21 +534,16 @@ img{max-width:100%; display:block;}
    KAMPÜS KART BİLGİLENDİRME KARTI (info-notice-card bileşeni)
    ============================================================ */
 .info-notice-card{
-  position:relative; width:100%; max-width:440px; margin:16px auto 4px;
-  background:var(--surface-glass);
-  backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%);
-  border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg);
-  padding:26px 22px 22px; overflow:hidden;
-  opacity:0; transform:translateY(24px);
-  transition:transform .6s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, opacity .6s ease, background .3s ease, border-color .3s ease;
+  position:relative; width:100%; max-width:440px; margin:20px auto 4px;
+  background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm);
+  padding:22px 20px 20px; overflow:hidden;
+  opacity:0; transform:translateY(14px);
+  transition:transform .5s cubic-bezier(.22,1,.36,1), box-shadow .3s ease, opacity .5s ease, background .3s ease, border-color .3s ease;
 }
 .info-notice-card.in-view{ opacity:1; transform:translateY(0); }
 @media (hover:hover){
-  .info-notice-card:hover{ transform:translateY(-6px); box-shadow:0 24px 60px rgba(0,0,0,0.18); }
-}
-.info-notice-card::before{
-  content:''; position:absolute; top:-70px; right:-60px; width:220px; height:220px; border-radius:50%;
-  background:radial-gradient(circle, rgba(var(--primary-rgb),0.22), transparent 70%); pointer-events:none;
+  .info-notice-card:hover{ box-shadow:var(--shadow-md); }
 }
 .info-notice-card .top-badge{
   position:absolute; top:18px; right:18px; z-index:2; display:flex; align-items:center; gap:6px;
@@ -520,12 +559,6 @@ img{max-width:100%; display:block;}
   display:flex; align-items:center; justify-content:center; color:#fff; box-shadow:var(--shadow-primary);
 }
 .info-notice-card .icon-badge svg{ width:26px; height:26px; position:relative; z-index:1; }
-.info-notice-card .icon-badge::after{
-  content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
-  background:linear-gradient(120deg, transparent, rgba(255,255,255,.55), transparent);
-  transform:skewX(-20deg); animation:wtkShimmer 3.2s ease-in-out infinite;
-}
-@keyframes wtkShimmer{ 0%{left:-60%;} 45%{left:120%;} 100%{left:120%;} }
 .info-notice-card h3{ margin:0; font-size:16.5px; font-weight:800; letter-spacing:-.2px; line-height:1.35; }
 .info-notice-card .card-sub{ display:block; margin-top:4px; font-size:12px; color:var(--text-secondary); font-weight:600; }
 .info-notice-card .info-rows{ position:relative; z-index:1; display:flex; flex-direction:column; gap:2px; margin-bottom:20px; }
@@ -556,7 +589,7 @@ img{max-width:100%; display:block;}
 .info-notice-card .card-btn.primary{ background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff; box-shadow:var(--shadow-primary); }
 .info-notice-card .card-btn.outline{ background:transparent; border:1.5px solid var(--border); color:var(--text); }
 @media (hover:hover){
-  .info-notice-card .card-btn.primary:hover{ box-shadow:0 16px 34px rgba(var(--primary-rgb),.4); transform:translateY(-2px); }
+  .info-notice-card .card-btn.primary:hover{ box-shadow:0 8px 18px rgba(var(--primary-rgb),.28); transform:translateY(-2px); }
   .info-notice-card .card-btn.outline:hover{ border-color:var(--primary); color:var(--primary-dark); background:var(--primary-light); transform:translateY(-2px); }
 }
 @media (max-width:380px){
@@ -664,85 +697,121 @@ img{max-width:100%; display:block;}
 #wtkChatBtn{
 position:fixed;
 right:20px;
-bottom:20px;
+bottom:calc(var(--navbar-h) + 18px);
 z-index:9999;
-width:60px;
-height:60px;
+width:58px;
+height:58px;
 border:none;
 border-radius:50%;
 cursor:pointer;
 font-size:24px;
-background:#ff7a00;
-color:white;
+background:var(--primary);
+color:#fff;
+box-shadow:var(--shadow-primary);
+transition:transform var(--t-fast);
 }
+#wtkChatBtn:active{transform:scale(.92);}
 
 #wtkChatWindow{
 position:fixed;
 right:20px;
-bottom:90px;
+bottom:calc(var(--navbar-h) + 84px);
 width:320px;
 max-width:90vw;
 height:450px;
-background:white;
-border-radius:16px;
+max-height:65vh;
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:var(--radius-lg);
 display:none;
 flex-direction:column;
-box-shadow:0 10px 30px rgba(0,0,0,.3);
+box-shadow:var(--shadow-lg);
 z-index:9999;
+overflow:hidden;
 }
 
 #wtkChatHeader{
-padding:12px;
-font-weight:bold;
+padding:14px 16px;
+font-weight:800;
+font-size:14px;
 display:flex;
 justify-content:space-between;
-border-bottom:1px solid #ddd;
-color:black;
+align-items:center;
+border-bottom:1px solid var(--border);
+color:var(--text);
+}
+#wtkCloseBtn{
+background:none;
+border:none;
+color:var(--text-secondary);
+font-size:15px;
+cursor:pointer;
+padding:4px;
 }
 
 #wtkMessages{
 flex:1;
 overflow-y:auto;
-padding:10px;
-color:black;
+padding:12px;
+color:var(--text);
 }
 
 #wtkInputArea{
 display:flex;
 gap:8px;
 padding:10px;
-border-top:1px solid #ddd;
+border-top:1px solid var(--border);
 }
 
 #wtkInput{
 flex:1;
-padding:8px;
-color:black;
-background:white;
--webkit-text-fill-color:black;
-caret-color:black;
+padding:10px 12px;
+color:var(--text);
+background:var(--bg);
+border:1px solid var(--border);
+border-radius:var(--radius-sm);
+font-size:13.5px;
+-webkit-text-fill-color:var(--text);
+caret-color:var(--text);
 }
+#wtkInput:focus{border-color:var(--primary);}
 
 #wtkInput::placeholder{
-color:#666;
+color:var(--text-tertiary);
 opacity:1;
 }
 
+#wtkSendBtn{
+background:var(--primary);
+color:#fff;
+border:none;
+border-radius:var(--radius-sm);
+padding:0 16px;
+font-weight:700;
+font-size:13px;
+cursor:pointer;
+}
+#wtkSendBtn:active{transform:scale(.95);}
+
 .wtk-bot{
-background:#f2f2f2;
-padding:8px;
+background:var(--surface-2);
+padding:8px 10px;
 border-radius:10px;
 margin-bottom:8px;
-color:black;
+color:var(--text);
+font-size:13px;
+line-height:1.5;
 }
 
 .wtk-user{
-background:#d9f5ff;
-padding:8px;
+background:var(--primary-light);
+padding:8px 10px;
 border-radius:10px;
 margin-bottom:8px;
 text-align:right;
-color:black;
+color:var(--text);
+font-size:13px;
+line-height:1.5;
 }
 
 .wtk-source-tag{
@@ -757,7 +826,7 @@ text-transform:uppercase;
 .wtk-typing{
 display:inline-flex;
 gap:4px;
-background:#f2f2f2;
+background:var(--surface-2);
 padding:10px 12px;
 border-radius:10px;
 margin-bottom:8px;
@@ -766,7 +835,7 @@ margin-bottom:8px;
 width:6px;
 height:6px;
 border-radius:50%;
-background:#999;
+background:var(--text-tertiary);
 animation:wtkTypingBounce 1.1s infinite ease-in-out;
 }
 .wtk-typing span:nth-child(2){animation-delay:.15s;}
@@ -851,11 +920,42 @@ cursor:not-allowed;
         <div class="welcome-block">
           <div class="greet" id="homeGreet">Hoş Geldin 👋</div>
           <div class="date" id="homeDate"></div>
-          <div class="welcome-note">
-            <b id="homeHighlightTitle">Hızlı Bilgi</b>
-            <span id="homeHighlightText">E-Kayıt süreci başladı, tarihleri Akademik Takvim sayfasından takip edebilirsin.</span>
+        </div>
+
+        <div class="highlight-strip">
+          <b id="homeHighlightTitle">Hızlı Bilgi</b>
+          <span id="homeHighlightText">E-Kayıt süreci başladı, tarihleri Akademik Takvim sayfasından takip edebilirsin.</span>
+        </div>
+
+        <!-- ---- WTK Yardımcı Kartı ---- -->
+        <div class="assistant-card">
+          <div class="assistant-card-top" id="assistantOpenTrigger">
+            <div class="assistant-avatar">🤖</div>
+            <div class="assistant-card-text">
+              <h3>WTK Yardımcı</h3>
+              <p>Bugün sana nasıl yardımcı olabilirim?</p>
+            </div>
+          </div>
+          <div class="assistant-quick-actions">
+            <button class="aq-btn" data-nav="page-course-content"><span class="aq-ic">📖</span>Ders İçerikleri</button>
+            <button class="aq-btn" data-scroll="campusCardNotice"><span class="aq-ic">💳</span>Kampüs Kart</button>
+            <button class="aq-btn" data-nav="page-calendar"><span class="aq-ic">📅</span>Akademik Takvim</button>
+            <button class="aq-btn" data-nav="page-announcements"><span class="aq-ic">📢</span>Duyurular</button>
+            <button class="aq-btn" data-nav="page-calendar"><span class="aq-ic">💰</span>Dönem Ücreti</button>
           </div>
         </div>
+
+        <div class="section-head container-pad">
+          <div class="section-title">Yaklaşan Tarihler</div>
+          <button class="link-more" data-nav="page-calendar">Takvimi Gör</button>
+        </div>
+        <div class="timeline" id="homeCalendarPreview"></div>
+
+        <div class="section-head container-pad">
+          <div class="section-title">Son Duyurular</div>
+          <button class="link-more" data-nav="page-announcements">Tümü</button>
+        </div>
+        <div id="homeAnnPreview"></div>
 
         <!-- ---- Kampüs Kart Bilgilendirme Kartı ---- -->
         <div class="info-notice-card" id="campusCardNotice" data-animate-in>
@@ -952,26 +1052,6 @@ cursor:not-allowed;
             </a>
           </div>
         </div>
-
-        <div class="quick-grid" id="quickGrid"></div>
-
-        <div class="section-head container-pad">
-          <div class="section-title">Yaklaşan Tarihler</div>
-          <button class="link-more" data-nav="page-calendar">Takvimi Gör</button>
-        </div>
-        <div class="hscroll" id="homeCalendarPreview"></div>
-
-        <div class="section-head container-pad">
-          <div class="section-title">Son Duyurular</div>
-          <button class="link-more" data-nav="page-announcements">Tümü</button>
-        </div>
-        <div id="homeAnnPreview"></div>
-
-        <div class="section-head container-pad">
-          <div class="section-title">Faydalı Bağlantılar</div>
-          <button class="link-more" data-nav="page-links">Tümü</button>
-        </div>
-        <div id="homeLinksPreview"></div>
       </section>
 
       <!-- ---- DERS NOTLARI ---- -->
@@ -1133,7 +1213,7 @@ cursor:not-allowed;
             <span class="chip chip-blue">Gayriresmî</span>
             <span class="chip chip-green">v2.0</span>
           </div>
-          <div class="about-credit">Kurucu & Geliştirici • @emrebeymi</div>
+          <div class="about-credit">Designed by @emrebeymi</div>
         </div>
       </section>
 
@@ -1147,8 +1227,13 @@ cursor:not-allowed;
         <div class="info-list card">
           <div class="info-row"><span class="lab">Bölüm</span><span class="val">Web Tasarımı ve Kodlama</span></div>
           <div class="info-row"><span class="lab">Üniversite</span><span class="val">Ankara Üniversitesi Açıköğretim Fakültesi</span></div>
-          <div class="info-row"><span class="lab">Tema</span><span class="val" id="profileThemeVal">Açık Mod</span></div>
+          <div class="info-row"><span class="lab">Tema</span><span class="val" id="profileThemeVal">Koyu Mod</span></div>
         </div>
+
+        <div class="section-head container-pad" style="margin:22px 0 8px;">
+          <div class="section-title" style="font-size:15px;">Kısayollar</div>
+        </div>
+        <div class="quick-grid" id="profileShortcutGrid"></div>
 
         <div class="settings-list card">
           <div class="settings-row">
@@ -1498,7 +1583,10 @@ function applyTheme(theme){
   if(pv) pv.textContent = dark ? 'Koyu Mod' : 'Açık Mod';
 }
 function initTheme(){
-  const saved = lsGet(LS.theme, null) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  // Marka kimliği koyu temaya öncelik verir; kullanıcı sistemi
+  // açıkça "light" istemediği sürece (veya daha önce elle açık
+  // temayı seçmediyse) koyu tema varsayılan olarak açılır.
+  const saved = lsGet(LS.theme, null) || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
   applyTheme(saved);
 }
 function toggleTheme(){
@@ -1564,17 +1652,45 @@ function switchPage(pageId, silent){
 }
 
 /* ---------------- Render: Ana Sayfa ---------------- */
+// Not: "Ders Notları" ana sayfadan kaldırıldı (yalnızca alt menüden
+// erişilir). Diğer ikincil sayfalar (Sınavlar, Faydalı Bağlantılar vb.)
+// artık Profil sayfasındaki "Kısayollar" ızgarasında listelenir, böylece
+// ana sayfa yalnızca Yardımcı kartı + Yaklaşan Tarihler + Duyurular'a
+// odaklanabilir.
 const QUICK_ITEMS = [
-  {icon:'📚', label:'Ders Notları', nav:'page-courses'},
   {icon:'📄', label:'PDF Arşivi', nav:'page-pdf'},
-  {icon:'📅', label:'Akademik Takvim', nav:'page-calendar'},
-  {icon:'📢', label:'Duyurular', nav:'page-announcements'},
   {icon:'📝', label:'Sınavlar', nav:'page-exams'},
   {icon:'📖', label:'Ders İçerikleri', nav:'page-course-content'},
   {icon:'🎓', label:'Faydalı Bağlantılar', nav:'page-links'},
-  {icon:'👤', label:'Profil', nav:'page-profile'},
+  {icon:'📅', label:'Akademik Takvim', nav:'page-calendar'},
   {icon:'ℹ️', label:'Hakkında', nav:'page-about'}
 ];
+
+function renderProfileShortcuts(){
+  const el = document.getElementById('profileShortcutGrid');
+  if(!el) return;
+  el.innerHTML = QUICK_ITEMS.map(q => `
+    <div class="quick-item" data-nav="${q.nav}">
+      <div class="quick-icon">${q.icon}</div>
+      <span>${q.label}</span>
+    </div>`).join('');
+}
+
+/* Ana sayfa "Yaklaşan Tarihler" widget'ı — Akademik Takvim sayfasıyla
+   aynı zaman çizelgesi (timeline) bileşenini kullanır, sadece daha az
+   öğe gösterir. */
+function homeTimelineItemHtml(c){
+  const st = dateStatus(c.start, c.end);
+  const badge = st==='ongoing' ? '<span class="chip chip-green">Devam Ediyor</span>' : st==='upcoming' ? `<span class="chip chip-orange">${daysUntil(c.start)} gün kaldı</span>` : '<span class="chip chip-gray">Sona Erdi</span>';
+  return `<div class="tl-item ${st}">
+    <div class="tl-dot"></div>
+    <div class="tl-card card">
+      <h5>${escapeHtml(c.title)}</h5>
+      <div class="rng">${fmtDateTR(c.start)} – ${fmtDateTR(c.end)}</div>
+      <div style="margin-top:8px;">${badge}</div>
+    </div>
+  </div>`;
+}
 
 function renderHome(){
   document.getElementById('homeDate').textContent = new Date().toLocaleDateString('tr-TR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
@@ -1582,22 +1698,13 @@ function renderHome(){
   document.getElementById('homeHighlightTitle').textContent = home.highlightTitle;
   document.getElementById('homeHighlightText').textContent = home.highlightText;
 
-  document.getElementById('quickGrid').innerHTML = QUICK_ITEMS.map(q => `
-    <div class="quick-item" data-nav="${q.nav}">
-      <div class="quick-icon">${q.icon}</div>
-      <span>${q.label}</span>
-    </div>`).join('');
-
   const upcoming = Data.cal.filter(c => dateStatus(c.start,c.end) !== 'past').slice(0,4);
-  document.getElementById('homeCalendarPreview').innerHTML = (upcoming.length ? upcoming : Data.cal.slice(0,2)).map(c=>{
-    const st = dateStatus(c.start,c.end);
-    const label = st==='ongoing' ? 'DEVAM EDİYOR' : st==='upcoming' ? 'YAKLAŞIYOR' : 'SONA ERDİ';
-    const color = st==='ongoing' ? 'var(--success)' : st==='upcoming' ? 'var(--primary)' : 'var(--text-tertiary)';
-    return `<div class="mini-cal-card"><div class="status" style="color:${color}">${label}</div><h5>${escapeHtml(c.title)}</h5><div class="rng">${fmtDateShort(c.start)} – ${fmtDateShort(c.end)}</div></div>`;
-  }).join('');
+  const tlList = upcoming.length ? upcoming : Data.cal.slice(0,2);
+  document.getElementById('homeCalendarPreview').innerHTML = tlList.length ? tlList.map(homeTimelineItemHtml).join('') : emptyStateHtml('📅','Takvim kaydı yok');
 
   document.getElementById('homeAnnPreview').innerHTML = Data.ann.slice(0,2).map(annCardHtml).join('') || emptyStateHtml('📢','Henüz duyuru yok');
-  document.getElementById('homeLinksPreview').innerHTML = Data.links.slice(0,3).map(linkCardHtml).join('') || emptyStateHtml('🎓','Bağlantı yok');
+
+  renderProfileShortcuts();
 }
 
 function emptyStateHtml(emoji, text){
@@ -1605,9 +1712,12 @@ function emptyStateHtml(emoji, text){
 }
 
 /* ---------------- Render: Duyurular ---------------- */
-function annCardHtml(a){
+function annCardHtml(a, idx){
   const authorLine = a.author ? `<span class="ann-author">— ${escapeHtml(a.author)}</span>` : '';
-  return `<div class="card ann-card">
+  const featured = idx === 0;
+  const chip = featured ? '<span class="ann-featured-chip">✨ Öne Çıkan</span>' : '';
+  return `<div class="card ann-card${featured?' featured':''}">
+    ${chip}
     <div class="ann-top"><h5>${escapeHtml(a.title)}</h5><span class="ann-date">${annDateLabel(a.createdAt)}</span></div>
     <p>${escapeHtml(a.content)}</p>
     ${authorLine}
@@ -2326,6 +2436,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if(navEl){ switchPage(navEl.dataset.nav); }
   });
 
+  /* ---- Aynı sayfada belirli bir bölüme kaydırma (örn. Kampüs Kart kısayolu) ---- */
+  document.body.addEventListener('click', (e)=>{
+    const scrollEl = e.target.closest('[data-scroll]');
+    if(!scrollEl) return;
+    switchPage('page-home');
+    requestAnimationFrame(()=>{
+      const target = document.getElementById(scrollEl.dataset.scroll);
+      if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
   /* ---- Karanlık mod ---- */
   document.getElementById('darkToggleBtn').addEventListener('click', toggleTheme);
   document.getElementById('darkSwitch').addEventListener('change', toggleTheme);
@@ -2492,6 +2613,16 @@ chatBtn.addEventListener('click', ()=>{
 closeBtn.addEventListener('click', ()=>{
   chatWindow.style.display='none';
 });
+
+// Ana sayfadaki büyük "WTK Yardımcı" kartına dokununca da (kısayol
+// butonları hariç) aynı sohbet penceresi açılır.
+const assistantOpenTrigger = document.getElementById('assistantOpenTrigger');
+if(assistantOpenTrigger){
+  assistantOpenTrigger.addEventListener('click', ()=>{
+    chatWindow.style.display='flex';
+    input.focus();
+  });
+}
 
 function addMessage(text, type, sourceLabel){
   const div=document.createElement('div');
