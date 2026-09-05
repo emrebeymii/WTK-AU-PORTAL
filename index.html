@@ -1477,6 +1477,17 @@ function startAnnouncementsListener(){
             createdAt: toJsDateSafe(data.createdAt)
           };
         });
+        // Firestore sorgusu zaten 'desc' istiyor, ama yeni eklenen bir
+        // duyurunun sunucu zaman damgası (serverTimestamp) bir anlığına
+        // null gelebilir; bu durumda sıralama şaşabilir. Bu yüzden
+        // istemci tarafında da açıkça en yeni tarih en başta olacak
+        // şekilde sıralıyoruz — henüz zaman damgası gelmemiş (null)
+        // duyuru "az önce" eklenmiş kabul edilip en üstte kalır.
+        announcementsCache.sort((a, b) => {
+          const ta = a.createdAt ? a.createdAt.getTime() : Date.now();
+          const tb = b.createdAt ? b.createdAt.getTime() : Date.now();
+          return tb - ta;
+        });
         announcementsLoaded = true;
         renderHome();
         renderAnnouncements();
