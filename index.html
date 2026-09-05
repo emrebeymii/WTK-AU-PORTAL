@@ -175,8 +175,11 @@ img{max-width:100%; display:block;}
 .splash-loader::after{content:''; display:block; width:40%; height:100%; background:#fff; border-radius:99px; animation:loaderMove 1.1s ease-in-out infinite;}
 @keyframes loaderMove{0%{transform:translateX(-100%);} 100%{transform:translateX(340%);}}
 
-/* ---------- Login ---------- */
-#loginScreen{
+/* ---------- Login / Kayıt / Onay Bekleniyor / Hesap Bulunamadı ----------
+   Bu dört tam ekran görünümün hepsi aynı sabit-konum + geçiş desenini
+   paylaşır (.auth-screen), böylece hangisi gösterilirse gösterilsin
+   aynı görsel dilde açılır/kapanır. */
+.auth-screen{
   position:fixed; inset:0; z-index:900; background:var(--bg); display:flex; flex-direction:column;
   opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease, visibility .5s ease;
   overflow-y:auto;
@@ -185,7 +188,12 @@ img{max-width:100%; display:block;}
      görünmez biçimde kilitleyip donmuş hissi verebilir. */
   visibility:hidden; pointer-events:none;
 }
-#loginScreen.show{opacity:1; transform:translateY(0); visibility:visible; pointer-events:auto;}
+.auth-screen.show{opacity:1; transform:translateY(0); visibility:visible; pointer-events:auto;}
+/* Giriş/Kayıt ekranı içindeki iki görünüm (sekme gibi) arasında geçiş */
+.auth-view{display:none;}
+.auth-view.active{display:block;}
+.auth-switch{text-align:center; font-size:12.8px; color:var(--text-secondary); margin-top:16px;}
+.auth-switch button{background:none; border:none; color:var(--primary); font-weight:800; font-size:12.8px; cursor:pointer; padding:2px 4px;}
 .login-hero{
   background:linear-gradient(155deg,var(--primary) 0%, var(--primary-dark) 100%);
   padding:56px 26px 60px; color:#fff; border-radius:0 0 40px 40px; position:relative; overflow:hidden;
@@ -857,34 +865,117 @@ cursor:not-allowed;
   <div id="splash">
     <div class="splash-logo">&lt;/&gt;</div>
     <div class="splash-title">Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama Portalı</div>
-    <div class="splash-sub">@emrebeymi tarafından hazırlandı</div>
+    <div class="splash-sub">Öğrenci topluluğu tarafından hazırlandı</div>
     <div class="splash-loader"></div>
   </div>
 
-  <!-- ============ GİRİŞ EKRANI ============ -->
-  <div id="loginScreen">
+  <!-- ============ GİRİŞ / KAYIT EKRANI ============ -->
+  <div id="loginScreen" class="auth-screen">
     <div class="login-hero">
       <div class="login-logo">&lt;/&gt;</div>
       <h1>Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama<br>Öğrenci Portalı</h1>
       <p>Bu platform bölüm öğrencileri tarafından oluşturulmuş bağımsız bir topluluk platformudur.</p>
     </div>
     <div class="login-body">
-      <div class="login-card">
-        <span class="field-label">Öğrenci Şifresi</span>
-        <div class="pw-wrap">
-          <input type="password" id="loginPassword" placeholder="Şifrenizi girin" autocomplete="off" maxlength="20">
-          <button class="pw-toggle" id="togglePw" type="button" aria-label="Şifreyi göster/gizle">👁️</button>
+
+      <!-- ---- GİRİŞ YAP ---- -->
+      <div class="auth-view active" id="authViewLogin">
+        <div class="login-card">
+          <div class="form-group">
+            <label>E-posta</label>
+            <input type="email" id="loginEmail" placeholder="ornek@ogrenci.ankara.edu.tr" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label>Şifre</label>
+            <div class="pw-wrap">
+              <input type="password" id="loginPassword" placeholder="Şifreniz" autocomplete="current-password">
+              <button class="pw-toggle" id="togglePw" type="button" aria-label="Şifreyi göster/gizle">👁️</button>
+            </div>
+          </div>
+          <div class="remember-row">
+            <input type="checkbox" id="rememberMe" checked>
+            <label for="rememberMe">Beni hatırla</label>
+          </div>
+          <button class="btn btn-primary btn-block" id="loginBtn">Giriş Yap</button>
+          <div class="error-card" id="loginError">⚠️ <span id="loginErrorText">Giriş başarısız oldu.</span></div>
         </div>
-        <div class="remember-row">
-          <input type="checkbox" id="rememberMe">
-          <label for="rememberMe">Beni hatırla</label>
-        </div>
-        <button class="btn btn-primary" id="loginBtn">Giriş Yap</button>
-        <div class="error-card" id="loginError">⚠️ <span id="loginErrorText">Şifre hatalı. Lütfen tekrar deneyin.</span></div>
+        <div class="auth-switch">Hesabın yok mu? <button type="button" id="showRegisterBtn">Kayıt Ol</button></div>
+        <div class="login-footer-note">Bu, Ankara Üniversitesi'nin resmî bir platformu değildir.</div>
       </div>
-      <div class="login-footer-note">Bu, Ankara Üniversitesi'nin resmî bir platformu değildir. Şifreyi bölüm topluluk kanallarından edinebilirsiniz.</div>
+
+      <!-- ---- KAYIT OL ---- -->
+      <div class="auth-view" id="authViewRegister">
+        <div class="login-card">
+          <div class="form-group">
+            <label>Ad Soyad</label>
+            <input type="text" id="regDisplayName" placeholder="Ad Soyad" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label>Kullanıcı Adı</label>
+            <input type="text" id="regUsername" placeholder="ör. emrebeymii" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>E-posta</label>
+            <input type="email" id="regEmail" placeholder="ornek@ogrenci.ankara.edu.tr" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label>Şifre</label>
+            <div class="pw-wrap">
+              <input type="password" id="regPassword" placeholder="En az 6 karakter" autocomplete="new-password">
+              <button class="pw-toggle" id="toggleRegPw" type="button" aria-label="Şifreyi göster/gizle">👁️</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Şifre (Tekrar)</label>
+            <input type="password" id="regPassword2" placeholder="Şifrenizi tekrar girin" autocomplete="new-password">
+          </div>
+          <button class="btn btn-primary btn-block" id="registerBtn">Kayıt Ol</button>
+          <div class="error-card" id="registerError">⚠️ <span id="registerErrorText">Kayıt oluşturulamadı.</span></div>
+        </div>
+        <div class="auth-switch">Zaten hesabın var mı? <button type="button" id="showLoginBtn">Giriş Yap</button></div>
+        <div class="login-footer-note">Kayıt olduktan sonra bir yöneticinin onayını beklemen gerekir.</div>
+      </div>
+
     </div>
   </div>
+
+  <!-- ============ ONAY BEKLENİYOR EKRANI ============ -->
+  <div id="pendingScreen" class="auth-screen">
+    <div class="login-hero">
+      <div class="login-logo">⏳</div>
+      <h1>Hesabın Onay Bekliyor</h1>
+      <p>Kaydın alındı! Bir yönetici hesabını onayladığında bu ekran otomatik olarak portala geçecek.</p>
+    </div>
+    <div class="login-body">
+      <div class="login-card" style="text-align:center;">
+        <div style="font-size:42px; margin-bottom:12px;">🕒</div>
+        <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.65;">
+          Bu genelde kısa sürer. Sekmeyi açık bırakabilir ya da daha sonra tekrar giriş
+          yapabilirsin — onaylandığın an doğrudan portala erişebileceksin.
+        </p>
+        <button class="btn btn-danger-ghost btn-block" id="pendingLogoutBtn" style="margin-top:18px;">🚪 Çıkış Yap</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HESAP BULUNAMADI EKRANI ============ -->
+  <div id="accountMissingScreen" class="auth-screen">
+    <div class="login-hero">
+      <div class="login-logo">⚠️</div>
+      <h1>Hesap Bulunamadı</h1>
+      <p>Bu hesaba ait bir öğrenci profili bulunamadı.</p>
+    </div>
+    <div class="login-body">
+      <div class="login-card" style="text-align:center;">
+        <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.65;">
+          Başvurun reddedilmiş ya da kayıt sırasında bir sorun oluşmuş olabilir. Bunun bir
+          hata olduğunu düşünüyorsan bölüm topluluk kanallarından yöneticiyle iletişime geç.
+        </p>
+        <button class="btn btn-danger-ghost btn-block" id="missingLogoutBtn" style="margin-top:18px;">🚪 Çıkış Yap</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- ============ UYGULAMA GÖVDESİ ============ -->
   <div id="app" class="hidden">
@@ -1213,21 +1304,31 @@ cursor:not-allowed;
             <span class="chip chip-blue">Gayriresmî</span>
             <span class="chip chip-green">v2.0</span>
           </div>
-          <div class="about-credit">Designed & Developed by @emrebeymi </div>
+          <div class="about-credit">Designed by @emrebeymi</div>
         </div>
       </section>
 
       <!-- ---- PROFİL ---- -->
       <section id="page-profile" class="page">
         <div class="profile-hero">
-          <div class="profile-avatar">Ö</div>
-          <h3>Öğrenci</h3>
-          <span>Ankara Üniversitesi Açıköğretim</span>
+          <div class="profile-avatar" id="profileAvatarBox">Ö</div>
+          <h3 id="profileDisplayNameVal">Öğrenci</h3>
+          <span id="profileUsernameVal">@—</span>
         </div>
         <div class="info-list card">
-          <div class="info-row"><span class="lab">Bölüm</span><span class="val">Web Tasarımı ve Kodlama</span></div>
-          <div class="info-row"><span class="lab">Üniversite</span><span class="val">Ankara Üniversitesi Açıköğretim Fakültesi</span></div>
+          <div class="info-row"><span class="lab">E-posta</span><span class="val" id="profileEmailVal">—</span></div>
+          <div class="info-row"><span class="lab">Kayıt Tarihi</span><span class="val" id="profileCreatedVal">—</span></div>
           <div class="info-row"><span class="lab">Tema</span><span class="val" id="profileThemeVal">Koyu Mod</span></div>
+        </div>
+
+        <div class="section-head container-pad" style="margin:22px 0 8px;">
+          <div class="section-title" style="font-size:15px;">Hakkımda</div>
+          <button class="link-more" id="editProfileBtn">✏️ Düzenle</button>
+        </div>
+        <div class="container-pad">
+          <div class="card" style="padding:14px 16px;">
+            <p id="profileBioText" style="font-size:13px; color:var(--text-secondary); line-height:1.65;">—</p>
+          </div>
         </div>
 
         <div class="section-head container-pad" style="margin:22px 0 8px;">
@@ -1258,7 +1359,7 @@ cursor:not-allowed;
       <!-- ---- YÖNETİCİ PANELİ ---- -->
       <section id="page-admin" class="page">
         <div class="page-header"><h2>🛠️ Yönetici Paneli</h2><p>İçerik yönetimi</p></div>
-        <div class="admin-lock-note">🔐 <span>Bu panelde yaptığınız değişiklikler bu cihazda saklanır ve tüm öğrencilerin gördüğü içerikleri günceller.</span></div>
+        <div class="admin-lock-note">🔐 <span>Bu panelde yaptığınız değişiklikler tüm öğrencilere anında yansır (Kullanıcılar sekmesindeki onaylar dahil).</span></div>
         <div class="admin-tabs" id="adminTabs"></div>
         <div class="admin-panel-body" id="adminBody"></div>
       </section>
@@ -1339,8 +1440,12 @@ import {
   onSnapshot, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged,
+  setPersistence, browserLocalPersistence, browserSessionPersistence
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import {
+  getStorage, ref as storageRef, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD15b4znteEZtIxmFzD_QwXAHj4Mk60As0",
@@ -1353,7 +1458,26 @@ const firebaseConfig = {
 };
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
-const auth = getAuth(firebaseApp);
+const auth = getAuth(firebaseApp);           // Öğrenci hesapları (kayıt/giriş) — tek "gerçek" oturum
+const storage = getStorage(firebaseApp);      // Profil fotoğrafı yüklemeleri (Firebase Storage)
+
+/* ---- Yönetici için İKİNCİ, BAĞIMSIZ bir Firebase App örneği ----
+   Neden: Firebase Authentication istemcide (tarayıcıda) her "app" için
+   yalnızca TEK bir aktif kullanıcı oturumuna izin verir. Öğrenciler artık
+   kendi e-posta/şifreleriyle GERÇEKTEN giriş yaptığı için, yönetici de
+   AYNI auth nesnesini kullansaydı, "Yönetici Girişi" yapıldığı an mevcut
+   öğrenci oturumu kapanırdı (öğrenci uygulamadan atılırdı). Bunu önlemek
+   için yöneticiye özel ikinci bir Firebase App + Auth + Firestore örneği
+   açılıyor: öğrenci kendi oturumunda kalırken, yönetici panelini AYRICA
+   (üstüne binen) bir oturum olarak açabiliyor — tıpkı eski sistemde
+   olduğu gibi. Her iki örnek de AYNI Firebase projesine (aynı
+   firebaseConfig) bağlanır; ayrılan yalnızca istemci tarafındaki oturum
+   durumudur. Yöneticinin Firestore'a yazdığı her şey (duyurular, ana
+   sayfa içeriği, kullanıcı onayları) Güvenlik Kurallarının doğru
+   request.auth'u görmesi için bilerek adminDb üzerinden yapılır. */
+const adminApp = initializeApp(firebaseConfig, "wtkAdminSession");
+const adminAuth = getAuth(adminApp);
+const adminDb = getFirestore(adminApp);
 /* NOT: apiKey burada gizli bir anahtar değildir, Firebase Web SDK'da her
    zaman istemci tarafında görünür olması normaldir. Gerçek erişim kontrolü
    Firestore Güvenlik Kuralları + Firebase Authentication ile sağlanır —
@@ -1363,11 +1487,9 @@ const auth = getAuth(firebaseApp);
 "use strict";
 
 /* ---------------- Sabitler ---------------- */
-const STUDENT_PASSWORD = "WTK2026AU";
-const ADMIN_EMAIL       = "emre.dmre0@gmail.com"; // Firebase Console > Authentication'da oluşturacağınız hesabın e-postası ile AYNI olmalı
+const ADMIN_EMAIL       = "admin@wtkauportal.local"; // Firebase Console > Authentication'da oluşturacağınız hesabın e-postası ile AYNI olmalı
 const LS = {
-  authLocal:'wtk_auth_local', authSession:'wtk_auth_session',
-  theme:'wtk_theme', remember:'wtk_remember_flag',
+  theme:'wtk_theme',
   pdfs:'wtk_pdfs', links:'wtk_links',
   calendar:'wtk_calendar', fee:'wtk_fee', home:'wtk_home_content', notifSeen:'wtk_notif_seen',
   duckBadge:'wtk_duck_badge_golden', portalHoleLast:'wtk_portal_hole_last_shown'
@@ -1607,37 +1729,135 @@ function toggleTheme(){
   applyTheme(next);
 }
 
-/* ---------------- Kimlik doğrulama ---------------- */
+/* ---------------- Kimlik doğrulama ----------------
+   ESKİ SİSTEM: tüm öğrenciler AYNI paylaşılan şifreyi (STUDENT_PASSWORD)
+   girip localStorage/sessionStorage'a bir "girdim" bayrağı yazıyordu.
+   YENİ SİSTEM: her öğrenci kendi e-posta/şifresiyle GERÇEK bir Firebase
+   Authentication hesabına sahip; profil bilgileri (ad, kullanıcı adı,
+   bio, onay durumu, avatar) Firestore'daki users/{uid} belgesinde
+   tutulur ve CİHAZDAN BAĞIMSIZ olarak senkronize kalır. localStorage
+   artık kimlik/oturum bilgisi için HİÇ kullanılmıyor. */
+
+let currentStudentUser = null;   // Firebase Auth kullanıcı nesnesi (öğrenci)
+let currentUserProfile = null;   // Firestore users/{uid} verisi (öğrencinin kendi profili)
+let profileUnsub = null;         // kendi profilini dinleyen onSnapshot'ı kapatmak için
+let authResolved = false;        // ilk onAuthStateChanged çağrısı geldi mi?
+let splashMinTimeElapsed = false;// açılış ekranı en az 1.5sn gösterildi mi?
+
 function isLoggedIn(){
-  return localStorage.getItem(LS.authLocal) === '1' || sessionStorage.getItem(LS.authSession) === '1';
+  return !!(currentStudentUser && currentUserProfile && currentUserProfile.approved === true);
 }
-function doLogin(remember){
-  if(remember){ localStorage.setItem(LS.authLocal, '1'); }
-  else{ sessionStorage.setItem(LS.authSession, '1'); }
-}
-function doLogout(){
-  localStorage.removeItem(LS.authLocal);
-  sessionStorage.removeItem(LS.authSession);
-  signOut(auth).catch(err => console.warn('Firebase çıkış hatası:', err));
+
+/* Dört tam ekran görünümden (giriş/kayıt, onay bekleniyor, hesap
+   bulunamadı, uygulamanın kendisi) yalnızca birini gösterir. */
+function showAuthScreen(id){
   document.getElementById('app').classList.add('hidden');
-  const ls = document.getElementById('loginScreen');
-  ls.classList.remove('hidden');
-  requestAnimationFrame(()=> ls.classList.add('show'));
-  document.getElementById('loginPassword').value = '';
-  switchPage('page-home', true);
-  resetPortalHoleSession(); // 🌀 bir sonraki giriş bağımsız bir %15 şansı alsın
+  ['loginScreen','pendingScreen','accountMissingScreen'].forEach(sid=>{
+    const el = document.getElementById(sid);
+    if(!el) return;
+    if(sid === id){
+      el.classList.remove('hidden');
+      requestAnimationFrame(()=> el.classList.add('show'));
+    } else {
+      el.classList.remove('show');
+      el.classList.add('hidden');
+    }
+  });
 }
+
+function trySplashDismiss(){
+  if(!splashMinTimeElapsed || !authResolved) return;
+  document.getElementById('splash').classList.add('fade-out');
+}
+
+/* ---- Öğrenci oturum durumu: TEK doğruluk kaynağı ----
+   Bu dinleyici hem giriş/çıkışları hem de "onay bekleniyor" ekranını
+   yönetir. Admin onayladığı anda (başka bir cihazdan bile olsa) bu
+   öğrencinin profil dinleyicisi tetiklenir ve ekran otomatik olarak
+   ana uygulamaya geçer — sayfa yenilemeye gerek yoktur. */
+function startStudentAuthListener(){
+  onAuthStateChanged(auth, (user) => {
+    if(profileUnsub){ profileUnsub(); profileUnsub = null; }
+    currentStudentUser = user;
+    currentUserProfile = null;
+
+    authResolved = true;
+    trySplashDismiss();
+
+    if(!user){
+      showAuthScreen('loginScreen');
+      return;
+    }
+
+    profileUnsub = onSnapshot(doc(db, 'users', user.uid), (snap) => {
+      if(!snap.exists()){
+        // Firestore belgesi yok: başvuru reddedilmiş ya da kayıt sırasında
+        // profil oluşturma adımı başarısız olmuş olabilir.
+        currentUserProfile = null;
+        showAuthScreen('accountMissingScreen');
+        return;
+      }
+      currentUserProfile = {
+        id: snap.id,
+        ...snap.data(),
+        createdAt: toJsDateSafe(snap.data().createdAt)
+      };
+      if(currentUserProfile.approved === true){
+        showApp();
+        renderProfilePage();
+      } else {
+        showAuthScreen('pendingScreen');
+      }
+    }, (err) => {
+      console.error('Profil dinleme hatası:', err);
+      toast('Profil bilgisi alınamadı. Bağlantınızı kontrol edin.', 'error');
+    });
+  });
+}
+
+function doLogout(){
+  signOut(auth).catch(err => console.warn('Çıkış hatası:', err));
+  // Ekran geçişi (giriş ekranına dönüş) startStudentAuthListener içindeki
+  // onAuthStateChanged tarafından otomatik olarak yapılır.
+  switchPage('page-home', true);
+  resetPortalHoleSession(); // 🌀 bir sonraki girişin bağımsız bir %15 şansı olsun
+}
+
 function isAdmin(){ return !!currentAdminUser; }
 
-/* ---- Yönetici oturumu: GERÇEK Firebase Authentication durumu ----
+/* ---- Yönetici oturumu: AYRI bir Firebase App örneği (adminAuth) ----
    isAdmin() artık istemci tarafı bir bayrağa değil, Firebase'in kendi
    doğrulanmış oturum durumuna bakar. Firestore Güvenlik Kuralları da
    aynı oturumu (request.auth) kontrol ettiği için, admin paneli
-   arayüzde gizli olsa bile şifresiz kimse Firestore'a yazamaz. */
+   arayüzde gizli olsa bile şifresiz kimse Firestore'a yazamaz.
+   Öğrenci oturumundan (auth) BAĞIMSIZ çalışır — bkz. adminApp tanımı. */
 let currentAdminUser = null;
+let allUsersCache = [];          // Yönetici panelindeki "Kullanıcılar" listesi
+let usersListenerUnsub = null;
 function startAdminAuthListener(){
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(adminAuth, (user) => {
     currentAdminUser = user;
+
+    if(usersListenerUnsub){ usersListenerUnsub(); usersListenerUnsub = null; }
+    if(user){
+      // Kullanıcı listesi yalnızca yönetici oturumu açıkken dinlenir
+      // (Güvenlik Kuralları da yalnızca admin'in tüm kullanıcıları
+      // listeleyebilmesine izin vermelidir).
+      usersListenerUnsub = onSnapshot(collection(adminDb, 'users'), (snapshot) => {
+        allUsersCache = snapshot.docs
+          .map(d => ({ id: d.id, ...d.data(), createdAt: toJsDateSafe(d.data().createdAt) }))
+          .sort((a, b) => {
+            if(a.approved !== b.approved) return a.approved ? 1 : -1; // onay bekleyenler önce
+            const ta = a.createdAt ? a.createdAt.getTime() : 0;
+            const tb = b.createdAt ? b.createdAt.getTime() : 0;
+            return tb - ta; // en yeni kayıt önce
+          });
+        if(activeAdminTab === 'users') renderAdminPanel();
+      }, (err) => console.error('Kullanıcı listesi dinleme hatası:', err));
+    } else {
+      allUsersCache = [];
+    }
+
     const adminPage = document.getElementById('page-admin');
     if(!user && adminPage && adminPage.classList.contains('active')){
       // Oturum başka bir sekmede kapatıldıysa admin panelinden çıkar
@@ -1776,10 +1996,11 @@ function closeNotifPanel(){ document.getElementById('notifPanel').classList.remo
    kalınmadan durum kendiliğinden onarılır. */
 function reconcileUIState(){
   const app = document.getElementById('app');
-  const loginScreen = document.getElementById('loginScreen');
   if(app && !app.classList.contains('hidden')){
-    loginScreen.classList.add('hidden');
-    loginScreen.classList.remove('show');
+    ['loginScreen','pendingScreen','accountMissingScreen'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){ el.classList.add('hidden'); el.classList.remove('show'); }
+    });
   }
   const anyModalOpen = document.querySelector('.modal-overlay.open');
   if(!anyModalOpen){ document.body.classList.remove('scroll-lock'); }
@@ -1852,6 +2073,38 @@ function renderPdfs(){
 }
 
 /* ---------------- Genel render tetikleyici ---------------- */
+/* ---------------- Render: Profil ----------------
+   Avatarı bir <img> yerine .avatar-mini/.profile-avatar kutusunun
+   arka plan resmi olarak basar — böylece mevcut CSS/markup'a hiç
+   dokunmadan hem topbar hem profil sayfası aynı yardımcıyla senkron
+   kalır. Fotoğraf yoksa isim baş harfine geri döner. */
+function paintAvatarBox(el, profile){
+  if(!el) return;
+  if(profile && profile.avatarUrl){
+    el.style.backgroundImage = `url('${profile.avatarUrl}')`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.textContent = '';
+  } else {
+    el.style.backgroundImage = '';
+    const initial = (profile && profile.displayName ? profile.displayName.trim().charAt(0) : 'Ö');
+    el.textContent = initial.toUpperCase() || 'Ö';
+  }
+}
+function renderProfilePage(){
+  const p = currentUserProfile;
+  paintAvatarBox(document.getElementById('avatarBtn'), p);
+  if(!p) return; // profil henüz yüklenmediyse (ör. onay bekleniyor ekranından geçiş anı) diğer alanlara dokunma
+  paintAvatarBox(document.getElementById('profileAvatarBox'), p);
+  document.getElementById('profileDisplayNameVal').textContent = p.displayName || 'Öğrenci';
+  document.getElementById('profileUsernameVal').textContent = '@' + (p.username || '—');
+  document.getElementById('profileEmailVal').textContent = p.email || '—';
+  document.getElementById('profileCreatedVal').textContent = p.createdAt
+    ? p.createdAt.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'})
+    : '—';
+  document.getElementById('profileBioText').textContent = (p.bio && p.bio.trim()) ? p.bio : 'Henüz bir bio eklenmedi.';
+}
+
 function renderAll(){
   renderHome();
   renderAnnouncements();
@@ -1862,6 +2115,7 @@ function renderAll(){
   renderPdfs();
   renderNotifPanel();
   updateNotifDot();
+  renderProfilePage();
   if(isAdmin()) renderAdminPanel();
 }
 
@@ -1873,7 +2127,8 @@ const ADMIN_TABS = [
   {id:'pdf', label:'📄 PDF'},
   {id:'links', label:'🎓 Bağlantılar'},
   {id:'cal', label:'📅 Takvim'},
-  {id:'home', label:'🏠 Ana Sayfa'}
+  {id:'home', label:'🏠 Ana Sayfa'},
+  {id:'users', label:'👥 Kullanıcılar'}
 ];
 let activeAdminTab = 'ann';
 
@@ -1938,28 +2193,76 @@ function renderAdminPanel(){
       <div class="form-group"><label>Vurgu Metni</label><textarea id="homeTextInput">${escapeHtml(h.highlightText)}</textarea></div>
       <button class="btn btn-primary btn-block" id="saveHomeContentBtn">Ana Sayfa İçeriğini Kaydet</button>
     `;
+  } else if(activeAdminTab === 'users'){
+    const list = allUsersCache;
+    body.innerHTML = list.length ? list.map(u => `
+      <div class="card admin-item" style="align-items:flex-start;">
+        <div class="admin-item-info">
+          <h5>${escapeHtml(u.displayName||'—')} <span style="font-weight:400; color:var(--text-tertiary);">@${escapeHtml(u.username||'—')}</span></h5>
+          <span>${escapeHtml(u.email||'—')}${u.createdAt ? ' · '+u.createdAt.toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'}) : ''}</span>
+          <span class="chip ${u.approved ? 'chip-green' : 'chip-orange'}" style="margin-top:6px; display:inline-block;">${u.approved ? '✅ Onaylı' : '⏳ Onay Bekliyor'}</span>
+        </div>
+        <div class="admin-item-actions">
+          ${u.approved
+            ? `<button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Erişimi kaldır">🚫</button>`
+            : `<button class="icon-sm-btn btn-ghost" data-approve-user="${u.id}" title="Onayla">✅</button>
+               <button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Reddet">🗑️</button>`}
+        </div>
+      </div>`).join('') : emptyStateHtml('👥','Henüz kayıtlı öğrenci yok.');
   }
-  document.getElementById('adminFab').classList.toggle('hidden', activeAdminTab === 'home');
+  document.getElementById('adminFab').classList.toggle('hidden', activeAdminTab === 'home' || activeAdminTab === 'users');
 }
 
 /* ---- Form modalı: Ekle / Düzenle ---- */
 let formCtx = { type:null, id:null };
+let pendingAvatarFile = null; // Profil düzenleme modalında seçilen ama henüz yüklenmemiş fotoğraf
 
 function openForm(type, id){
   formCtx = {type, id: id || null};
+  pendingAvatarFile = null;
   const isEdit = !!id;
-  const titleMap = {ann:'Duyuru', pdf:'PDF', links:'Bağlantı', cal:'Takvim Kaydı'};
-  document.getElementById('formModalTitle').textContent = (isEdit?'Düzenle: ':'Yeni ') + titleMap[type];
-  document.getElementById('formModalSub').textContent = isEdit ? 'Mevcut kaydı güncelleyin.' : 'Aşağıdaki alanları doldurun.';
+  const titleMap = {ann:'Duyuru', pdf:'PDF', links:'Bağlantı', cal:'Takvim Kaydı', profile:'Profil'};
+  document.getElementById('formModalTitle').textContent = type==='profile' ? 'Profili Düzenle' : (isEdit?'Düzenle: ':'Yeni ') + titleMap[type];
+  document.getElementById('formModalSub').textContent = type==='profile' ? 'Bu bilgiler tüm portalda görünür.' : (isEdit ? 'Mevcut kaydı güncelleyin.' : 'Aşağıdaki alanları doldurun.');
   const body = document.getElementById('formModalBody');
 
   let record = {};
-  if(isEdit){
+  if(type === 'profile'){
+    record = currentUserProfile || {};
+  } else if(isEdit){
     const map = {ann:Data.ann, pdf:Data.pdfs, links:Data.links, cal:Data.cal};
     record = map[type].find(r=>r.id===id) || {};
   }
 
-  if(type==='ann'){
+  if(type==='profile'){
+    body.innerHTML = `
+      <div class="form-group" style="text-align:center;">
+        <div class="profile-avatar" id="editAvatarPreview" style="margin:0 auto 10px; cursor:pointer;" title="Fotoğrafı değiştirmek için tıkla"></div>
+        <input type="file" id="f_avatarFile" accept="image/*" style="display:none;">
+        <button type="button" class="btn btn-outline" id="chooseAvatarBtn" style="width:auto; padding:8px 18px; font-size:12px;">📷 Fotoğraf Seç</button>
+      </div>
+      <div class="form-group"><label>Ad Soyad</label><input type="text" id="f_displayName" value="${escapeHtml(record.displayName||'')}"></div>
+      <div class="form-group"><label>Kullanıcı Adı</label><input type="text" id="f_username" value="${escapeHtml(record.username||'')}"></div>
+      <div class="form-group"><label>Bio</label><textarea id="f_bio" maxlength="200" placeholder="Kendinden kısaca bahset...">${escapeHtml(record.bio||'')}</textarea></div>`;
+    paintAvatarBox(document.getElementById('editAvatarPreview'), record);
+    document.getElementById('chooseAvatarBtn').addEventListener('click', ()=> document.getElementById('f_avatarFile').click());
+    document.getElementById('f_avatarFile').addEventListener('change', (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(!file.type.startsWith('image/')){ toast('Lütfen bir resim dosyası seçin', 'error'); return; }
+      if(file.size > 3 * 1024 * 1024){ toast('Fotoğraf 3 MB\'tan küçük olmalı', 'error'); return; }
+      pendingAvatarFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const preview = document.getElementById('editAvatarPreview');
+        preview.style.backgroundImage = `url('${reader.result}')`;
+        preview.style.backgroundSize = 'cover';
+        preview.style.backgroundPosition = 'center';
+        preview.textContent = '';
+      };
+      reader.readAsDataURL(file);
+    });
+  } else if(type==='ann'){
     body.innerHTML = `
       <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
       <div class="form-group"><label>Yazar</label><input type="text" id="f_author" value="${escapeHtml(record.author||'')}" placeholder="ör. Bölüm Başkanlığı"></div>
@@ -2004,6 +2307,42 @@ async function saveFormInner(){
   const isEdit = !!id;
   const val = sel => (document.getElementById(sel) ? document.getElementById(sel).value.trim() : '');
 
+  /* ---- PROFİL: kendi Firestore belgesine (users/{uid}) ve gerekiyorsa
+     Firebase Storage'a (avatars/{uid}) yazılır — İKİSİ DE öğrencinin
+     KENDİ oturumu (auth) üzerinden, admin oturumundan bağımsız. */
+  if(type === 'profile'){
+    if(!currentStudentUser){ toast('Oturum bulunamadı, lütfen tekrar giriş yapın', 'error'); return; }
+    const displayName = val('f_displayName');
+    const username = val('f_username');
+    const bio = document.getElementById('f_bio').value.trim();
+    if(!displayName || !username){ toast('Ad soyad ve kullanıcı adı zorunlu', 'error'); return; }
+    const saveBtn = document.getElementById('formModalSave');
+    const originalLabel = saveBtn.textContent;
+    saveBtn.disabled = true; saveBtn.textContent = 'Kaydediliyor...';
+    try{
+      let avatarUrl = (currentUserProfile && currentUserProfile.avatarUrl) || '';
+      if(pendingAvatarFile){
+        saveBtn.textContent = 'Fotoğraf yükleniyor...';
+        const fileRef = storageRef(storage, `avatars/${currentStudentUser.uid}`);
+        await uploadBytes(fileRef, pendingAvatarFile);
+        avatarUrl = await getDownloadURL(fileRef);
+      }
+      saveBtn.textContent = 'Kaydediliyor...';
+      await updateDoc(doc(db, 'users', currentStudentUser.uid), { displayName, username, bio, avatarUrl });
+      closeModal('formModal');
+      toast('Profil güncellendi', 'success');
+      pendingAvatarFile = null;
+      // Kendi profilini onSnapshot ile canlı dinlediğimiz için (bkz.
+      // startStudentAuthListener) ekran otomatik güncellenir.
+    }catch(err){
+      console.error('Profil güncelleme hatası:', err);
+      toast('Profil güncellenemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
+    }finally{
+      saveBtn.disabled = false; saveBtn.textContent = originalLabel;
+    }
+    return;
+  }
+
   /* ---- DUYURU: Firestore'a yazılır (localStorage KULLANILMAZ) ---- */
   if(type === 'ann'){
     const title = val('f_title'), author = val('f_author'), content = val('f_content');
@@ -2013,9 +2352,9 @@ async function saveFormInner(){
     saveBtn.disabled = true; saveBtn.textContent = 'Kaydediliyor...';
     try{
       if(isEdit){
-        await updateDoc(doc(db, 'announcements', id), { title, author, content });
+        await updateDoc(doc(adminDb, 'announcements', id), { title, author, content });
       } else {
-        await addDoc(collection(db, 'announcements'), { title, author, content, createdAt: serverTimestamp() });
+        await addDoc(collection(adminDb, 'announcements'), { title, author, content, createdAt: serverTimestamp() });
       }
       closeModal('formModal');
       toast(isEdit ? 'Duyuru güncellendi' : 'Duyuru eklendi', 'success');
@@ -2061,7 +2400,7 @@ async function deleteRecord(type, id){
   /* ---- DUYURU: Firestore'dan silinir ---- */
   if(type === 'ann'){
     try{
-      await deleteDoc(doc(db, 'announcements', id));
+      await deleteDoc(doc(adminDb, 'announcements', id));
       toast('Duyuru silindi', 'success');
       // Liste onSnapshot ile TÜM kullanıcılarda otomatik güncellenir.
     }catch(err){
@@ -2374,58 +2713,138 @@ document.addEventListener('DOMContentLoaded', () => {
     cards.forEach(c => io.observe(c));
   })();
 
-  /* ---- Duyurular ve Ana Sayfa Hızlı Bilgi: Firestore dinleyicilerini
+  /* ---- Duyurular, Ana Sayfa Hızlı Bilgi ve Öğrenci/Yönetici oturumları:
      hemen başlat (giriş ekranı açıkken bile arka planda çeksin, ilgili
      sayfaya gelindiğinde veri zaten hazır olsun) ---- */
   startAnnouncementsListener();
   startHomeContentListener();
   startAdminAuthListener();
+  startStudentAuthListener();
 
-  /* ---- Açılış ekranı ---- */
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('fade-out');
-    if(isLoggedIn()){
-      showApp();
-    } else {
-      const ls = document.getElementById('loginScreen');
-      ls.classList.remove('hidden');
-      requestAnimationFrame(()=> ls.classList.add('show'));
-    }
-  }, 1500);
+  /* ---- Açılış ekranı: en az 1.5sn göster, ilk auth kontrolü de
+     bittiğinde (hangisi geç olursa) açılışı kapat ---- */
+  setTimeout(() => { splashMinTimeElapsed = true; trySplashDismiss(); }, 1500);
 
   initTheme();
 
-  /* ---- Giriş ekranı: şifre göster/gizle ---- */
+  /* ---- Giriş / Kayıt: şifre göster-gizle ---- */
   document.getElementById('togglePw').addEventListener('click', function(){
     const inp = document.getElementById('loginPassword');
     const showing = inp.type === 'text';
     inp.type = showing ? 'password' : 'text';
     this.textContent = showing ? '👁️' : '🙈';
   });
+  document.getElementById('toggleRegPw').addEventListener('click', function(){
+    const inp = document.getElementById('regPassword');
+    const showing = inp.type === 'text';
+    inp.type = showing ? 'password' : 'text';
+    this.textContent = showing ? '👁️' : '🙈';
+  });
+
+  /* ---- Giriş / Kayıt görünümleri arasında geçiş ---- */
+  function showAuthView(id){
+    document.querySelectorAll('.auth-view').forEach(v => v.classList.toggle('active', v.id === id));
+  }
+  document.getElementById('showRegisterBtn').addEventListener('click', ()=> showAuthView('authViewRegister'));
+  document.getElementById('showLoginBtn').addEventListener('click', ()=> showAuthView('authViewLogin'));
+
+  function showFieldError(cardId, textId, msg){
+    const errCard = document.getElementById(cardId);
+    document.getElementById(textId).textContent = msg;
+    errCard.classList.add('show'); errCard.classList.remove('shake'); void errCard.offsetWidth; errCard.classList.add('shake');
+  }
+
+  const AUTH_ERROR_MESSAGES = {
+    'auth/invalid-credential': 'E-posta veya şifre hatalı.',
+    'auth/wrong-password': 'E-posta veya şifre hatalı.',
+    'auth/user-not-found': 'Bu e-posta ile kayıtlı bir hesap bulunamadı.',
+    'auth/invalid-email': 'Geçersiz e-posta adresi.',
+    'auth/too-many-requests': 'Çok fazla hatalı deneme yapıldı. Lütfen biraz sonra tekrar deneyin.',
+    'auth/network-request-failed': 'İnternet bağlantınızı kontrol edin.',
+    'auth/email-already-in-use': 'Bu e-posta adresi zaten kayıtlı.',
+    'auth/weak-password': 'Şifre çok zayıf, en az 6 karakter kullanın.'
+  };
 
   /* ---- Giriş yap ---- */
-  function attemptLogin(){
+  async function attemptLogin(){
+    const email = document.getElementById('loginEmail').value.trim();
     const pass = document.getElementById('loginPassword').value;
     const remember = document.getElementById('rememberMe').checked;
-    const errCard = document.getElementById('loginError');
-    if(pass === STUDENT_PASSWORD){
-      errCard.classList.remove('show','shake');
-      doLogin(remember);
-      const ls = document.getElementById('loginScreen');
-      ls.classList.remove('show');
-      setTimeout(()=>{ ls.classList.add('hidden'); showApp(); }, 480);
-    } else {
-      document.getElementById('loginErrorText').textContent = 'Şifre hatalı. Lütfen tekrar deneyin.';
-      errCard.classList.add('show');
-      errCard.classList.remove('shake'); void errCard.offsetWidth; errCard.classList.add('shake');
+    const btn = document.getElementById('loginBtn');
+    document.getElementById('loginError').classList.remove('show');
+
+    if(!email || !pass){ showFieldError('loginError','loginErrorText','Lütfen e-posta ve şifrenizi girin.'); return; }
+
+    const originalLabel = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
+    try{
+      await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+      await signInWithEmailAndPassword(auth, email, pass);
+      // Ekran geçişi startStudentAuthListener içindeki onAuthStateChanged
+      // tarafından otomatik yapılır (app / onay bekleniyor / hesap yok).
+    }catch(err){
+      console.error('Giriş hatası:', err);
+      showFieldError('loginError','loginErrorText', AUTH_ERROR_MESSAGES[err.code] || 'Giriş başarısız oldu. Lütfen tekrar deneyin.');
+    }finally{
+      btn.disabled = false; btn.textContent = originalLabel;
     }
   }
   document.getElementById('loginBtn').addEventListener('click', attemptLogin);
   document.getElementById('loginPassword').addEventListener('keydown', e=>{ if(e.key==='Enter') attemptLogin(); });
+  document.getElementById('loginEmail').addEventListener('keydown', e=>{ if(e.key==='Enter') attemptLogin(); });
+
+  /* ---- Kayıt ol ----
+     Firebase Authentication'da yeni bir hesap açar ve HEMEN ardından
+     Firestore'da users/{uid} profil belgesini oluşturur (approved:false).
+     onAuthStateChanged tetiklenip "Onay Bekleniyor" ekranını otomatik
+     gösterecektir. */
+  async function attemptRegister(){
+    const displayName = document.getElementById('regDisplayName').value.trim();
+    const username = document.getElementById('regUsername').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const password2 = document.getElementById('regPassword2').value;
+    const btn = document.getElementById('registerBtn');
+    document.getElementById('registerError').classList.remove('show');
+
+    if(!displayName || !username || !email || !password){ showFieldError('registerError','registerErrorText','Lütfen tüm alanları doldurun.'); return; }
+    if(password.length < 6){ showFieldError('registerError','registerErrorText','Şifre en az 6 karakter olmalı.'); return; }
+    if(password !== password2){ showFieldError('registerError','registerErrorText','Şifreler eşleşmiyor.'); return; }
+
+    const originalLabel = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Kayıt oluşturuluyor...';
+    try{
+      await setPersistence(auth, browserLocalPersistence);
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      try{
+        await setDoc(doc(db, 'users', cred.user.uid), {
+          username, displayName, email,
+          role: 'student', approved: false,
+          avatarUrl: '', bio: '',
+          createdAt: serverTimestamp()
+        });
+      }catch(profileErr){
+        console.error('Profil oluşturma hatası:', profileErr);
+        showFieldError('registerError','registerErrorText','Hesap oluşturuldu ama profil kaydedilemedi. Lütfen yöneticiyle iletişime geçin.');
+        return;
+      }
+      // onAuthStateChanged devralır: "Onay Bekleniyor" ekranı otomatik açılır.
+    }catch(err){
+      console.error('Kayıt hatası:', err);
+      showFieldError('registerError','registerErrorText', AUTH_ERROR_MESSAGES[err.code] || 'Kayıt oluşturulamadı. Lütfen tekrar deneyin.');
+    }finally{
+      btn.disabled = false; btn.textContent = originalLabel;
+    }
+  }
+  document.getElementById('registerBtn').addEventListener('click', attemptRegister);
+
+  /* ---- Onay Bekleniyor / Hesap Bulunamadı ekranlarındaki çıkış butonları ---- */
+  document.getElementById('pendingLogoutBtn').addEventListener('click', doLogout);
+  document.getElementById('missingLogoutBtn').addEventListener('click', doLogout);
 
   /* ---- Uygulamayı göster ---- */
   window.showApp = function(){
-    // Önce uygulamayı göster, ardından giriş ekranının kesinlikle
+    // Önce uygulamayı göster, ardından diğer tüm ekranların kesinlikle
     // gizlendiğinden ve tıklamaları engellemediğinden emin ol.
     document.getElementById('app').classList.remove('hidden');
     reconcileUIState();
@@ -2485,6 +2904,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---- Avatar -> profil ---- */
   document.getElementById('avatarBtn').addEventListener('click', ()=> switchPage('page-profile'));
   document.getElementById('goAboutBtn').addEventListener('click', ()=> switchPage('page-about'));
+  document.getElementById('editProfileBtn').addEventListener('click', ()=> openForm('profile', null));
 
   /* ---- Çıkış yap ---- */
   document.getElementById('logoutBtn').addEventListener('click', doLogout);
@@ -2542,7 +2962,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const originalLabel = loginBtn.textContent;
     loginBtn.disabled = true; loginBtn.textContent = 'Giriş yapılıyor...';
-    signInWithEmailAndPassword(auth, ADMIN_EMAIL, pass)
+    signInWithEmailAndPassword(adminAuth, ADMIN_EMAIL, pass)
       .then(() => {
         // onAuthStateChanged tetiklenip currentAdminUser'ı otomatik güncelleyecek.
         errCard.classList.remove('show');
@@ -2585,6 +3005,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const delBtn = e.target.closest('[data-del]');
     const feeBtn = e.target.closest('#editFeeBtn');
     const saveHomeBtn = e.target.closest('#saveHomeContentBtn');
+    const approveBtn = e.target.closest('[data-approve-user]');
+    const rejectBtn = e.target.closest('[data-reject-user]');
     if(editBtn){ openForm(editBtn.dataset.edit, editBtn.dataset.id); }
     if(delBtn){ if(confirm('Bu kaydı silmek istediğinize emin misiniz?')){ deleteRecord(delBtn.dataset.del, delBtn.dataset.id); } }
     if(feeBtn){
@@ -2596,7 +3018,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const highlightText = document.getElementById('homeTextInput').value.trim() || DEFAULTS.home.highlightText;
       const originalLabel = saveHomeBtn.textContent;
       saveHomeBtn.disabled = true; saveHomeBtn.textContent = 'Kaydediliyor...';
-      setDoc(doc(db, 'settings', 'homeContent'), { highlightTitle, highlightText }, { merge:true })
+      setDoc(doc(adminDb, 'settings', 'homeContent'), { highlightTitle, highlightText }, { merge:true })
         .then(()=> toast('Ana sayfa içeriği güncellendi', 'success'))
         .catch(err=>{
           console.error('Ana sayfa içeriği güncelleme hatası:', err);
@@ -2604,6 +3026,29 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .finally(()=>{ saveHomeBtn.disabled = false; saveHomeBtn.textContent = originalLabel; });
       // Liste onSnapshot ile TÜM kullanıcılarda otomatik güncellenir, ayrıca renderAll() gerekmez.
+    }
+    /* ---- Kullanıcı onaylama ---- */
+    if(approveBtn){
+      updateDoc(doc(adminDb, 'users', approveBtn.dataset.approveUser), { approved: true })
+        .then(()=> toast('Kullanıcı onaylandı', 'success'))
+        .catch(err=>{ console.error('Onaylama hatası:', err); toast('Onaylanamadı. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
+    }
+    /* ---- Kullanıcı reddetme (bekleyen başvuru → belgeyi sil) veya
+       erişim kaldırma (zaten onaylı → approved:false, belge kalır) ---- */
+    if(rejectBtn){
+      const u = allUsersCache.find(x => x.id === rejectBtn.dataset.rejectUser);
+      if(!u) return;
+      if(u.approved){
+        if(!confirm(`${u.displayName || 'Bu kullanıcının'} erişimini kaldırmak istediğinize emin misiniz?`)) return;
+        updateDoc(doc(adminDb, 'users', u.id), { approved: false })
+          .then(()=> toast('Erişim kaldırıldı', 'success'))
+          .catch(err=>{ console.error('Erişim kaldırma hatası:', err); toast('İşlem başarısız. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
+      } else {
+        if(!confirm('Bu kayıt başvurusunu reddetmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return;
+        deleteDoc(doc(adminDb, 'users', u.id))
+          .then(()=> toast('Başvuru reddedildi', 'success'))
+          .catch(err=>{ console.error('Reddetme hatası:', err); toast('İşlem başarısız. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
+      }
     }
   });
 /* ============================================================
