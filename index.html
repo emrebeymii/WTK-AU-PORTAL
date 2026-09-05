@@ -1659,6 +1659,13 @@ function switchPage(pageId, silent){
   });
   document.getElementById('content').scrollTo({top:0, behavior: silent ? 'auto' : 'smooth'});
   document.getElementById('adminFab').classList.toggle('hidden', pageId !== 'page-admin');
+  // WTK Yardımcı balonu yalnızca Ana Sayfa'da görünsün — diğer sayfalarda
+  // (özellikle Yönetici panelindeki "duyuru ekle" FAB'ı gibi) sabit
+  // konumlu butonların üstüne binmesini engeller.
+  const wtkBtn = document.getElementById('wtkChatBtn');
+  if(wtkBtn) wtkBtn.classList.toggle('hidden', pageId !== 'page-home');
+  const wtkWin = document.getElementById('wtkChatWindow');
+  if(wtkWin && pageId !== 'page-home') wtkWin.style.display = 'none';
   closeNotifPanel();
 }
 
