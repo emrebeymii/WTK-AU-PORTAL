@@ -865,7 +865,7 @@ cursor:not-allowed;
   <div id="splash">
     <div class="splash-logo">&lt;/&gt;</div>
     <div class="splash-title">Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama Portalı</div>
-    <div class="splash-sub">@emrebeymi tarafından bolca kahve ile hazırlandı</div>
+    <div class="splash-sub">Öğrenci topluluğu tarafından hazırlandı</div>
     <div class="splash-loader"></div>
   </div>
 
@@ -1304,7 +1304,7 @@ cursor:not-allowed;
             <span class="chip chip-blue">Gayriresmî</span>
             <span class="chip chip-green">v2.0</span>
           </div>
-          <div class="about-credit">Kurucu & Geliştirici • @emrebeymi</div>
+          <div class="about-credit">Designed by @emrebeymi</div>
         </div>
       </section>
 
@@ -1443,9 +1443,14 @@ import {
   getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged,
   setPersistence, browserLocalPersistence, browserSessionPersistence
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-import {
-  getStorage, ref as storageRef, uploadBytes, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-storage.js";
+/* NOT: Firebase Storage KASITLI OLARAK kullanılmıyor. Profil fotoğrafları
+   tarayıcıda (canvas ile) küçültülüp JPEG'e sıkıştırılıyor ve doğrudan
+   Firestore'daki users/{uid}.avatarUrl alanına bir Base64 Data URL
+   olarak yazılıyor — bkz. resizeImageToDataUrl() ve saveFormInner()
+   içindeki 'profile' dalı. Böylece Storage'ın Blaze plana geçiş
+   gereksinimine ihtiyaç kalmıyor; ~60 kullanıcılık bir portal için
+   küçük (300x300, q=0.7) JPEG'ler Firestore'un 1 MiB belge sınırının
+   fersah fersah altında kalır. */
 
 const firebaseConfig = {
   apiKey: "AIzaSyD15b4znteEZtIxmFzD_QwXAHj4Mk60As0",
@@ -1459,7 +1464,6 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);           // Öğrenci hesapları (kayıt/giriş) — tek "gerçek" oturum
-const storage = getStorage(firebaseApp);      // Profil fotoğrafı yüklemeleri (Firebase Storage)
 
 /* ---- Yönetici için İKİNCİ, BAĞIMSIZ bir Firebase App örneği ----
    Neden: Firebase Authentication istemcide (tarayıcıda) her "app" için
@@ -2092,6 +2096,18 @@ function paintAvatarBox(el, profile){
     el.textContent = initial.toUpperCase() || 'Ö';
   }
 }
+/* paintAvatarBox'ın HTML-string üreten karşılığı — admin Kullanıcılar
+   listesi gibi innerHTML şablonlarıyla oluşturulan yerlerde kullanılır.
+   Aynı kural: avatarUrl varsa küçük resim, yoksa isim baş harfi. */
+function avatarThumbHtml(profile, sizePx){
+  const size = sizePx || 40;
+  const base = `width:${size}px; height:${size}px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:${Math.round(size*0.42)}px; color:#fff;`;
+  if(profile && profile.avatarUrl){
+    return `<div style="${base} background-image:url('${profile.avatarUrl}'); background-size:cover; background-position:center;"></div>`;
+  }
+  const initial = (profile && profile.displayName ? profile.displayName.trim().charAt(0).toUpperCase() : 'Ö');
+  return `<div style="${base} background:linear-gradient(135deg,var(--primary),var(--primary-dark));">${initial || 'Ö'}</div>`;
+}
 function renderProfilePage(){
   const p = currentUserProfile;
   paintAvatarBox(document.getElementById('avatarBtn'), p);
@@ -2215,8 +2231,9 @@ function renderAdminPanel(){
   } else if(activeAdminTab === 'users'){
     const list = allUsersCache;
     body.innerHTML = list.length ? list.map(u => `
-      <div class="card admin-item" style="align-items:flex-start;">
-        <div class="admin-item-info">
+      <div class="card admin-item" style="align-items:flex-start; gap:12px;">
+        ${avatarThumbHtml(u, 40)}
+        <div class="admin-item-info" style="flex:1; min-width:0;">
           <h5>${escapeHtml(u.displayName||'—')} <span style="font-weight:400; color:var(--text-tertiary);">@${escapeHtml(u.username||'—')}</span></h5>
           <span>${escapeHtml(u.email||'—')}${u.createdAt ? ' · '+u.createdAt.toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'}) : ''}</span>
           <span class="chip ${u.approved ? 'chip-green' : 'chip-orange'}" style="margin-top:6px; display:inline-block;">${u.approved ? '✅ Onaylı' : '⏳ Onay Bekliyor'}</span>
@@ -2234,11 +2251,40 @@ function renderAdminPanel(){
 
 /* ---- Form modalı: Ekle / Düzenle ---- */
 let formCtx = { type:null, id:null };
-let pendingAvatarFile = null; // Profil düzenleme modalında seçilen ama henüz yüklenmemiş fotoğraf
+let pendingAvatarDataUrl = null; // Profil düzenleme modalında seçilip küçültülen fotoğrafın Base64 Data URL'i (henüz kaydedilmemiş)
+
+/* Seçilen görseli tarayıcıda (canvas ile) en uzun kenarı 300px'i
+   geçmeyecek şekilde küçültür ve %70 kalitede JPEG'e sıkıştırıp bir
+   Data URL (Base64) olarak döndürür. Firebase Storage'a HİÇ ihtiyaç
+   duymaz — sonuç doğrudan Firestore'a yazılabilecek kadar küçüktür. */
+function resizeImageToDataUrl(file, maxSize, quality){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Dosya okunamadı'));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Görsel yüklenemedi'));
+      img.onload = () => {
+        let { width, height } = img;
+        if(width > height){
+          if(width > maxSize){ height = Math.round(height * (maxSize / width)); width = maxSize; }
+        } else {
+          if(height > maxSize){ width = Math.round(width * (maxSize / height)); height = maxSize; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 function openForm(type, id){
   formCtx = {type, id: id || null};
-  pendingAvatarFile = null;
+  pendingAvatarDataUrl = null;
   const isEdit = !!id;
   const titleMap = {ann:'Duyuru', pdf:'PDF', links:'Bağlantı', cal:'Takvim Kaydı', profile:'Profil'};
   document.getElementById('formModalTitle').textContent = type==='profile' ? 'Profili Düzenle' : (isEdit?'Düzenle: ':'Yeni ') + titleMap[type];
@@ -2265,21 +2311,36 @@ function openForm(type, id){
       <div class="form-group"><label>Bio</label><textarea id="f_bio" maxlength="200" placeholder="Kendinden kısaca bahset...">${escapeHtml(record.bio||'')}</textarea></div>`;
     paintAvatarBox(document.getElementById('editAvatarPreview'), record);
     document.getElementById('chooseAvatarBtn').addEventListener('click', ()=> document.getElementById('f_avatarFile').click());
-    document.getElementById('f_avatarFile').addEventListener('change', (e)=>{
+    document.getElementById('f_avatarFile').addEventListener('change', async (e)=>{
       const file = e.target.files && e.target.files[0];
       if(!file) return;
       if(!file.type.startsWith('image/')){ toast('Lütfen bir resim dosyası seçin', 'error'); return; }
-      if(file.size > 3 * 1024 * 1024){ toast('Fotoğraf 3 MB\'tan küçük olmalı', 'error'); return; }
-      pendingAvatarFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const preview = document.getElementById('editAvatarPreview');
-        preview.style.backgroundImage = `url('${reader.result}')`;
+      if(file.size > 2 * 1024 * 1024){ toast('Fotoğraf 2 MB\'tan küçük olmalı', 'error'); e.target.value=''; return; }
+
+      const preview = document.getElementById('editAvatarPreview');
+      const chooseBtn = document.getElementById('chooseAvatarBtn');
+      const originalBtnLabel = chooseBtn.textContent;
+      // ---- Yükleme/işleme göstergesi (küçültme+sıkıştırma anlık değil,
+      // büyük fotoğraflarda bir kaç yüz milisaniye sürebilir) ----
+      chooseBtn.disabled = true;
+      chooseBtn.textContent = '⏳ İşleniyor...';
+      preview.style.opacity = '.5';
+      try{
+        const dataUrl = await resizeImageToDataUrl(file, 300, 0.7);
+        pendingAvatarDataUrl = dataUrl;
+        preview.style.backgroundImage = `url('${dataUrl}')`;
         preview.style.backgroundSize = 'cover';
         preview.style.backgroundPosition = 'center';
         preview.textContent = '';
-      };
-      reader.readAsDataURL(file);
+      }catch(err){
+        console.error('Fotoğraf işleme hatası:', err);
+        toast('Fotoğraf işlenemedi. Başka bir dosya deneyin.', 'error');
+      }finally{
+        chooseBtn.disabled = false;
+        chooseBtn.textContent = originalBtnLabel;
+        preview.style.opacity = '1';
+        e.target.value = ''; // aynı dosya tekrar seçilirse 'change' yine tetiklensin
+      }
     });
   } else if(type==='ann'){
     body.innerHTML = `
@@ -2326,9 +2387,12 @@ async function saveFormInner(){
   const isEdit = !!id;
   const val = sel => (document.getElementById(sel) ? document.getElementById(sel).value.trim() : '');
 
-  /* ---- PROFİL: kendi Firestore belgesine (users/{uid}) ve gerekiyorsa
-     Firebase Storage'a (avatars/{uid}) yazılır — İKİSİ DE öğrencinin
-     KENDİ oturumu (auth) üzerinden, admin oturumundan bağımsız. */
+  /* ---- PROFİL: kendi Firestore belgesine (users/{uid}) yazılır.
+     Fotoğraf ayrıca bir yere "yüklenmez" — openForm() içinde seçilir
+     seçilmez tarayıcıda küçültülüp Base64 Data URL'e çevrilmiş halde
+     (pendingAvatarDataUrl) burada bekliyor, doğrudan avatarUrl alanına
+     yazılır. Hepsi öğrencinin KENDİ oturumu (auth) üzerinden, admin
+     oturumundan bağımsız. */
   if(type === 'profile'){
     if(!currentStudentUser){ toast('Oturum bulunamadı, lütfen tekrar giriş yapın', 'error'); return; }
     const displayName = val('f_displayName');
@@ -2337,20 +2401,14 @@ async function saveFormInner(){
     if(!displayName || !username){ toast('Ad soyad ve kullanıcı adı zorunlu', 'error'); return; }
     const saveBtn = document.getElementById('formModalSave');
     const originalLabel = saveBtn.textContent;
+    const photoChanged = !!pendingAvatarDataUrl;
     saveBtn.disabled = true; saveBtn.textContent = 'Kaydediliyor...';
     try{
-      let avatarUrl = (currentUserProfile && currentUserProfile.avatarUrl) || '';
-      if(pendingAvatarFile){
-        saveBtn.textContent = 'Fotoğraf yükleniyor...';
-        const fileRef = storageRef(storage, `avatars/${currentStudentUser.uid}`);
-        await uploadBytes(fileRef, pendingAvatarFile);
-        avatarUrl = await getDownloadURL(fileRef);
-      }
-      saveBtn.textContent = 'Kaydediliyor...';
+      const avatarUrl = pendingAvatarDataUrl || (currentUserProfile && currentUserProfile.avatarUrl) || '';
       await updateDoc(doc(db, 'users', currentStudentUser.uid), { displayName, username, bio, avatarUrl });
       closeModal('formModal');
-      toast('Profil güncellendi', 'success');
-      pendingAvatarFile = null;
+      toast(photoChanged ? 'Profil fotoğrafı güncellendi' : 'Profil güncellendi', 'success');
+      pendingAvatarDataUrl = null;
       // Kendi profilini onSnapshot ile canlı dinlediğimiz için (bkz.
       // startStudentAuthListener) ekran otomatik güncellenir.
     }catch(err){
