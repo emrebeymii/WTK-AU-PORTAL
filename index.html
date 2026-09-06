@@ -865,7 +865,7 @@ cursor:not-allowed;
   <div id="splash">
     <div class="splash-logo">&lt;/&gt;</div>
     <div class="splash-title">Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama Portalı</div>
-    <div class="splash-sub">@emrebeymi tarafından hazırlandı</div>
+    <div class="splash-sub">@emrebeymi tarafından bolca kahve ile hazırlandı</div>
     <div class="splash-loader"></div>
   </div>
 
@@ -1487,7 +1487,7 @@ const adminDb = getFirestore(adminApp);
 "use strict";
 
 /* ---------------- Sabitler ---------------- */
-const ADMIN_EMAIL       = "emre.dmre0@gmail.com"; // Firebase Console > Authentication'da oluşturacağınız hesabın e-postası ile AYNI olmalı
+const ADMIN_EMAIL       = "admin@wtkauportal.local"; // Firebase Console > Authentication'da oluşturacağınız hesabın e-postası ile AYNI olmalı
 const LS = {
   theme:'wtk_theme',
   pdfs:'wtk_pdfs', links:'wtk_links',
@@ -1865,6 +1865,7 @@ function startAdminAuthListener(){
     }
     if(document.getElementById('app') && !document.getElementById('app').classList.contains('hidden')){
       renderAdminPanel();
+      renderProfilePage();
     }
   });
 }
@@ -2103,6 +2104,18 @@ function renderProfilePage(){
     ? p.createdAt.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'})
     : '—';
   document.getElementById('profileBioText').textContent = (p.bio && p.bio.trim()) ? p.bio : 'Henüz bir bio eklenmedi.';
+
+  // "Yönetici Girişi" satırı yalnızca e-postası ADMIN_EMAIL ile eşleşen
+  // hesapta görünür — diğer tüm öğrencilerden gizlenir. Bu SADECE bir
+  // arayüz gizlemesidir; gerçek erişim kontrolü zaten Firebase
+  // Authentication + Firestore Güvenlik Kuralları tarafından sağlanıyor,
+  // yani biri bu satırı DOM'dan zorla görünür yapsa bile admin şifresini
+  // bilmeden panele giremez.
+  const adminRow = document.getElementById('openAdminLoginBtn');
+  if(adminRow){
+    const looksLikeAdmin = !!p.email && p.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    adminRow.classList.toggle('hidden', !(looksLikeAdmin || isAdmin()));
+  }
 }
 
 function renderAll(){
