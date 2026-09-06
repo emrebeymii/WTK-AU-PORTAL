@@ -1487,7 +1487,7 @@ const adminDb = getFirestore(adminApp);
 "use strict";
 
 /* ---------------- Sabitler ---------------- */
-const ADMIN_EMAIL       = "emre.dmre0@gmail.com"; // Firebase Console > Authentication'da oluşturacağınız hesabın e-postası ile AYNI olmalı
+const ADMIN_EMAIL       = "emre.dmre0@gmail.com"; // Firebase Console > Authentication'daki admin hesabının e-postasıyla AYNI olmalı
 const LS = {
   theme:'wtk_theme',
   pdfs:'wtk_pdfs', links:'wtk_links',
@@ -2111,10 +2111,16 @@ function renderProfilePage(){
   // Authentication + Firestore Güvenlik Kuralları tarafından sağlanıyor,
   // yani biri bu satırı DOM'dan zorla görünür yapsa bile admin şifresini
   // bilmeden panele giremez.
+  // NOT: Bilerek isAdmin() KONTROL EDİLMİYOR — adminAuth oturumu farklı
+  // bir Firebase App örneğinde tutulduğu için, bir kez admin girişi
+  // yapılmış bir tarayıcıda BAŞKA bir öğrenci hesabıyla giriş yapılsa
+  // bile o eski oturum arka planda açık kalabilir. Görünürlüğü isAdmin()
+  // ile de birleştirmek, o tarayıcıdaki HER öğrenci hesabında bu satırın
+  // yanlışlıkla görünmesine yol açıyordu.
   const adminRow = document.getElementById('openAdminLoginBtn');
   if(adminRow){
     const looksLikeAdmin = !!p.email && p.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    adminRow.classList.toggle('hidden', !(looksLikeAdmin || isAdmin()));
+    adminRow.classList.toggle('hidden', !looksLikeAdmin);
   }
 }
 
