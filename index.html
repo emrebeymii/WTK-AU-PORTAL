@@ -216,9 +216,11 @@ img{max-width:100%; display:block;}
 }
 .pw-wrap input:focus{border-color:var(--primary); background:var(--surface);}
 .pw-toggle{position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:18px; cursor:pointer; padding:8px; opacity:.6;}
-.remember-row{display:flex; align-items:center; gap:9px; margin:16px 0 20px;}
+.remember-row{display:flex; align-items:center; justify-content:space-between; gap:9px; margin:16px 0 20px;}
+.remember-check{display:flex; align-items:center; gap:9px;}
 .remember-row input[type=checkbox]{width:19px; height:19px; accent-color:var(--primary); cursor:pointer;}
 .remember-row label{font-size:13.5px; color:var(--text-secondary); cursor:pointer;}
+.forgot-link{background:none; border:none; color:var(--primary); font-weight:800; font-size:12.3px; cursor:pointer; padding:2px 4px;}
 .error-card{
   display:flex; align-items:center; gap:10px; background:var(--danger-bg); color:var(--danger); border-radius:var(--radius-sm);
   padding:13px 14px; font-size:13.5px; font-weight:600; margin-top:14px; max-height:0; opacity:0; overflow:hidden;
@@ -226,11 +228,21 @@ img{max-width:100%; display:block;}
 }
 .error-card.show{max-height:80px; opacity:1;}
 .error-card.shake{animation:shakeErr .45s;}
+.success-card{
+  display:flex; align-items:center; gap:10px; background:var(--success-bg); color:var(--success); border-radius:var(--radius-sm);
+  padding:13px 14px; font-size:13.5px; font-weight:600; margin-top:14px; max-height:0; opacity:0; overflow:hidden;
+  transition:max-height .35s ease, opacity .35s ease, margin .35s ease;
+}
+.success-card.show{max-height:100px; opacity:1;}
 @keyframes shakeErr{
   10%,90%{transform:translateX(-1px);} 20%,80%{transform:translateX(2px);}
   30%,50%,70%{transform:translateX(-5px);} 40%,60%{transform:translateX(5px);}
 }
 .login-footer-note{text-align:center; font-size:11.5px; color:var(--text-tertiary); margin-top:24px; line-height:1.6; padding:0 10px;}
+.kvkk-note{
+  display:flex; align-items:flex-start; gap:6px; text-align:left; font-size:10.8px; color:var(--text-tertiary);
+  line-height:1.55; margin-top:10px; padding:0 2px;
+}
 
 /* ---------- Top bar ---------- */
 .topbar{
@@ -865,7 +877,7 @@ cursor:not-allowed;
   <div id="splash">
     <div class="splash-logo">&lt;/&gt;</div>
     <div class="splash-title">Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama Portalı</div>
-    <div class="splash-sub">Öğrenci topluluğu tarafından hazırlandı</div>
+    <div class="splash-sub">@emrebeymi tarafından bolca kahve ile hazırlandı</div>
     <div class="splash-loader"></div>
   </div>
 
@@ -893,14 +905,32 @@ cursor:not-allowed;
             </div>
           </div>
           <div class="remember-row">
-            <input type="checkbox" id="rememberMe" checked>
-            <label for="rememberMe">Beni hatırla</label>
+            <div class="remember-check">
+              <input type="checkbox" id="rememberMe" checked>
+              <label for="rememberMe">Beni hatırla</label>
+            </div>
+            <button type="button" class="forgot-link" id="forgotPasswordLink">Şifremi unuttum?</button>
           </div>
           <button class="btn btn-primary btn-block" id="loginBtn">Giriş Yap</button>
           <div class="error-card" id="loginError">⚠️ <span id="loginErrorText">Giriş başarısız oldu.</span></div>
         </div>
         <div class="auth-switch">Hesabın yok mu? <button type="button" id="showRegisterBtn">Kayıt Ol</button></div>
         <div class="login-footer-note">Bu, Ankara Üniversitesi'nin resmî bir platformu değildir.</div>
+      </div>
+
+      <!-- ---- ŞİFREMİ UNUTTUM ---- -->
+      <div class="auth-view" id="authViewForgot">
+        <div class="login-card">
+          <div class="form-group">
+            <label>E-posta</label>
+            <input type="email" id="forgotEmail" placeholder="ornek@ogrenci.ankara.edu.tr" autocomplete="username">
+          </div>
+          <button class="btn btn-primary btn-block" id="sendResetBtn">Sıfırlama Bağlantısı Gönder</button>
+          <div class="error-card" id="forgotError">⚠️ <span id="forgotErrorText">Bir hata oluştu.</span></div>
+          <div class="success-card" id="forgotSuccess">✅ <span id="forgotSuccessText">Bağlantı gönderildi.</span></div>
+        </div>
+        <div class="auth-switch">Şifreni hatırladın mı? <button type="button" id="backToLoginBtn">Giriş Yap</button></div>
+        <div class="login-footer-note">E-posta adresine bir şifre sıfırlama bağlantısı göndereceğiz. Gelen kutunu (ve spam klasörünü) kontrol etmeyi unutma.</div>
       </div>
 
       <!-- ---- KAYIT OL ---- -->
@@ -930,6 +960,7 @@ cursor:not-allowed;
             <input type="password" id="regPassword2" placeholder="Şifrenizi tekrar girin" autocomplete="new-password">
           </div>
           <button class="btn btn-primary btn-block" id="registerBtn">Kayıt Ol</button>
+          <p class="kvkk-note"><span>🔒</span><span>Kayıt olarak; ad-soyad, kullanıcı adı ve e-posta bilgilerinin, hesabının onaylanabilmesi amacıyla Firebase altyapısında güvenli şekilde saklanmasını kabul etmiş olursun. Bilgilerin üçüncü taraflarla paylaşılmaz.</span></p>
           <div class="error-card" id="registerError">⚠️ <span id="registerErrorText">Kayıt oluşturulamadı.</span></div>
         </div>
         <div class="auth-switch">Zaten hesabın var mı? <button type="button" id="showLoginBtn">Giriş Yap</button></div>
@@ -1304,7 +1335,7 @@ cursor:not-allowed;
             <span class="chip chip-blue">Gayriresmî</span>
             <span class="chip chip-green">v2.0</span>
           </div>
-          <div class="about-credit">Designed by @emrebeymi</div>
+          <div class="about-credit">Kurucu & Geliştirici • @emrebeymi</div>
         </div>
       </section>
 
@@ -1441,6 +1472,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 import {
   getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged,
+  sendPasswordResetEmail,
   setPersistence, browserLocalPersistence, browserSessionPersistence
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 /* NOT: Firebase Storage KASITLI OLARAK kullanılmıyor. Profil fotoğrafları
@@ -2824,11 +2856,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.getElementById('showRegisterBtn').addEventListener('click', ()=> showAuthView('authViewRegister'));
   document.getElementById('showLoginBtn').addEventListener('click', ()=> showAuthView('authViewLogin'));
+  document.getElementById('forgotPasswordLink').addEventListener('click', ()=>{
+    // Kullanıcı zaten giriş ekranına e-postasını yazdıysa, şifre sıfırlama
+    // görünümüne geçerken bunu tekrar yazmak zorunda kalmasın.
+    const typedEmail = document.getElementById('loginEmail').value.trim();
+    if(typedEmail) document.getElementById('forgotEmail').value = typedEmail;
+    document.getElementById('forgotError').classList.remove('show');
+    document.getElementById('forgotSuccess').classList.remove('show');
+    showAuthView('authViewForgot');
+  });
+  document.getElementById('backToLoginBtn').addEventListener('click', ()=> showAuthView('authViewLogin'));
 
   function showFieldError(cardId, textId, msg){
     const errCard = document.getElementById(cardId);
     document.getElementById(textId).textContent = msg;
     errCard.classList.add('show'); errCard.classList.remove('shake'); void errCard.offsetWidth; errCard.classList.add('shake');
+  }
+  function showFieldSuccess(cardId, textId, msg){
+    document.getElementById(textId).textContent = msg;
+    document.getElementById(cardId).classList.add('show');
   }
 
   const AUTH_ERROR_MESSAGES = {
@@ -2836,11 +2882,36 @@ document.addEventListener('DOMContentLoaded', () => {
     'auth/wrong-password': 'E-posta veya şifre hatalı.',
     'auth/user-not-found': 'Bu e-posta ile kayıtlı bir hesap bulunamadı.',
     'auth/invalid-email': 'Geçersiz e-posta adresi.',
-    'auth/too-many-requests': 'Çok fazla hatalı deneme yapıldı. Lütfen biraz sonra tekrar deneyin.',
+    'auth/missing-email': 'Lütfen e-posta adresinizi girin.',
+    'auth/too-many-requests': 'Çok fazla deneme yapıldı. Lütfen biraz sonra tekrar deneyin.',
     'auth/network-request-failed': 'İnternet bağlantınızı kontrol edin.',
     'auth/email-already-in-use': 'Bu e-posta adresi zaten kayıtlı.',
     'auth/weak-password': 'Şifre çok zayıf, en az 6 karakter kullanın.'
   };
+
+  /* ---- Şifremi unuttum ---- */
+  async function attemptPasswordReset(){
+    const email = document.getElementById('forgotEmail').value.trim();
+    const btn = document.getElementById('sendResetBtn');
+    document.getElementById('forgotError').classList.remove('show');
+    document.getElementById('forgotSuccess').classList.remove('show');
+
+    if(!email){ showFieldError('forgotError','forgotErrorText','Lütfen e-posta adresinizi girin.'); return; }
+
+    const originalLabel = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+    try{
+      await sendPasswordResetEmail(auth, email);
+      showFieldSuccess('forgotSuccess','forgotSuccessText', `${email} adresine bir şifre sıfırlama bağlantısı gönderildi.`);
+    }catch(err){
+      console.error('Şifre sıfırlama hatası:', err);
+      showFieldError('forgotError','forgotErrorText', AUTH_ERROR_MESSAGES[err.code] || 'Sıfırlama bağlantısı gönderilemedi. Lütfen tekrar deneyin.');
+    }finally{
+      btn.disabled = false; btn.textContent = originalLabel;
+    }
+  }
+  document.getElementById('sendResetBtn').addEventListener('click', attemptPasswordReset);
+  document.getElementById('forgotEmail').addEventListener('keydown', e=>{ if(e.key==='Enter') attemptPasswordReset(); });
 
   /* ---- Giriş yap ---- */
   async function attemptLogin(){
