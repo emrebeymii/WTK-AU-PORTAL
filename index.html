@@ -404,6 +404,19 @@ img{max-width:100%; display:block;}
 .pdf-dl{width:38px; height:38px; border-radius:11px; background:var(--primary); color:#fff; border:none; display:flex; align-items:center; justify-content:center; font-size:15px; cursor:pointer; flex-shrink:0;}
 .pdf-dl:active{transform:scale(.9);}
 .archive-stats{display:flex; gap:10px; padding:14px 18px 4px;}
+
+/* ---------- Kullanıcı Dizini ---------- */
+.directory-list{display:flex; flex-direction:column; gap:10px; padding-top:10px;}
+.directory-card{display:flex; align-items:center; gap:12px; padding:12px 14px;}
+.directory-avatar-wrap{position:relative; flex-shrink:0; line-height:0;}
+.online-dot{
+  position:absolute; right:-1px; bottom:-1px; width:12px; height:12px; border-radius:50%;
+  border:2px solid var(--surface); background:var(--text-tertiary);
+}
+.online-dot.online{background:var(--success);}
+.directory-card-info{flex:1; min-width:0;}
+.directory-card-info h5{font-size:14px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.directory-card-info span{font-size:12px; color:var(--text-secondary);}
 .stat-box{flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; text-align:center; box-shadow:var(--shadow-sm);}
 .stat-box b{font-size:20px; font-weight:800; color:var(--primary); display:block;}
 .stat-box span{font-size:10.5px; color:var(--text-secondary); font-weight:700;}
@@ -880,7 +893,7 @@ cursor:not-allowed;
   <div id="splash">
     <div class="splash-logo">&lt;/&gt;</div>
     <div class="splash-title">Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama Portalı</div>
-    <div class="splash-sub">@emrebeymi tarafından bolca kahve ile hazırlandı</div>
+    <div class="splash-sub">@emrebeymi tarafından bolca Cold Brew ile hazırlandı</div>
     <div class="splash-loader"></div>
   </div>
 
@@ -1222,6 +1235,16 @@ cursor:not-allowed;
       <section id="page-links" class="page">
         <div class="page-header"><h2>🎓 Faydalı Bağlantılar</h2><p>Sık kullanılan üniversite sistemleri</p></div>
         <div id="linksList" style="padding-top:8px;"></div>
+      </section>
+
+      <!-- ---- KULLANICI DİZİNİ ---- -->
+      <section id="page-directory" class="page">
+        <div class="page-header"><h2>👥 Kullanıcı Dizini</h2><p>Onaylı portal üyeleri</p></div>
+        <div class="archive-stats">
+          <div class="stat-box"><b id="dirTotalCount">0</b><span>👥 TOPLAM ÜYE</span></div>
+          <div class="stat-box"><b id="dirActiveCount">0</b><span>🟢 ŞU AN AKTİF</span></div>
+        </div>
+        <div class="directory-list container-pad" id="directoryList"></div>
       </section>
 
       <!-- ---- SINAVLAR ---- -->
@@ -1791,6 +1814,57 @@ function isLoggedIn(){
   return !!(currentStudentUser && currentUserProfile && currentUserProfile.approved === true);
 }
 
+/* ---- Herkese açık profil aynası: publicProfiles/{uid} ----
+   users/{uid} e-posta, rol ve onay durumu gibi HASSAS alanlar içerdiği
+   için Kullanıcı Dizini artık ORADAN okumuyor. Bunun yerine, sadece
+   herkese gösterilmesi güvenli üç alanı (displayName, username,
+   avatarUrl) barındıran AYRI bir publicProfiles/{uid} belgesi tutuluyor.
+   Bu belge SADECE şu iki durumda yazılır:
+     1) Öğrenci onaylandıktan sonra kendi profilini dinlerken (aşağıda,
+        startStudentAuthListener içinde) — bu hem ilk oluşturma hem de
+        profil düzenlemelerinin otomatik yansıması içindir (users/{uid}
+        zaten canlı dinlendiği için, bir düzenleme bu fonksiyonu tekrar
+        tetikler).
+     2) Admin bir kullanıcının erişimini kaldırdığında/reddettiğinde
+        belge silinir (bkz. rejectOrRevokeUserById) — böylece kişi
+        dizinden anında kaybolur. */
+async function syncPublicProfile(){
+  if(!currentStudentUser || !currentUserProfile) return;
+  try{
+    await setDoc(doc(db, 'publicProfiles', currentStudentUser.uid), {
+      displayName: currentUserProfile.displayName || '',
+      username: currentUserProfile.username || '',
+      avatarUrl: currentUserProfile.avatarUrl || ''
+    }, { merge: true });
+  }catch(err){
+    console.error('Herkese açık profil senkronizasyon hatası:', err);
+  }
+}
+
+/* ---- "Şu An Aktif" için nabız (heartbeat) ----
+   Onaylı bir öğrenci uygulamadayken publicProfiles/{uid} belgesindeki
+   lastSeen alanını dakikada bir günceller (users/{uid} DEĞİL — bu alan
+   artık tamamen herkese açık aynada tutuluyor). Kullanıcı Dizini bu
+   alana bakarak son 5 dakika içinde güncellenmiş olanları "çevrimiçi"
+   sayar. setDoc+merge kullanılır ki belge henüz yoksa (ör. onaydan
+   hemen sonraki ilk nabız) hata vermeden oluşsun. Sekme arka
+   plandayken gereksiz yazma yapılmaması için document.hidden kontrol
+   edilir. */
+const HEARTBEAT_INTERVAL_MS = 60 * 1000;
+let heartbeatTimer = null;
+function sendHeartbeat(){
+  if(!currentStudentUser || document.hidden) return;
+  setDoc(doc(db, 'publicProfiles', currentStudentUser.uid), { lastSeen: serverTimestamp() }, { merge: true }).catch(()=>{});
+}
+function startHeartbeat(){
+  sendHeartbeat();
+  if(heartbeatTimer) clearInterval(heartbeatTimer);
+  heartbeatTimer = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
+}
+function stopHeartbeat(){
+  if(heartbeatTimer){ clearInterval(heartbeatTimer); heartbeatTimer = null; }
+}
+
 /* Dört tam ekran görünümden (giriş/kayıt, onay bekleniyor, hesap
    bulunamadı, uygulamanın kendisi) yalnızca birini gösterir. */
 function showAuthScreen(id){
@@ -1821,6 +1895,9 @@ function trySplashDismiss(){
 function startStudentAuthListener(){
   onAuthStateChanged(auth, (user) => {
     if(profileUnsub){ profileUnsub(); profileUnsub = null; }
+    if(directoryUnsub){ directoryUnsub(); directoryUnsub = null; }
+    if(directoryRefreshTimer){ clearInterval(directoryRefreshTimer); directoryRefreshTimer = null; }
+    stopHeartbeat();
     currentStudentUser = user;
     currentUserProfile = null;
 
@@ -1848,6 +1925,9 @@ function startStudentAuthListener(){
       if(currentUserProfile.approved === true){
         showApp();
         renderProfilePage();
+        syncPublicProfile(); // ilk oluşturma + her profil düzenlemesinde otomatik yeniden senkronizasyon
+        startHeartbeat();
+        startDirectoryListener();
       } else {
         showAuthScreen('pendingScreen');
       }
@@ -1909,8 +1989,68 @@ function startAdminAuthListener(){
     if(document.getElementById('app') && !document.getElementById('app').classList.contains('hidden')){
       renderAdminPanel();
       renderProfilePage();
+      renderDirectory(); // "Erişimi kaldır" butonu admin durumu değişince anında görünsün/gizlensin
     }
   });
+}
+
+/* ---- Kullanıcı Dizini: TÜM giriş yapmış kullanıcılara açık ----
+   Admin panelindeki "Kullanıcılar" sekmesi (adminDb, bekleyen
+   başvurular + e-posta/rol dahil tam moderasyon görünümü) ile KARIŞTIRILMASIN.
+   Bu liste, e-posta/rol/onay durumu gibi hiçbir hassas alan İÇERMEYEN
+   ayrı publicProfiles koleksiyonunu okur — dolayısıyla herkese açılması
+   güvenlidir. Bir kullanıcı yalnızca admin onayladıktan sonra bu
+   koleksiyonda bir belgeye sahip olur (bkz. syncPublicProfile) ve
+   erişimi kaldırıldığında belge silinir (bkz. rejectOrRevokeUserById) —
+   yani koleksiyonun kendisi zaten "sadece onaylılar" listesidir, ekstra
+   bir where('approved',...) filtresine gerek yoktur. */
+let directoryUsersCache = [];
+let directoryUnsub = null;
+let directoryRefreshTimer = null;
+function startDirectoryListener(){
+  if(directoryUnsub) return; // zaten dinleniyor
+  directoryUnsub = onSnapshot(collection(db, 'publicProfiles'), (snapshot) => {
+    directoryUsersCache = snapshot.docs
+      .map(d => ({ id: d.id, ...d.data(), lastSeen: toJsDateSafe(d.data().lastSeen) }))
+      .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||'', 'tr'));
+    renderDirectory();
+  }, (err) => console.error('Kullanıcı dizini dinleme hatası:', err));
+  // 5 dakikalık çevrimiçi eşiği zamana bağlı olduğu için, yeni bir
+  // Firestore güncellemesi gelmese bile listeyi periyodik tazeler
+  // (aksi halde biri sessizce "çevrimdışı" olduğunda ekran geç fark eder).
+  if(directoryRefreshTimer) clearInterval(directoryRefreshTimer);
+  directoryRefreshTimer = setInterval(renderDirectory, 30 * 1000);
+}
+
+function renderDirectory(){
+  const listEl = document.getElementById('directoryList');
+  const totalEl = document.getElementById('dirTotalCount');
+  const activeEl = document.getElementById('dirActiveCount');
+  if(!listEl || !totalEl || !activeEl) return;
+
+  const now = Date.now();
+  const isOnline = (u) => !!(u.lastSeen && (now - u.lastSeen.getTime()) < 5 * 60 * 1000);
+
+  totalEl.textContent = directoryUsersCache.length;
+  activeEl.textContent = directoryUsersCache.filter(isOnline).length;
+
+  listEl.innerHTML = directoryUsersCache.length ? directoryUsersCache.map(u => {
+    const online = isOnline(u);
+    const adminActions = isAdmin()
+      ? `<div class="admin-item-actions"><button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Erişimi kaldır">🚫</button></div>`
+      : '';
+    return `<div class="card directory-card">
+      <div class="directory-avatar-wrap">
+        ${avatarThumbHtml(u, 46)}
+        <span class="online-dot ${online ? 'online' : ''}" title="${online ? 'Çevrimiçi' : 'Çevrimdışı'}"></span>
+      </div>
+      <div class="directory-card-info">
+        <h5>${escapeHtml(u.displayName || '—')}</h5>
+        <span>@${escapeHtml(u.username || '—')}</span>
+      </div>
+      ${adminActions}
+    </div>`;
+  }).join('') : emptyStateHtml('👥', 'Henüz onaylı üye yok.');
 }
 
 /* ---------------- Sayfa geçişleri ---------------- */
@@ -1940,6 +2080,7 @@ function switchPage(pageId, silent){
 // ana sayfa yalnızca Yardımcı kartı + Yaklaşan Tarihler + Duyurular'a
 // odaklanabilir.
 const QUICK_ITEMS = [
+  {icon:'👥', label:'Kullanıcı Dizini', nav:'page-directory'},
   {icon:'📄', label:'PDF Arşivi', nav:'page-pdf'},
   {icon:'📝', label:'Sınavlar', nav:'page-exams'},
   {icon:'📖', label:'Ders İçerikleri', nav:'page-course-content'},
@@ -3160,6 +3301,41 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAdminPanel();
   });
 
+  /* ---- Kullanıcı onaylama / reddetme / erişim kaldırma ----
+     Admin Panelindeki "Kullanıcılar" sekmesi VE herkese açık "Kullanıcı
+     Dizini" sayfası bu AYNI fonksiyonları çağırır — ikisi de admin
+     oturumu (adminDb) üzerinden yazar.
+     NOT: approveUserById SADECE users.approved'ı true yapar; publicProfiles
+     belgesini oluşturmaz — bunu, kendi profilini canlı dinleyen öğrencinin
+     tarayıcısı otomatik olarak yapar (bkz. syncPublicProfile). Ama revoke/
+     reddetme durumunda öğrenci o an çevrimdışı olabileceği için, dizinden
+     ANINDA kaybolması için publicProfiles belgesini burada, admin
+     tarafında siliyoruz. */
+  function approveUserById(uid){
+    updateDoc(doc(adminDb, 'users', uid), { approved: true })
+      .then(()=> toast('Kullanıcı onaylandı', 'success'))
+      .catch(err=>{ console.error('Onaylama hatası:', err); toast('Onaylanamadı. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
+  }
+  function rejectOrRevokeUserById(uid, wasApproved, displayName){
+    if(wasApproved){
+      if(!confirm(`${displayName || 'Bu kullanıcının'} erişimini kaldırmak istediğinize emin misiniz?`)) return;
+      Promise.all([
+        updateDoc(doc(adminDb, 'users', uid), { approved: false }),
+        deleteDoc(doc(adminDb, 'publicProfiles', uid)).catch(()=>{}) // dizinde hiç yoksa sessizce yok say
+      ])
+        .then(()=> toast('Erişim kaldırıldı', 'success'))
+        .catch(err=>{ console.error('Erişim kaldırma hatası:', err); toast('İşlem başarısız. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
+    } else {
+      if(!confirm('Bu kayıt başvurusunu reddetmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return;
+      Promise.all([
+        deleteDoc(doc(adminDb, 'users', uid)),
+        deleteDoc(doc(adminDb, 'publicProfiles', uid)).catch(()=>{}) // hiç onaylanmadıysa zaten yoktur
+      ])
+        .then(()=> toast('Başvuru reddedildi', 'success'))
+        .catch(err=>{ console.error('Reddetme hatası:', err); toast('İşlem başarısız. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
+    }
+  }
+
   /* ---- Yönetici: ekle / düzenle / sil (delegasyon) ---- */
   document.getElementById('adminBody').addEventListener('click', (e)=>{
     const editBtn = e.target.closest('[data-edit]');
@@ -3189,28 +3365,23 @@ document.addEventListener('DOMContentLoaded', () => {
       // Liste onSnapshot ile TÜM kullanıcılarda otomatik güncellenir, ayrıca renderAll() gerekmez.
     }
     /* ---- Kullanıcı onaylama ---- */
-    if(approveBtn){
-      updateDoc(doc(adminDb, 'users', approveBtn.dataset.approveUser), { approved: true })
-        .then(()=> toast('Kullanıcı onaylandı', 'success'))
-        .catch(err=>{ console.error('Onaylama hatası:', err); toast('Onaylanamadı. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
-    }
+    if(approveBtn){ approveUserById(approveBtn.dataset.approveUser); }
     /* ---- Kullanıcı reddetme (bekleyen başvuru → belgeyi sil) veya
        erişim kaldırma (zaten onaylı → approved:false, belge kalır) ---- */
     if(rejectBtn){
       const u = allUsersCache.find(x => x.id === rejectBtn.dataset.rejectUser);
       if(!u) return;
-      if(u.approved){
-        if(!confirm(`${u.displayName || 'Bu kullanıcının'} erişimini kaldırmak istediğinize emin misiniz?`)) return;
-        updateDoc(doc(adminDb, 'users', u.id), { approved: false })
-          .then(()=> toast('Erişim kaldırıldı', 'success'))
-          .catch(err=>{ console.error('Erişim kaldırma hatası:', err); toast('İşlem başarısız. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
-      } else {
-        if(!confirm('Bu kayıt başvurusunu reddetmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return;
-        deleteDoc(doc(adminDb, 'users', u.id))
-          .then(()=> toast('Başvuru reddedildi', 'success'))
-          .catch(err=>{ console.error('Reddetme hatası:', err); toast('İşlem başarısız. Bağlantınızı kontrol edip tekrar deneyin.', 'error'); });
-      }
+      rejectOrRevokeUserById(u.id, u.approved, u.displayName);
     }
+  });
+
+  /* ---- Kullanıcı Dizini: sadece yönetici için "Erişimi kaldır" (delegasyon) ---- */
+  document.getElementById('directoryList').addEventListener('click', (e)=>{
+    const rejectBtn = e.target.closest('[data-reject-user]');
+    if(!rejectBtn) return;
+    const u = directoryUsersCache.find(x => x.id === rejectBtn.dataset.rejectUser);
+    if(!u) return;
+    rejectOrRevokeUserById(u.id, true, u.displayName); // dizinde sadece onaylı üyeler listelenir
   });
 /* ============================================================
    WTK YARDIMCI — TAMAMEN YEREL, API'SİZ SOHBET ASİSTANI
