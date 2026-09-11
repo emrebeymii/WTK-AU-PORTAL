@@ -134,13 +134,23 @@ img{max-width:100%; display:block;}
   box-shadow:var(--shadow-sm);
   transition:transform .24s cubic-bezier(.22,1,.36,1), box-shadow .24s cubic-bezier(.22,1,.36,1), background var(--t-base), border-color var(--t-base);
 }
-@media (hover:hover){
+@media (hover:hover) and (pointer:fine){
   .card:hover{transform:translateY(-3px); box-shadow:var(--shadow-md);}
 }
 .glass{
   /* Cam/blur efekti minimuma indirildi: modern SaaS panellerindeki gibi
      düz, opak yüzey + ince kenarlık kullanılıyor. */
   background:var(--surface-glass); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+}
+/* Dokunmatik cihazlarda backdrop-filter'ı TAMAMEN kapat. Bu, sabit
+   (position:fixed/sticky) üst çubuk ve alt menünün ARKASINDAKİ her
+   sayfa geçişi/kaydırma animasyonunda GPU'ya sürekli yeniden
+   bulanıklaştırma (recomposite) yaptırıyordu — mobilde hissedilen
+   "takılma"nın en büyük sebebi genelde budur. Masaüstünde (fare/hassas
+   işaretçi) ince blur aynen kalıyor, sadece dokunmatik cihazlarda düz
+   opak arka plana dönüyor. */
+@media (pointer:coarse){
+  .glass{background:var(--surface); backdrop-filter:none; -webkit-backdrop-filter:none;}
 }
 .section-title{font-size:19px; font-weight:800; letter-spacing:-.3px;}
 .section-head{display:flex; align-items:center; justify-content:space-between; margin:28px 0 14px;}
@@ -278,14 +288,17 @@ img{max-width:100%; display:block;}
 
 /* ---------- Main content / pages ---------- */
 .content{padding-bottom:calc(var(--navbar-h) + 24px); min-height:calc(100vh - var(--topbar-h));}
-.page{display:none; animation:pageIn .3s cubic-bezier(.16,1,.3,1);}
+.page{display:none; animation:pageIn .3s cubic-bezier(.16,1,.3,1); will-change:transform, opacity;}
 .page.active{display:block;}
 @keyframes pageIn{from{opacity:0; transform:translateX(14px);} to{opacity:1; transform:translateX(0);}}
 
 /* Ana sayfa kartları sırayla girer (Hoş Geldin önce). [data-animate-in]
    kendi kaydırma-tetiklemeli animasyonunu kullanmaya devam eder, o yüzden
-   burada hariç tutulur. */
-#page-home.active > *:not([data-animate-in]){animation:cardIn .38s cubic-bezier(.22,1,.36,1) both;}
+   burada hariç tutulur. will-change, tarayıcıya bu öğeleri animasyon
+   BAŞLAMADAN ÖNCE kendi GPU katmanına almasını söyler — aksi halde ilk
+   karede (özellikle zayıf donanımlı telefonlarda) küçük bir "atlama"
+   hissi oluşabiliyordu. */
+#page-home.active > *:not([data-animate-in]){animation:cardIn .38s cubic-bezier(.22,1,.36,1) both; will-change:transform, opacity;}
 #page-home.active > *:not([data-animate-in]):nth-child(1){animation-delay:0ms;}
 #page-home.active > *:not([data-animate-in]):nth-child(2){animation-delay:90ms;}
 #page-home.active > *:not([data-animate-in]):nth-child(3){animation-delay:180ms;}
@@ -294,6 +307,20 @@ img{max-width:100%; display:block;}
 #page-home.active > *:not([data-animate-in]):nth-child(6){animation-delay:350ms;}
 #page-home.active > *:not([data-animate-in]):nth-child(7){animation-delay:350ms;}
 @keyframes cardIn{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+
+/* Gerçek telefon ekranlarında (dar viewport) animasyonları biraz daha
+   kısa tutuyoruz — daha az süre = daha az "iş", daha akıcı/hızlı his. */
+@media (max-width:480px){
+  .page{animation-duration:.22s;}
+  #page-home.active > *:not([data-animate-in]){animation-duration:.3s;}
+}
+
+/* Sistem seviyesinde "hareketi azalt" tercih edilmişse (genelde eski/
+   düşük güçlü cihazlarda da açık olur) tüm giriş animasyonlarını
+   pratikte kapatıyoruz — içerik anında görünür, takılma hissi kalmaz. */
+@media (prefers-reduced-motion:reduce){
+  .page, #page-home.active > *:not([data-animate-in]){animation:none !important;}
+}
 
 .page-header{padding:20px 18px 4px;}
 .page-header h2{font-size:22px; font-weight:800; letter-spacing:-.4px;}
@@ -323,7 +350,7 @@ img{max-width:100%; display:block;}
   position:relative; overflow:hidden;
   transition:transform .24s cubic-bezier(.22,1,.36,1), box-shadow .24s cubic-bezier(.22,1,.36,1);
 }
-@media (hover:hover){
+@media (hover:hover) and (pointer:fine){
   .assistant-card:hover{transform:translateY(-3px); box-shadow:var(--shadow-md);}
 }
 .assistant-card::before{
@@ -350,7 +377,7 @@ img{max-width:100%; display:block;}
 .aq-btn .aq-ic{font-size:16px; flex-shrink:0;}
 .aq-btn:active{transform:scale(.96);}
 .aq-btn:nth-child(5){grid-column:1 / -1;}
-@media (hover:hover){
+@media (hover:hover) and (pointer:fine){
   .aq-btn:hover{border-color:var(--primary); background:var(--primary-light);}
 }
 
@@ -599,7 +626,7 @@ img{max-width:100%; display:block;}
   transition:transform .5s cubic-bezier(.22,1,.36,1), box-shadow .3s ease, opacity .5s ease, background .3s ease, border-color .3s ease;
 }
 .info-notice-card.in-view{ opacity:1; transform:translateY(0); }
-@media (hover:hover){
+@media (hover:hover) and (pointer:fine){
   .info-notice-card:hover{ transform:translateY(-3px); box-shadow:var(--shadow-md); transition:transform .24s cubic-bezier(.22,1,.36,1), box-shadow .24s cubic-bezier(.22,1,.36,1); }
 }
 .info-notice-card .top-badge{
@@ -623,7 +650,7 @@ img{max-width:100%; display:block;}
   display:flex; align-items:flex-start; gap:12px; padding:11px 10px; border-radius:14px; cursor:default;
   transition:background var(--t-fast), transform var(--t-fast);
 }
-@media (hover:hover){
+@media (hover:hover) and (pointer:fine){
   .info-notice-card .info-row-item:hover{ background:var(--primary-light); transform:translateX(3px); }
   .info-notice-card .info-row-item:hover .row-icon{ transform:scale(1.1) rotate(-4deg); background:var(--primary); color:#fff; }
 }
@@ -645,7 +672,7 @@ img{max-width:100%; display:block;}
 .info-notice-card .card-btn svg{ width:15px; height:15px; flex-shrink:0; }
 .info-notice-card .card-btn.primary{ background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff; box-shadow:var(--shadow-primary); }
 .info-notice-card .card-btn.outline{ background:transparent; border:1.5px solid var(--border); color:var(--text); }
-@media (hover:hover){
+@media (hover:hover) and (pointer:fine){
   .info-notice-card .card-btn.primary:hover{ box-shadow:0 8px 18px rgba(var(--primary-rgb),.28); transform:translateY(-2px); }
   .info-notice-card .card-btn.outline:hover{ border-color:var(--primary); color:var(--primary-dark); background:var(--primary-light); transform:translateY(-2px); }
 }
@@ -914,7 +941,7 @@ cursor:not-allowed;
   <div id="splash">
     <div class="splash-logo">&lt;/&gt;</div>
     <div class="splash-title">Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama Portalı</div>
-    <div class="splash-sub">@emrebeymi tarafından 💚 ile hazırlandı</div>
+    <div class="splash-sub">Öğrenci topluluğu tarafından hazırlandı</div>
     <div class="splash-loader"></div>
   </div>
 
@@ -1386,7 +1413,7 @@ cursor:not-allowed;
             <span class="chip chip-blue">Gayriresmî</span>
             <span class="chip chip-green">v2.0</span>
           </div>
-          <div class="about-credit">Designed • Founder By @emrebeymi</div>
+          <div class="about-credit">Designed by @emrebeymi</div>
         </div>
       </section>
 
