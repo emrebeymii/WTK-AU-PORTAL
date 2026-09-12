@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>WTK Portal | Ankara Üniversitesi Açıköğretim</title>
 <meta name="description" content="Ankara Üniversitesi Açıköğretim Web Tasarımı ve Kodlama bölümü öğrencileri için bağımsız topluluk portalı.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23ff7a00'/%3E%3Ctext x='50' y='64' font-size='42' font-family='monospace' font-weight='bold' fill='white' text-anchor='middle'%3E%3C/%3E%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23ff7a00'/%3E%3Cpolyline points='16,32 38,68 50,42 62,68 84,32' fill='none' stroke='white' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 /* ============================================================
    WTK PORTAL — TEK DOSYA STİL TABLOSU
@@ -207,44 +207,58 @@ img{max-width:100%; display:block;}
   100%{width:0; opacity:0;}
 }
 
-/* 3-5) Logo: SVG çerçeve çizimi + glif + nefes alan glow */
+/* 3) Logo: TEK SVG (topbar ve giriş ekranıyla birebir aynı path/viewBox)
+   kendini bir path olarak çizer. */
 .splash-mark{
-  position:relative; width:96px; height:96px;
+  position:relative; width:150px; height:90px;
   opacity:0;
   animation:splashMarkIn .5s cubic-bezier(.34,1.56,.64,1) .55s forwards,
             splashMarkIdle 2.4s ease-in-out 1.3s infinite;
   will-change:transform, opacity, filter;
 }
-@keyframes splashMarkIn{from{opacity:0; transform:scale(.55);} to{opacity:1; transform:scale(1);}}
-@keyframes splashMarkIdle{0%,100%{filter:drop-shadow(0 0 0 rgba(var(--primary-rgb),0));} 50%{filter:drop-shadow(0 0 16px rgba(var(--primary-rgb),.55));}}
+@keyframes splashMarkIn{from{opacity:0; transform:scale(.6);} to{opacity:1; transform:scale(1);}}
+/* 4-5) glow kazanır + merkezde nefes alarak bekler (bekleme uzarsa bile
+   asla donmuş görünmez) */
+@keyframes splashMarkIdle{0%,100%{filter:drop-shadow(0 0 0 rgba(var(--primary-rgb),0));} 50%{filter:drop-shadow(0 0 22px rgba(var(--primary-rgb),.6));}}
 
-.splash-mark-ring{position:absolute; inset:0; width:100%; height:100%; overflow:visible;}
-.splash-mark-ring-path{
-  fill:none; stroke:var(--primary); stroke-width:3; stroke-linecap:round;
-  stroke-dasharray:400; stroke-dashoffset:400;
-  animation:splashRingDraw .6s cubic-bezier(.22,1,.36,1) .55s forwards;
+.splash-mark-svg{width:100%; height:100%; overflow:visible; display:block;}
+.splash-mark-path{
+  stroke-dasharray:170; stroke-dashoffset:170;
+  animation:splashPathDraw .65s cubic-bezier(.22,1,.36,1) .55s forwards;
 }
-@keyframes splashRingDraw{to{stroke-dashoffset:0;}}
+@keyframes splashPathDraw{to{stroke-dashoffset:0;}}
 
-.splash-mark-glyph{
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-family:monospace; font-weight:800; font-size:34px; color:#fff; opacity:0;
-  animation:splashGlyphIn .35s ease 1.05s forwards;
+/* Kelime işareti + slogan (storyboard adım 4-5) — sadece splash'ta,
+   header'da yok. Logo çizimi bitince kısa bir gecikmeyle belirir. */
+.splash-word{
+  margin-top:18px; font-size:22px; font-weight:800; letter-spacing:1px; color:#fff;
+  opacity:0; animation:splashTextIn .4s ease 1.15s forwards;
 }
-@keyframes splashGlyphIn{from{opacity:0; transform:scale(.7);} to{opacity:1; transform:scale(1);}}
+.splash-tagline{
+  margin-top:4px; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--primary);
+  opacity:0; animation:splashTextIn .4s ease 1.3s forwards;
+}
+@keyframes splashTextIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+/* Devir teslimi (6. adım) başlarken JS bu class'ı ekler — kelime/slogan
+   hızla ve KAYBOLARAK değil, logonun hareketiyle aynı anda küçülüp
+   silinerek sahneden çıkar (opacity ayrı bir "fade-out" olayı değil,
+   tek bir birleşik hareketin parçasıdır). */
+.splash-word.splash-text-out, .splash-tagline.splash-text-out{
+  animation:none; opacity:0; transform:translateY(-8px) scale(.9);
+  transition:opacity .25s ease, transform .25s ease;
+}
 
-/* 6) Paylaşılan-öğe geçişi: JS bu class'ı ekleyip --tx/--ty/--sc/--br'yi
-   #appLogo'nun GERÇEK ölçülmüş konum/boyutuna göre ayarlar. Kısa bir
-   blur darbesi ("motion blur" hissi) hareketle senkronize çalışır. */
+/* 6) Paylaşılan-öğe geçişi: JS bu class'ı ekleyip --tx/--ty/--sc'yi
+   hedef logonun (#appLogo ya da .login-logo) GERÇEK ölçülmüş konum/
+   boyutuna göre ayarlar. Kısa bir blur darbesi ("motion blur" hissi)
+   hareketle senkronize çalışır. Aynı SVG olduğu için "logo kaybolup
+   yenisi belirmiyor" — gerçekten AYNI eleman küçülüp yerine oturuyor. */
 .splash-mark.splash-mark-shrink{
   animation:none; /* nefes alma döngüsünü kes, artık elle kontrol ediyoruz */
-  transition:transform .6s cubic-bezier(.65,0,.35,1), border-radius .6s cubic-bezier(.65,0,.35,1), filter .6s ease;
+  transition:transform .6s cubic-bezier(.65,0,.35,1), filter .6s ease;
   transform:translate(var(--tx,0), var(--ty,0)) scale(var(--sc,1));
-  border-radius:var(--br,28px);
   filter:drop-shadow(0 0 0 rgba(var(--primary-rgb),0)) blur(0px);
 }
-.splash-mark-shrink .splash-mark-ring,
-.splash-mark-shrink .splash-mark-ring-path{opacity:0; transition:opacity .2s ease;}
 .splash-mark-shrink.splash-mark-blur{filter:blur(5px);}
 
 /* 7-9) Altta beliren ekranın TEK SEFERLİK "bulanıktan netleşme" girişi.
@@ -299,8 +313,9 @@ img{max-width:100%; display:block;}
 .login-hero::before{content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.1); top:-90px; right:-60px;}
 .login-hero::after{content:''; position:absolute; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.08); bottom:-60px; left:-40px;}
 .login-logo{
-  width:64px; height:64px; border-radius:18px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.35);
-  display:flex; align-items:center; justify-content:center; font-family:monospace; font-weight:800; font-size:26px; margin-bottom:20px; position:relative;
+  width:120px; height:72px; font-size:40px;
+  display:flex; align-items:center; justify-content:center; margin-bottom:20px; position:relative;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,.25));
 }
 .login-hero h1{font-size:22px; font-weight:800; line-height:1.35; position:relative; letter-spacing:-.3px;}
 .login-hero p{font-size:13px; margin-top:10px; opacity:.9; max-width:320px; position:relative; line-height:1.5;}
@@ -351,7 +366,8 @@ img{max-width:100%; display:block;}
   padding:0 16px; height:var(--topbar-h); border-bottom:1px solid var(--border);
 }
 .topbar-left{display:flex; align-items:center; gap:10px; min-width:0;}
-.topbar-logo{width:36px; height:36px; border-radius:11px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-family:monospace; font-weight:800; color:#fff; font-size:15px; flex-shrink:0;}
+.topbar-logo{width:38px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.wtk-logo-svg{width:100%; height:100%; display:block; filter:drop-shadow(0 0 6px rgba(var(--primary-rgb),.35));}
 .topbar-titles{min-width:0;}
 .topbar-titles .t1{font-size:13.5px; font-weight:800; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;}
 .topbar-titles .t2{font-size:10.5px; color:var(--text-secondary); font-weight:600;}
@@ -621,7 +637,7 @@ img{max-width:100%; display:block;}
 
 /* About page */
 .about-card{margin:16px 18px; padding:22px; text-align:center;}
-.about-logo{width:64px; height:64px; margin:0 auto 16px; border-radius:18px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:26px; font-weight:800; color:#fff;}
+.about-logo{width:100px; height:60px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center;}
 .about-card h3{font-size:16px; font-weight:800; margin-bottom:10px;}
 .about-card p{font-size:13px; color:var(--text-secondary); line-height:1.7;}
 .about-tags{display:flex; gap:8px; justify-content:center; margin-top:16px; flex-wrap:wrap;}
@@ -657,7 +673,9 @@ img{max-width:100%; display:block;}
 .bottomnav{
   position:fixed; left:0; right:0; bottom:0; height:var(--navbar-h); display:flex; z-index:80;
   border-top:1px solid var(--border); padding-bottom:env(safe-area-inset-bottom);
+  transition:opacity .5s cubic-bezier(.22,1,.36,1) .5s, transform .5s cubic-bezier(.22,1,.36,1) .5s;
 }
+#appFrame.cold-start .bottomnav{opacity:0; transform:translateY(100%); transition:none;}
 #appFrame .bottomnav{position:absolute;}
 .nav-btn{
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:none; border:none;
@@ -1054,17 +1072,34 @@ cursor:not-allowed;
   <div id="splash">
     <div class="splash-glow-line"></div>
     <div class="splash-mark" id="splashMark">
-      <svg class="splash-mark-ring" viewBox="0 0 96 96" aria-hidden="true">
-        <rect class="splash-mark-ring-path" x="3" y="3" width="90" height="90" rx="26"/>
+      <svg class="splash-mark-svg" viewBox="0 0 100 60" aria-hidden="true">
+        <defs>
+          <linearGradient id="wtkLogoGradSplash" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffb347"/>
+            <stop offset="100%" stop-color="#e8590c"/>
+          </linearGradient>
+        </defs>
+        <polyline class="splash-mark-path" points="6,10 28,50 50,20 72,50 94,10" fill="none" stroke="url(#wtkLogoGradSplash)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <span class="splash-mark-glyph">&lt;/&gt;</span>
     </div>
+    <div class="splash-word">WTK AU</div>
+    <div class="splash-tagline">More Than Education</div>
   </div>
 
   <!-- ============ GİRİŞ / KAYIT EKRANI ============ -->
   <div id="loginScreen" class="auth-screen">
     <div class="login-hero">
-      <div class="login-logo">&lt;/&gt;</div>
+      <div class="login-logo">
+        <svg class="wtk-logo-svg" viewBox="0 0 100 60" aria-hidden="true">
+          <defs>
+            <linearGradient id="wtkLogoGradLogin" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffb347"/>
+              <stop offset="100%" stop-color="#e8590c"/>
+            </linearGradient>
+          </defs>
+          <polyline points="6,10 28,50 50,20 72,50 94,10" fill="none" stroke="url(#wtkLogoGradLogin)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <h1>Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama<br>Öğrenci Portalı</h1>
       <p>Bu platform bölüm öğrencileri tarafından oluşturulmuş bağımsız bir topluluk platformudur.</p>
     </div>
@@ -1198,7 +1233,17 @@ cursor:not-allowed;
     <!-- Üst çubuk -->
     <header class="topbar glass">
       <div class="topbar-left">
-        <div class="topbar-logo" id="appLogo" title="WTK Portal">&lt;/&gt;</div>
+        <div class="topbar-logo" id="appLogo" title="WTK Portal">
+          <svg class="wtk-logo-svg" viewBox="0 0 100 60" aria-hidden="true">
+            <defs>
+              <linearGradient id="wtkLogoGradTopbar" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffb347"/>
+                <stop offset="100%" stop-color="#e8590c"/>
+              </linearGradient>
+            </defs>
+            <polyline points="6,10 28,50 50,20 72,50 94,10" fill="none" stroke="url(#wtkLogoGradTopbar)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <div class="topbar-titles">
           <div class="t1">WTK Öğrenci Portalı</div>
           <div class="t2">Ankara Üniversitesi Açıköğretim</div>
@@ -1521,7 +1566,17 @@ cursor:not-allowed;
       <section id="page-about" class="page">
         <div class="page-header"><h2>ℹ️ Hakkında</h2></div>
         <div class="about-card card">
-          <div class="about-logo">&lt;/&gt;</div>
+          <div class="about-logo">
+            <svg class="wtk-logo-svg" viewBox="0 0 100 60" aria-hidden="true">
+              <defs>
+                <linearGradient id="wtkLogoGradAbout" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffb347"/>
+                  <stop offset="100%" stop-color="#e8590c"/>
+                </linearGradient>
+              </defs>
+              <polyline points="6,10 28,50 50,20 72,50 94,10" fill="none" stroke="url(#wtkLogoGradAbout)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
           <h3>WTK Öğrenci Portalı</h3>
           <p>Bu platform Ankara Üniversitesi Açıköğretim Web Tasarımı ve Kodlama öğrencileri için hazırlanmış bağımsız bir topluluk platformudur. Üniversitenin resmî web sitesi değildir.</p>
           <div class="about-tags">
@@ -2083,7 +2138,6 @@ function runSplashHandoff(){
   mark.style.setProperty('--tx', (toCenterX - fromCenterX) + 'px');
   mark.style.setProperty('--ty', (toCenterY - fromCenterY) + 'px');
   mark.style.setProperty('--sc', scale);
-  mark.style.setProperty('--br', getComputedStyle(targetLogo).borderRadius);
 
   // Aynı ölçümü, siyah sahnenin "iris" gibi tam bu noktadan açılması için
   // splash'a da veriyoruz — logo ile arka planın açılış noktası birebir örtüşsün.
@@ -2095,6 +2149,13 @@ function runSplashHandoff(){
     // Hareketin tam ortasında kısa bir blur darbesi — "motion blur" hissi.
     setTimeout(()=> mark.classList.add('splash-mark-blur'), 90);
     setTimeout(()=> mark.classList.remove('splash-mark-blur'), 380);
+
+    // Kelime işareti + slogan, logo hareketiyle AYNI ANDA sahneden çıkar
+    // (ayrı bir fade-out olayı değil, tek bir birleşik hareketin parçası).
+    const word = document.querySelector('.splash-word');
+    const tagline = document.querySelector('.splash-tagline');
+    if(word) word.classList.add('splash-text-out');
+    if(tagline) tagline.classList.add('splash-text-out');
 
     splash.classList.add('splash-reveal');
     document.getElementById('appFrame').classList.remove('cold-start');
