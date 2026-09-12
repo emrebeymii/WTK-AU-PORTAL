@@ -183,7 +183,7 @@ img{max-width:100%; display:block;}
    ============================================================ */
 #splash{
   position:fixed; inset:0; z-index:999; background:#000;
-  display:flex; align-items:center; justify-content:center; color:#fff;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;
   overflow:hidden;
   clip-path:circle(150vmax at 50% 50%);
   transition:clip-path .65s cubic-bezier(.22,1,.36,1);
@@ -210,7 +210,7 @@ img{max-width:100%; display:block;}
 /* 3) Logo: TEK SVG (topbar ve giriş ekranıyla birebir aynı path/viewBox)
    kendini bir path olarak çizer. */
 .splash-mark{
-  position:relative; width:150px; height:90px;
+  position:relative; width:108px; height:92px;
   opacity:0;
   animation:splashMarkIn .5s cubic-bezier(.34,1.56,.64,1) .55s forwards,
             splashMarkIdle 2.4s ease-in-out 1.3s infinite;
@@ -223,19 +223,20 @@ img{max-width:100%; display:block;}
 
 .splash-mark-svg{width:100%; height:100%; overflow:visible; display:block;}
 .splash-mark-path{
-  stroke-dasharray:170; stroke-dashoffset:170;
+  stroke-dasharray:230; stroke-dashoffset:230;
   animation:splashPathDraw .65s cubic-bezier(.22,1,.36,1) .55s forwards;
 }
 @keyframes splashPathDraw{to{stroke-dashoffset:0;}}
 
-/* Kelime işareti + slogan (storyboard adım 4-5) — sadece splash'ta,
-   header'da yok. Logo çizimi bitince kısa bir gecikmeyle belirir. */
+/* Kelime işareti + slogan (storyboard adım 4-5) — kompakt bir marka
+   kilidi olarak logonun HEMEN altında, sıkı boşluklarla. Sadece
+   splash'ta, header'da yok. Logo çizimi bitince kısa bir gecikmeyle belirir. */
 .splash-word{
-  margin-top:18px; font-size:22px; font-weight:800; letter-spacing:1px; color:#fff;
+  margin-top:10px; font-size:21px; font-weight:800; letter-spacing:.5px; color:#fff;
   opacity:0; animation:splashTextIn .4s ease 1.15s forwards;
 }
 .splash-tagline{
-  margin-top:4px; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--primary);
+  margin-top:3px; font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--primary);
   opacity:0; animation:splashTextIn .4s ease 1.3s forwards;
 }
 @keyframes splashTextIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
@@ -313,7 +314,7 @@ img{max-width:100%; display:block;}
 .login-hero::before{content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.1); top:-90px; right:-60px;}
 .login-hero::after{content:''; position:absolute; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.08); bottom:-60px; left:-40px;}
 .login-logo{
-  width:120px; height:72px; font-size:40px;
+  width:96px; height:86px; font-size:40px;
   display:flex; align-items:center; justify-content:center; margin-bottom:20px; position:relative;
   filter:drop-shadow(0 4px 14px rgba(0,0,0,.25));
 }
@@ -366,7 +367,7 @@ img{max-width:100%; display:block;}
   padding:0 16px; height:var(--topbar-h); border-bottom:1px solid var(--border);
 }
 .topbar-left{display:flex; align-items:center; gap:10px; min-width:0;}
-.topbar-logo{width:38px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.topbar-logo{width:30px; height:27px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
 .wtk-logo-svg{width:100%; height:100%; display:block; filter:drop-shadow(0 0 6px rgba(var(--primary-rgb),.35));}
 .topbar-titles{min-width:0;}
 .topbar-titles .t1{font-size:13.5px; font-weight:800; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;}
@@ -637,7 +638,7 @@ img{max-width:100%; display:block;}
 
 /* About page */
 .about-card{margin:16px 18px; padding:22px; text-align:center;}
-.about-logo{width:100px; height:60px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center;}
+.about-logo{width:88px; height:80px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center;}
 .about-card h3{font-size:16px; font-weight:800; margin-bottom:10px;}
 .about-card p{font-size:13px; color:var(--text-secondary); line-height:1.7;}
 .about-tags{display:flex; gap:8px; justify-content:center; margin-top:16px; flex-wrap:wrap;}
@@ -1072,32 +1073,32 @@ cursor:not-allowed;
   <div id="splash">
     <div class="splash-glow-line"></div>
     <div class="splash-mark" id="splashMark">
-      <svg class="splash-mark-svg" viewBox="0 0 100 60" aria-hidden="true">
+      <svg class="splash-mark-svg" viewBox="0 0 100 90" aria-hidden="true">
         <defs>
           <linearGradient id="wtkLogoGradSplash" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#ffb347"/>
             <stop offset="100%" stop-color="#e8590c"/>
           </linearGradient>
         </defs>
-        <polyline class="splash-mark-path" points="6,10 28,50 50,20 72,50 94,10" fill="none" stroke="url(#wtkLogoGradSplash)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline class="splash-mark-path" points="8,14 32,76 50,34 68,76 92,14" fill="none" stroke="url(#wtkLogoGradSplash)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <div class="splash-word">WTK AU</div>
-    <div class="splash-tagline">More Than Education</div>
+    <div class="splash-tagline">Bağımsız Öğrenci Topluluğu</div>
   </div>
 
   <!-- ============ GİRİŞ / KAYIT EKRANI ============ -->
   <div id="loginScreen" class="auth-screen">
     <div class="login-hero">
       <div class="login-logo">
-        <svg class="wtk-logo-svg" viewBox="0 0 100 60" aria-hidden="true">
+        <svg class="wtk-logo-svg" viewBox="0 0 100 90" aria-hidden="true">
           <defs>
             <linearGradient id="wtkLogoGradLogin" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#ffb347"/>
               <stop offset="100%" stop-color="#e8590c"/>
             </linearGradient>
           </defs>
-          <polyline points="6,10 28,50 50,20 72,50 94,10" fill="none" stroke="url(#wtkLogoGradLogin)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="8,14 32,76 50,34 68,76 92,14" fill="none" stroke="url(#wtkLogoGradLogin)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <h1>Ankara Üniversitesi Açıköğretim<br>Web Tasarımı ve Kodlama<br>Öğrenci Portalı</h1>
@@ -1234,14 +1235,14 @@ cursor:not-allowed;
     <header class="topbar glass">
       <div class="topbar-left">
         <div class="topbar-logo" id="appLogo" title="WTK Portal">
-          <svg class="wtk-logo-svg" viewBox="0 0 100 60" aria-hidden="true">
+          <svg class="wtk-logo-svg" viewBox="0 0 100 90" aria-hidden="true">
             <defs>
               <linearGradient id="wtkLogoGradTopbar" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stop-color="#ffb347"/>
                 <stop offset="100%" stop-color="#e8590c"/>
               </linearGradient>
             </defs>
-            <polyline points="6,10 28,50 50,20 72,50 94,10" fill="none" stroke="url(#wtkLogoGradTopbar)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="8,14 32,76 50,34 68,76 92,14" fill="none" stroke="url(#wtkLogoGradTopbar)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div class="topbar-titles">
@@ -1567,14 +1568,14 @@ cursor:not-allowed;
         <div class="page-header"><h2>ℹ️ Hakkında</h2></div>
         <div class="about-card card">
           <div class="about-logo">
-            <svg class="wtk-logo-svg" viewBox="0 0 100 60" aria-hidden="true">
+            <svg class="wtk-logo-svg" viewBox="0 0 100 90" aria-hidden="true">
               <defs>
                 <linearGradient id="wtkLogoGradAbout" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stop-color="#ffb347"/>
                   <stop offset="100%" stop-color="#e8590c"/>
                 </linearGradient>
               </defs>
-              <polyline points="6,10 28,50 50,20 72,50 94,10" fill="none" stroke="url(#wtkLogoGradAbout)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="8,14 32,76 50,34 68,76 92,14" fill="none" stroke="url(#wtkLogoGradAbout)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
           <h3>WTK Öğrenci Portalı</h3>
