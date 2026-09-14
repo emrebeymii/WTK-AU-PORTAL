@@ -183,7 +183,6 @@ img{max-width:100%; display:block;}
    ============================================================ */
 #splash{
   position:fixed; inset:0; z-index:999; background:#000;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;
   overflow:hidden;
   clip-path:circle(150vmax at 50% 50%);
   transition:clip-path .65s cubic-bezier(.22,1,.36,1);
@@ -191,6 +190,21 @@ img{max-width:100%; display:block;}
 }
 #splash.splash-reveal{clip-path:circle(0px at var(--reveal-x,50%) var(--reveal-y,50%));}
 #splash.splash-done{display:none;}
+
+/* Logo + kelime işareti + slogan — #splash'ın (siyah perde) ÜSTÜNDE,
+   AYRI bir katman. KRİTİK: eğer bunlar #splash'ın İÇİNDE olsaydı,
+   perdenin hedef noktaya doğru daralan "iris" clip-path'i, henüz
+   yolculuğunu bitirmemiş logoyu perde küçüldükçe ERKEN kırpıp
+   görünmez yapardı — paylaşılan-öğe geçişi tamamlanmadan kesilirdi.
+   Bu katman, kendi z-index'i (1000 > 999) sayesinde perdeden bağımsız,
+   her zaman tam görünür kalır; sadece logonun KENDİ shrink/move
+   geçişiyle (aşağıda .splash-mark-shrink) hedefe ulaşır. */
+#splashBrand{
+  position:fixed; inset:0; z-index:1000; color:#fff;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  pointer-events:none;
+}
+#splashBrand.splash-done{display:none;}
 
 /* 2) Enerji çizgisi */
 .splash-glow-line{
@@ -249,18 +263,13 @@ img{max-width:100%; display:block;}
   transition:opacity .25s ease, transform .25s ease;
 }
 
-/* 6) Paylaşılan-öğe geçişi: JS bu class'ı ekleyip --tx/--ty/--sc'yi
+/* 6) Paylaşılan-öğe geçişi: JS (runSplashHandoff) --tx/--ty/--sc değerlerini
    hedef logonun (#appLogo ya da .login-logo) GERÇEK ölçülmüş konum/
-   boyutuna göre ayarlar. Kısa bir blur darbesi ("motion blur" hissi)
-   hareketle senkronize çalışır. Aynı SVG olduğu için "logo kaybolup
-   yenisi belirmiyor" — gerçekten AYNI eleman küçülüp yerine oturuyor. */
-.splash-mark.splash-mark-shrink{
-  animation:none; /* nefes alma döngüsünü kes, artık elle kontrol ediyoruz */
-  transition:transform .6s cubic-bezier(.65,0,.35,1), filter .6s ease;
-  transform:translate(var(--tx,0), var(--ty,0)) scale(var(--sc,1));
-  filter:drop-shadow(0 0 0 rgba(var(--primary-rgb),0)) blur(0px);
-}
-.splash-mark-shrink.splash-mark-blur{filter:blur(5px);}
+   boyutuna göre hesaplayıp doğrudan satır-içi transform/transition olarak
+   uygular (CSS class'ı değil — animasyondan geçişe devrin HER zaman net
+   bir A→B geçişi olarak tetiklenmesini garanti eder). Aynı SVG olduğu
+   için "logo kaybolup yenisi belirmiyor" — gerçekten AYNI eleman küçülüp
+   yerine oturuyor. */
 
 /* 7-9) Altta beliren ekranın TEK SEFERLİK "bulanıktan netleşme" girişi.
    .cold-start yalnızca ilk açılışta #appFrame üzerinde durur; devreye
@@ -1072,6 +1081,8 @@ cursor:not-allowed;
   <!-- ============ AÇILIŞ (SPLASH) EKRANI ============ -->
   <div id="splash">
     <div class="splash-glow-line"></div>
+  </div>
+  <div id="splashBrand">
     <div class="splash-mark" id="splashMark">
       <svg class="splash-mark-svg" viewBox="0 0 100 90" aria-hidden="true">
         <defs>
@@ -2117,6 +2128,7 @@ function trySplashDismiss(){
    oturur — klasik bir "shared element transition". */
 function runSplashHandoff(){
   const splash = document.getElementById('splash');
+  const brand = document.getElementById('splashBrand');
   const mark = document.getElementById('splashMark');
   // Hedef: hangi ekran gösterilecekse ONUN gerçek logosu. #appLogo yalnızca
   // #app içinde var (henüz onaylanmamış/giriş yapmamış bir ziyaretçi için
@@ -2126,7 +2138,11 @@ function runSplashHandoff(){
   const targetLogo = (app && !app.classList.contains('hidden'))
     ? document.getElementById('appLogo')
     : document.querySelector('.auth-screen:not(.hidden) .login-logo');
-  if(!splash || !mark || !targetLogo){ splash && splash.classList.add('splash-done'); return; }
+  if(!splash || !brand || !mark || !targetLogo){
+    splash && splash.classList.add('splash-done');
+    brand && brand.classList.add('splash-done');
+    return;
+  }
 
   const from = mark.getBoundingClientRect();
   const to = targetLogo.getBoundingClientRect();
@@ -2145,11 +2161,24 @@ function runSplashHandoff(){
   splash.style.setProperty('--reveal-x', toCenterX + 'px');
   splash.style.setProperty('--reveal-y', toCenterY + 'px');
 
+  // ---- Adım A: logoyu TAM O ANKİ (animasyonla gelen) görünümünde,
+  // AÇIKÇA ve GEÇİŞSİZ olarak sabitle. Bu, "animasyonu kaldır + aynı anda
+  // yeni transition'lı hedefe geç" belirsizliğini tamamen ortadan kaldırır
+  // — tarayıcı artık net bir A→B geçişi görür, ara durum tahmini yapmaz. ----
+  const frozenTransform = getComputedStyle(mark).transform;
+  mark.style.animation = 'none';
+  mark.style.transition = 'none';
+  mark.style.transform = frozenTransform === 'none' ? 'scale(1)' : frozenTransform;
+  void mark.offsetWidth; // reflow'u zorla — yukarıdaki dondurma GERÇEKTEN uygulansın
+
   requestAnimationFrame(()=>{
-    mark.classList.add('splash-mark-shrink');
+    // ---- Adım B: şimdi geçişi tanımla ve hedefe taşı. ----
+    mark.style.transition = 'transform .6s cubic-bezier(.65,0,.35,1), filter .6s ease';
+    mark.style.transform = `translate(${(toCenterX - fromCenterX)}px, ${(toCenterY - fromCenterY)}px) scale(${scale})`;
+    mark.style.filter = 'drop-shadow(0 0 0 rgba(var(--primary-rgb),0)) blur(0px)';
     // Hareketin tam ortasında kısa bir blur darbesi — "motion blur" hissi.
-    setTimeout(()=> mark.classList.add('splash-mark-blur'), 90);
-    setTimeout(()=> mark.classList.remove('splash-mark-blur'), 380);
+    setTimeout(()=> mark.style.filter = 'blur(5px)', 90);
+    setTimeout(()=> mark.style.filter = 'drop-shadow(0 0 0 rgba(var(--primary-rgb),0)) blur(0px)', 380);
 
     // Kelime işareti + slogan, logo hareketiyle AYNI ANDA sahneden çıkar
     // (ayrı bir fade-out olayı değil, tek bir birleşik hareketin parçası).
@@ -2162,9 +2191,14 @@ function runSplashHandoff(){
     document.getElementById('appFrame').classList.remove('cold-start');
   });
 
-  // Geçiş tamamlandıktan sonra splash'ı tamamen kaldır (görünmez bir
-  // katman bile olsa tıklamaları/erişilebilirliği etkilemesin).
-  setTimeout(()=>{ splash.classList.add('splash-done'); }, 720);
+  // Geçiş tamamlandıktan sonra hem siyah perdeyi hem de logo katmanını
+  // tamamen kaldır (görünmez bir katman bile olsa tıklamaları/
+  // erişilebilirliği etkilemesin — logo bu noktada zaten gerçek header
+  // logosunun TAM üzerinde durduğu için kaybolması fark edilmez).
+  setTimeout(()=>{
+    splash.classList.add('splash-done');
+    brand.classList.add('splash-done');
+  }, 720);
 }
 
 /* ---- Öğrenci oturum durumu: TEK doğruluk kaynağı ----
