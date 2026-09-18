@@ -74,6 +74,7 @@
 }
 
 *{box-sizing:border-box; margin:0; padding:0;}
+.lucide-ic{flex-shrink:0; vertical-align:middle; display:inline-block;}
 html{-webkit-tap-highlight-color:transparent;}
 body{
   font-family:var(--font);
@@ -161,7 +162,7 @@ img{max-width:100%; display:block;}
 .chip-blue{background:var(--info-bg); color:var(--info);}
 .chip-gray{background:var(--border); color:var(--text-secondary);}
 .empty-state{text-align:center; padding:48px 20px; color:var(--text-secondary);}
-.empty-state .emoji{font-size:40px; display:block; margin-bottom:10px;}
+.empty-state .emoji{display:flex; justify-content:center; margin-bottom:10px; color:var(--text-tertiary);}
 .container-pad{padding:0 18px;}
 
 /* ---------- Splash ---------- */
@@ -462,7 +463,8 @@ img{max-width:100%; display:block;}
 }
 
 .page-header{padding:20px 18px 4px;}
-.page-header h2{font-size:22px; font-weight:800; letter-spacing:-.4px;}
+.page-header h2{font-size:22px; font-weight:800; letter-spacing:-.4px; display:flex; align-items:center; gap:9px;}
+.page-header h2 .lucide-ic{color:var(--primary);}
 .page-header p{font-size:13px; color:var(--text-secondary); margin-top:4px;}
 
 /* Welcome block */
@@ -499,7 +501,7 @@ img{max-width:100%; display:block;}
 .assistant-card-top{display:flex; align-items:center; gap:13px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
 .assistant-card-top:active{opacity:.82;}
 .assistant-avatar{
-  width:50px; height:50px; border-radius:15px; flex-shrink:0; font-size:23px;
+  width:50px; height:50px; border-radius:15px; flex-shrink:0; color:#fff;
   background:linear-gradient(135deg,var(--primary),var(--primary-dark));
   display:flex; align-items:center; justify-content:center;
 }
@@ -571,6 +573,7 @@ img{max-width:100%; display:block;}
 .filter-chip{
   flex-shrink:0; padding:8px 15px; border-radius:999px; font-size:12.5px; font-weight:700; border:1.5px solid var(--border);
   background:var(--surface); cursor:pointer; transition:all var(--t-fast); white-space:nowrap;
+  display:inline-flex; align-items:center; gap:6px;
 }
 .filter-chip.active{background:var(--primary); color:#fff; border-color:var(--primary);}
 
@@ -691,7 +694,7 @@ img{max-width:100%; display:block;}
   flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:none; border:none;
   cursor:pointer; color:var(--text-tertiary); font-size:9.5px; font-weight:700; position:relative; padding-top:6px;
 }
-.nav-btn .nic{font-size:20px; transition:transform var(--t-fast);}
+.nav-btn .nic{display:inline-flex; transition:transform var(--t-fast);}
 .nav-btn.active{color:var(--primary);}
 .nav-btn.active .nic{transform:translateY(-2px) scale(1.08);}
 .nav-btn.active::before{content:''; position:absolute; top:0; width:26px; height:3px; border-radius:0 0 4px 4px; background:var(--primary);}
@@ -1128,7 +1131,7 @@ cursor:not-allowed;
             <label>Şifre</label>
             <div class="pw-wrap">
               <input type="password" id="loginPassword" placeholder="Şifreniz" autocomplete="current-password">
-              <button class="pw-toggle" id="togglePw" type="button" aria-label="Şifreyi göster/gizle">👁️</button>
+              <button class="pw-toggle" id="togglePw" type="button" aria-label="Şifreyi göster/gizle" data-icon="eye" data-size="18"></button>
             </div>
           </div>
           <div class="remember-row">
@@ -1139,7 +1142,7 @@ cursor:not-allowed;
             <button type="button" class="forgot-link" id="forgotPasswordLink">Şifremi unuttum?</button>
           </div>
           <button class="btn btn-primary btn-block" id="loginBtn">Giriş Yap</button>
-          <div class="error-card" id="loginError">⚠️ <span id="loginErrorText">Giriş başarısız oldu.</span></div>
+          <div class="error-card" id="loginError"><span data-icon="alertTriangle" data-size="16"></span> <span id="loginErrorText">Giriş başarısız oldu.</span></div>
         </div>
         <div class="auth-switch">Hesabın yok mu? <button type="button" id="showRegisterBtn">Kayıt Ol</button></div>
         <div class="login-footer-note">Bu, Ankara Üniversitesi'nin resmî bir platformu değildir.</div>
@@ -1153,8 +1156,8 @@ cursor:not-allowed;
             <input type="email" id="forgotEmail" placeholder="ornek@ogrenci.ankara.edu.tr" autocomplete="username">
           </div>
           <button class="btn btn-primary btn-block" id="sendResetBtn">Sıfırlama Bağlantısı Gönder</button>
-          <div class="error-card" id="forgotError">⚠️ <span id="forgotErrorText">Bir hata oluştu.</span></div>
-          <div class="success-card" id="forgotSuccess">✅ <span id="forgotSuccessText">Bağlantı gönderildi.</span></div>
+          <div class="error-card" id="forgotError"><span data-icon="alertTriangle" data-size="16"></span> <span id="forgotErrorText">Bir hata oluştu.</span></div>
+          <div class="success-card" id="forgotSuccess"><span data-icon="checkCircle" data-size="16"></span> <span id="forgotSuccessText">Bağlantı gönderildi.</span></div>
         </div>
         <div class="auth-switch">Şifreni hatırladın mı? <button type="button" id="backToLoginBtn">Giriş Yap</button></div>
         <div class="login-footer-note">E-posta adresine bir şifre sıfırlama bağlantısı göndereceğiz. Gelen kutunu (ve spam klasörünü) kontrol etmeyi unutma.</div>
@@ -1179,20 +1182,20 @@ cursor:not-allowed;
             <label>Şifre</label>
             <div class="pw-wrap">
               <input type="password" id="regPassword" placeholder="En az 6 karakter" autocomplete="new-password">
-              <button class="pw-toggle" id="toggleRegPw" type="button" aria-label="Şifreyi göster/gizle">👁️</button>
+              <button class="pw-toggle" id="toggleRegPw" type="button" aria-label="Şifreyi göster/gizle" data-icon="eye" data-size="18"></button>
             </div>
           </div>
           <div class="form-group">
             <label>Şifre (Tekrar)</label>
             <input type="password" id="regPassword2" placeholder="Şifrenizi tekrar girin" autocomplete="new-password">
           </div>
-          <p class="kvkk-note"><span>🔒</span><span>Kayıt olarak; ad-soyad, kullanıcı adı ve e-posta bilgilerinin, hesabının onaylanabilmesi amacıyla Firebase altyapısında güvenli şekilde saklanmasını kabul etmiş olursun. Bilgilerin üçüncü taraflarla paylaşılmaz.</span></p>
+          <p class="kvkk-note"><span data-icon="lock" data-size="15"></span><span>Kayıt olarak; ad-soyad, kullanıcı adı ve e-posta bilgilerinin, hesabının onaylanabilmesi amacıyla Firebase altyapısında güvenli şekilde saklanmasını kabul etmiş olursun. Bilgilerin üçüncü taraflarla paylaşılmaz.</span></p>
           <div class="kvkk-consent-row">
             <input type="checkbox" id="kvkkConsent">
             <label for="kvkkConsent">Yukarıdaki metni okudum, kabul ediyorum.</label>
           </div>
           <button class="btn btn-primary btn-block" id="registerBtn" disabled style="margin-top:14px;">Kayıt Ol</button>
-          <div class="error-card" id="registerError">⚠️ <span id="registerErrorText">Kayıt oluşturulamadı.</span></div>
+          <div class="error-card" id="registerError"><span data-icon="alertTriangle" data-size="16"></span> <span id="registerErrorText">Kayıt oluşturulamadı.</span></div>
         </div>
         <div class="auth-switch">Zaten hesabın var mı? <button type="button" id="showLoginBtn">Giriş Yap</button></div>
         <div class="login-footer-note">Kayıt olduktan sonra bir yöneticinin onayını beklemen gerekir.</div>
@@ -1204,18 +1207,18 @@ cursor:not-allowed;
   <!-- ============ ONAY BEKLENİYOR EKRANI ============ -->
   <div id="pendingScreen" class="auth-screen">
     <div class="login-hero">
-      <div class="login-logo">⏳</div>
+      <div class="login-logo" data-icon="clock" data-size="56"></div>
       <h1>Hesabın Onay Bekliyor</h1>
       <p>Kaydın alındı! Bir yönetici hesabını onayladığında bu ekran otomatik olarak portala geçecek.</p>
     </div>
     <div class="login-body">
       <div class="login-card" style="text-align:center;">
-        <div style="font-size:42px; margin-bottom:12px;">🕒</div>
+        <div style="margin-bottom:12px; color:var(--primary);" data-icon="clock" data-size="42"></div>
         <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.65;">
           Bu genelde kısa sürer. Sekmeyi açık bırakabilir ya da daha sonra tekrar giriş
           yapabilirsin — onaylandığın an doğrudan portala erişebileceksin.
         </p>
-        <button class="btn btn-danger-ghost btn-block" id="pendingLogoutBtn" style="margin-top:18px;">🚪 Çıkış Yap</button>
+        <button class="btn btn-danger-ghost btn-block" id="pendingLogoutBtn" style="margin-top:18px;"><span data-icon="logOut" data-size="17"></span> Çıkış Yap</button>
       </div>
     </div>
   </div>
@@ -1223,7 +1226,7 @@ cursor:not-allowed;
   <!-- ============ HESAP BULUNAMADI EKRANI ============ -->
   <div id="accountMissingScreen" class="auth-screen">
     <div class="login-hero">
-      <div class="login-logo">⚠️</div>
+      <div class="login-logo" data-icon="alertTriangle" data-size="56"></div>
       <h1>Hesap Bulunamadı</h1>
       <p>Bu hesaba ait bir öğrenci profili bulunamadı.</p>
     </div>
@@ -1233,7 +1236,7 @@ cursor:not-allowed;
           Başvurun reddedilmiş ya da kayıt sırasında bir sorun oluşmuş olabilir. Bunun bir
           hata olduğunu düşünüyorsan bölüm topluluk kanallarından yöneticiyle iletişime geç.
         </p>
-        <button class="btn btn-danger-ghost btn-block" id="missingLogoutBtn" style="margin-top:18px;">🚪 Çıkış Yap</button>
+        <button class="btn btn-danger-ghost btn-block" id="missingLogoutBtn" style="margin-top:18px;"><span data-icon="logOut" data-size="17"></span> Çıkış Yap</button>
       </div>
     </div>
   </div>
@@ -1262,9 +1265,9 @@ cursor:not-allowed;
         </div>
       </div>
       <div class="topbar-right">
-        <button class="icon-btn" id="darkToggleBtn" aria-label="Karanlık mod" title="Karanlık mod">🌙</button>
+        <button class="icon-btn" id="darkToggleBtn" aria-label="Karanlık mod" title="Karanlık mod"></button>
         <button class="icon-btn" id="notifBtn" aria-label="Bildirimler" title="Bildirimler">
-          🔔<span class="badge-dot hidden" id="notifDot"></span>
+          <span data-icon="bellRing" data-size="19"></span><span class="badge-dot hidden" id="notifDot"></span>
         </button>
         <div class="avatar-mini" id="avatarBtn" title="Profil">Ö</div>
       </div>
@@ -1281,7 +1284,7 @@ cursor:not-allowed;
       <!-- ---- ANA SAYFA ---- -->
       <section id="page-home" class="page active">
         <div class="welcome-block">
-          <div class="greet" id="homeGreet">Hoş Geldin 👋</div>
+          <div class="greet" id="homeGreet">Hoş Geldin</div>
           <div class="date" id="homeDate"></div>
         </div>
 
@@ -1293,18 +1296,18 @@ cursor:not-allowed;
         <!-- ---- WTK Yardımcı Kartı ---- -->
         <div class="assistant-card">
           <div class="assistant-card-top" id="assistantOpenTrigger">
-            <div class="assistant-avatar">🤖</div>
+            <div class="assistant-avatar" data-icon="bot" data-size="24"></div>
             <div class="assistant-card-text">
               <h3>WTK Yardımcı</h3>
               <p>Bugün sana nasıl yardımcı olabilirim?</p>
             </div>
           </div>
           <div class="assistant-quick-actions">
-            <button class="aq-btn" data-nav="page-course-content"><span class="aq-ic">📖</span>Ders İçerikleri</button>
-            <button class="aq-btn" data-scroll="campusCardNotice"><span class="aq-ic">💳</span>Kampüs Kart</button>
-            <button class="aq-btn" data-nav="page-calendar"><span class="aq-ic">📅</span>Akademik Takvim</button>
-            <button class="aq-btn" data-nav="page-announcements"><span class="aq-ic">📢</span>Duyurular</button>
-            <button class="aq-btn" data-nav="page-calendar"><span class="aq-ic">💰</span>Dönem Ücreti</button>
+            <button class="aq-btn" data-nav="page-course-content"><span class="aq-ic" data-icon="bookOpen" data-size="16"></span>Ders İçerikleri</button>
+            <button class="aq-btn" data-scroll="campusCardNotice"><span class="aq-ic" data-icon="creditCard" data-size="16"></span>Kampüs Kart</button>
+            <button class="aq-btn" data-nav="page-calendar"><span class="aq-ic" data-icon="calendar" data-size="16"></span>Akademik Takvim</button>
+            <button class="aq-btn" data-nav="page-announcements"><span class="aq-ic" data-icon="bell" data-size="16"></span>Duyurular</button>
+            <button class="aq-btn" data-nav="page-calendar"><span class="aq-ic" data-icon="wallet" data-size="16"></span>Dönem Ücreti</button>
           </div>
         </div>
 
@@ -1419,58 +1422,58 @@ cursor:not-allowed;
 
       <!-- ---- DERS NOTLARI ---- -->
       <section id="page-courses" class="page">
-        <div class="page-header"><h2>📚 Ders Notları</h2><p>Bölüm derslerine ait notlar ve kaynaklar</p></div>
-        <div class="search-bar"><span class="sic">🔍</span><input type="text" id="courseSearch" placeholder="Ders ara..."></div>
+        <div class="page-header"><h2><span data-icon="bookOpen" data-size="22"></span> Ders Notları</h2><p>Bölüm derslerine ait notlar ve kaynaklar</p></div>
+        <div class="search-bar"><span class="sic" data-icon="search" data-size="16"></span><input type="text" id="courseSearch" placeholder="Ders ara..."></div>
         <div class="filter-row" id="courseFilters"></div>
         <div class="grid-cards" id="courseGrid"></div>
       </section>
 
       <!-- ---- PDF ARŞİVİ ---- -->
       <section id="page-pdf" class="page">
-        <div class="page-header"><h2>📄 PDF Arşivi</h2><p>Ders materyalleri ve doküman arşivi</p></div>
+        <div class="page-header"><h2><span data-icon="fileText" data-size="22"></span> PDF Arşivi</h2><p>Ders materyalleri ve doküman arşivi</p></div>
         <div class="archive-stats">
           <div class="stat-box"><b id="pdfCountStat">0</b><span>TOPLAM DOSYA</span></div>
           <div class="stat-box"><b id="pdfCatStat">0</b><span>KATEGORİ</span></div>
         </div>
-        <div class="search-bar"><span class="sic">🔍</span><input type="text" id="pdfSearch" placeholder="PDF ara..."></div>
+        <div class="search-bar"><span class="sic" data-icon="search" data-size="16"></span><input type="text" id="pdfSearch" placeholder="PDF ara..."></div>
         <div class="pdf-list" id="pdfList"></div>
       </section>
 
       <!-- ---- DUYURULAR ---- -->
       <section id="page-announcements" class="page">
-        <div class="page-header"><h2>📢 Duyurular</h2><p>Bölüm ve topluluk duyuruları</p></div>
+        <div class="page-header"><h2><span data-icon="bell" data-size="22"></span> Duyurular</h2><p>Bölüm ve topluluk duyuruları</p></div>
         <div id="annList" style="padding-top:8px;"></div>
       </section>
 
       <!-- ---- AKADEMİK TAKVİM ---- -->
       <section id="page-calendar" class="page">
-        <div class="page-header"><h2>📅 Akademik Takvim</h2><p>2026–2027 dönemi önemli tarihler</p></div>
+        <div class="page-header"><h2><span data-icon="calendar" data-size="22"></span> Akademik Takvim</h2><p>2026–2027 dönemi önemli tarihler</p></div>
         <div class="fee-banner">
           <div><span>Dönem Ücreti</span><b id="feeAmount">6.250₺</b></div>
-          <div class="fee-emoji">💳</div>
+          <div class="fee-emoji" data-icon="creditCard" data-size="28"></div>
         </div>
         <div class="timeline" id="calendarTimeline"></div>
       </section>
 
       <!-- ---- FAYDALI BAĞLANTILAR ---- -->
       <section id="page-links" class="page">
-        <div class="page-header"><h2>🎓 Faydalı Bağlantılar</h2><p>Sık kullanılan üniversite sistemleri</p></div>
+        <div class="page-header"><h2><span data-icon="graduationCap" data-size="22"></span> Faydalı Bağlantılar</h2><p>Sık kullanılan üniversite sistemleri</p></div>
         <div id="linksList" style="padding-top:8px;"></div>
       </section>
 
       <!-- ---- KULLANICI DİZİNİ ---- -->
       <section id="page-directory" class="page">
-        <div class="page-header"><h2>👥 Kullanıcı Dizini</h2><p>Onaylı portal üyeleri</p></div>
+        <div class="page-header"><h2><span data-icon="users" data-size="22"></span> Kullanıcı Dizini</h2><p>Onaylı portal üyeleri</p></div>
         <div class="archive-stats">
-          <div class="stat-box"><b id="dirTotalCount">0</b><span>👥 TOPLAM ÜYE</span></div>
-          <div class="stat-box"><b id="dirActiveCount">0</b><span>🟢 ŞU AN AKTİF</span></div>
+          <div class="stat-box"><b id="dirTotalCount">0</b><span data-icon="users" data-size="12"></span> <span>TOPLAM ÜYE</span></div>
+          <div class="stat-box"><b id="dirActiveCount">0</b><span class="online-dot online" style="position:static; display:inline-block; border:none;"></span> <span>ŞU AN AKTİF</span></div>
         </div>
         <div class="directory-list container-pad" id="directoryList"></div>
       </section>
 
       <!-- ---- SINAVLAR ---- -->
       <section id="page-exams" class="page">
-        <div class="page-header"><h2>📝 Sınavlar</h2><p>Sınav yapısı, merkezler ve süreç hakkında bilgilendirme</p></div>
+        <div class="page-header"><h2><span data-icon="fileText" data-size="22"></span> Sınavlar</h2><p>Sınav yapısı, merkezler ve süreç hakkında bilgilendirme</p></div>
 
         <div class="card info-text-card">
           <p>Fakültemizde bir akademik yıl içerisinde her yarıyıl için bir <b>Ara Sınav (Vize)</b>, <b>Yarıyıl Sonu Sınavı (Final)</b> ve <b>Bütünleme Sınavı</b> yapılmaktadır. Ayrıca kayıtlı olunan programda 2547 sayılı Kanunun 5. maddesinin birinci fıkrasının (ı) bendi kapsamında açılan dersler dâhil, başarısız olunan en çok üç ders dışındaki dersleri başarıyla tamamlayan ve programa ilişkin tüm yükümlülükleri yerine getiren sınava girme hakkını kazanmış olup son yarıyıldaki/yıldaki başarısız öğrencilere mezuniyete üç ders sınavı hakkı tanınmaktadır.</p>
@@ -1479,7 +1482,7 @@ cursor:not-allowed;
         <div class="section-head container-pad"><div class="section-title">Sınav Merkezleri</div></div>
 
         <div class="card exam-center-card">
-          <h5>📍 Ara ve Final Sınavları</h5>
+          <h5 style="display:flex;align-items:center;gap:6px;"><span data-icon="mapPin" data-size="16"></span> Ara ve Final Sınavları</h5>
           <div class="chip-wrap">
             <span class="chip chip-orange">Adana</span><span class="chip chip-orange">Ankara</span><span class="chip chip-orange">Antalya</span>
             <span class="chip chip-orange">Bursa</span><span class="chip chip-orange">Diyarbakır</span><span class="chip chip-orange">Gaziantep</span>
@@ -1489,7 +1492,7 @@ cursor:not-allowed;
         </div>
 
         <div class="card exam-center-card">
-          <h5>📍 Bütünleme Sınavları</h5>
+          <h5 style="display:flex;align-items:center;gap:6px;"><span data-icon="mapPin" data-size="16"></span> Bütünleme Sınavları</h5>
           <div class="chip-wrap">
             <span class="chip chip-blue">Adana</span><span class="chip chip-blue">Ankara</span><span class="chip chip-blue">Diyarbakır</span>
             <span class="chip chip-blue">İstanbul (Avrupa)</span><span class="chip chip-blue">İstanbul (Anadolu)</span>
@@ -1500,18 +1503,18 @@ cursor:not-allowed;
 
         <div class="section-head container-pad"><div class="section-title">Sınav Formatı</div></div>
         <div class="grid-cards" style="padding-top:0;">
-          <div class="card course-card" style="cursor:default;"><div class="course-ic">✅</div><h5>Çoktan Seçmeli</h5><p>Fakültemiz tarafından gerçekleştirilen sınavlarda sorular çoktan seçmelidir.</p></div>
-          <div class="card course-card" style="cursor:default;"><div class="course-ic">🔢</div><h5>20 Soru</h5><p>Her bir ders için 20 soru sorulmaktadır.</p></div>
+          <div class="card course-card" style="cursor:default;"><div class="course-ic" data-icon="checkCircle" data-size="18"></div><h5>Çoktan Seçmeli</h5><p>Fakültemiz tarafından gerçekleştirilen sınavlarda sorular çoktan seçmelidir.</p></div>
+          <div class="card course-card" style="cursor:default;"><div class="course-ic" data-icon="hash" data-size="18"></div><h5>20 Soru</h5><p>Her bir ders için 20 soru sorulmaktadır.</p></div>
           <div class="card course-card" style="cursor:default;"><div class="course-ic">⏱️</div><h5>30 Dakika</h5><p>Sınav oturum süreleri her bir test için 30 dakika olacak şekilde uygulanır.</p></div>
         </div>
       </section>
 
       <!-- ---- DERSLER VE İÇERİKLERİ ---- -->
       <section id="page-course-content" class="page">
-        <div class="page-header"><h2>📖 Dersler ve İçerikleri</h2><p>Web Tasarımı ve Kodlama programı ders planı</p></div>
+        <div class="page-header"><h2><span data-icon="bookOpen" data-size="22"></span> Dersler ve İçerikleri</h2><p>Web Tasarımı ve Kodlama programı ders planı</p></div>
 
         <div class="container-pad" style="margin:14px 0 4px;">
-          <a class="btn btn-primary btn-block" href="https://ankuzef.ankara.edu.tr/images/2026/dersicerikleri/acik/webt.pdf" target="_blank" rel="noopener noreferrer">📄 Resmi Ders İçerikleri PDF'ini Aç</a>
+          <a class="btn btn-primary btn-block" href="https://ankuzef.ankara.edu.tr/images/2026/dersicerikleri/acik/webt.pdf" target="_blank" rel="noopener noreferrer"><span data-icon="fileText" data-size="16"></span> Resmi Ders İçerikleri PDF'ini Aç</a>
         </div>
 
         <div class="section-head container-pad"><div class="section-title">1. Sınıf / 1. Yarıyıl (Güz)</div><span class="chip chip-gray">30 AKTS</span></div>
@@ -1569,14 +1572,14 @@ cursor:not-allowed;
 
         <div class="fee-banner" style="margin:6px 18px 4px;">
           <div><span>Mezuniyet İçin Gerekli</span><b>120 AKTS</b></div>
-          <div class="fee-emoji">🎓</div>
+          <div class="fee-emoji" data-icon="graduationCap" data-size="28"></div>
         </div>
         <p style="font-size:11.5px; color:var(--text-tertiary); line-height:1.6; margin:0 18px 4px;">Seçmeli ders grubundan alınabilecek AKTS miktarı Genel Akademik Başarı Not Ortalamanıza (GABNO) göre değişir. Detaylı içerik ve intibak bilgileri için yukarıdaki resmi PDF'i inceleyin.</p>
       </section>
 
       <!-- ---- HAKKINDA ---- -->
       <section id="page-about" class="page">
-        <div class="page-header"><h2>ℹ️ Hakkında</h2></div>
+        <div class="page-header"><h2><span data-icon="info" data-size="22"></span> Hakkında</h2></div>
         <div class="about-card card">
           <div class="about-logo">
             <svg class="wtk-logo-svg" viewBox="0 0 100 90" aria-hidden="true">
@@ -1615,7 +1618,7 @@ cursor:not-allowed;
 
         <div class="section-head container-pad" style="margin:22px 0 8px;">
           <div class="section-title" style="font-size:15px;">Hakkımda</div>
-          <button class="link-more" id="editProfileBtn">✏️ Düzenle</button>
+          <button class="link-more" id="editProfileBtn"><span data-icon="pencil" data-size="14"></span> Düzenle</button>
         </div>
         <div class="container-pad">
           <div class="card" style="padding:14px 16px;">
@@ -1630,28 +1633,28 @@ cursor:not-allowed;
 
         <div class="settings-list card">
           <div class="settings-row">
-            <div class="settings-left"><div class="settings-ic">🌙</div><span class="label">Karanlık Mod</span></div>
+            <div class="settings-left"><div class="settings-ic" data-icon="moon" data-size="18"></div><span class="label">Karanlık Mod</span></div>
             <label class="switch"><input type="checkbox" id="darkSwitch"><span class="track"></span></label>
           </div>
           <div class="settings-row" id="openAdminLoginBtn">
-            <div class="settings-left"><div class="settings-ic">🛠️</div><span class="label">Yönetici Girişi</span></div>
+            <div class="settings-left"><div class="settings-ic" data-icon="wrench" data-size="18"></div><span class="label">Yönetici Girişi</span></div>
             <span class="link-arrow">›</span>
           </div>
           <div class="settings-row" id="goAboutBtn">
-            <div class="settings-left"><div class="settings-ic">ℹ️</div><span class="label">Hakkında</span></div>
+            <div class="settings-left"><div class="settings-ic" data-icon="info" data-size="18"></div><span class="label">Hakkında</span></div>
             <span class="link-arrow">›</span>
           </div>
         </div>
 
         <div class="container-pad" style="margin-top:8px;">
-          <button class="btn btn-danger-ghost btn-block" id="logoutBtn">🚪 Çıkış Yap</button>
+          <button class="btn btn-danger-ghost btn-block" id="logoutBtn"><span data-icon="logOut" data-size="17"></span> Çıkış Yap</button>
         </div>
       </section>
 
       <!-- ---- YÖNETİCİ PANELİ ---- -->
       <section id="page-admin" class="page">
-        <div class="page-header"><h2>🛠️ Yönetici Paneli</h2><p>İçerik yönetimi</p></div>
-        <div class="admin-lock-note">🔐 <span>Bu panelde yaptığınız değişiklikler tüm öğrencilere anında yansır (Kullanıcılar sekmesindeki onaylar dahil).</span></div>
+        <div class="page-header"><h2><span data-icon="settings" data-size="22"></span> Yönetici Paneli</h2><p>İçerik yönetimi</p></div>
+        <div class="admin-lock-note"><span data-icon="lock" data-size="16"></span> <span>Bu panelde yaptığınız değişiklikler tüm öğrencilere anında yansır (Kullanıcılar sekmesindeki onaylar dahil).</span></div>
         <div class="admin-tabs" id="adminTabs"></div>
         <div class="admin-panel-body" id="adminBody"></div>
       </section>
@@ -1660,11 +1663,11 @@ cursor:not-allowed;
 
     <!-- Alt gezinme menüsü -->
     <nav class="bottomnav glass">
-      <button class="nav-btn active" data-nav="page-home"><span class="nic">🏠</span>Ana Sayfa</button>
-      <button class="nav-btn" data-nav="page-courses"><span class="nic">📚</span>Dersler</button>
-      <button class="nav-btn" data-nav="page-pdf"><span class="nic">📄</span>PDF</button>
-      <button class="nav-btn" data-nav="page-announcements"><span class="nic">📢</span>Duyurular</button>
-      <button class="nav-btn" data-nav="page-profile"><span class="nic">👤</span>Profil</button>
+      <button class="nav-btn active" data-nav="page-home"><span class="nic" data-icon="house" data-size="22"></span>Ana Sayfa</button>
+      <button class="nav-btn" data-nav="page-courses"><span class="nic" data-icon="bookOpen" data-size="22"></span>Dersler</button>
+      <button class="nav-btn" data-nav="page-pdf"><span class="nic" data-icon="fileText" data-size="22"></span>PDF</button>
+      <button class="nav-btn" data-nav="page-announcements"><span class="nic" data-icon="bell" data-size="22"></span>Duyurular</button>
+      <button class="nav-btn" data-nav="page-profile"><span class="nic" data-icon="userCircle" data-size="22"></span>Profil</button>
     </nav>
 
     <button class="fab hidden" id="adminFab" title="Ekle">＋</button>
@@ -1674,17 +1677,17 @@ cursor:not-allowed;
   <div class="modal-overlay" id="adminLoginModal">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <button class="modal-close-x" data-close-modal="adminLoginModal">✕</button>
+      <button class="modal-close-x" data-close-modal="adminLoginModal" data-icon="x" data-size="18"></button>
       <div class="modal-title">Yönetici Girişi</div>
       <div class="modal-sub">Devam etmek için yönetici şifresini girin.</div>
       <div class="form-group">
         <label>Yönetici Şifresi</label>
         <div class="pw-wrap">
           <input type="password" id="adminPassword" placeholder="••••••••••••">
-          <button class="pw-toggle" id="toggleAdminPw" type="button">👁️</button>
+          <button class="pw-toggle" id="toggleAdminPw" type="button" data-icon="eye" data-size="18"></button>
         </div>
       </div>
-      <div class="error-card" id="adminLoginError">⚠️ <span>Yönetici şifresi hatalı.</span></div>
+      <div class="error-card" id="adminLoginError"><span data-icon="alertTriangle" data-size="16"></span> <span>Yönetici şifresi hatalı.</span></div>
       <div class="modal-actions"><button class="btn btn-primary" id="adminLoginBtn">Giriş Yap</button></div>
     </div>
   </div>
@@ -1693,7 +1696,7 @@ cursor:not-allowed;
   <div class="modal-overlay" id="formModal">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
-      <button class="modal-close-x" data-close-modal="formModal">✕</button>
+      <button class="modal-close-x" data-close-modal="formModal" data-icon="x" data-size="18"></button>
       <div class="modal-title" id="formModalTitle">Ekle</div>
       <div class="modal-sub" id="formModalSub"></div>
       <div id="formModalBody"></div>
@@ -1817,9 +1820,9 @@ const DEFAULTS = {
     {id:uid(), title:"PHP ile Web Programlama Notları", category:"Diğer", url:"#", size:"2.9 MB", date:"2026-07-05"}
   ],
   links:[
-    {id:uid(), title:"OBS", desc:"Öğrenci Bilgi Sistemi", url:"https://obs.ankara.edu.tr/account/login?returnurl=/Preparation/HazirlikDonemKayit", icon:"🖥️"},
-    {id:uid(), title:"Öğrenci İşleri", desc:"Ankara Üniversitesi Öğrenci İşleri", url:"https://ankuzef.ankara.edu.tr/tr/24-ogrenci-isleri", icon:"🏛️"},
-    {id:uid(), title:"ÖYS", desc:"Öğrenme Yönetim Sistemi", url:"https://oys.ankara.edu.tr", icon:"📖"}
+    {id:uid(), title:"OBS", desc:"Öğrenci Bilgi Sistemi", url:"https://obs.ankara.edu.tr/account/login?returnurl=/Preparation/HazirlikDonemKayit", icon:"monitor"},
+    {id:uid(), title:"Öğrenci İşleri", desc:"Ankara Üniversitesi Öğrenci İşleri", url:"https://ankuzef.ankara.edu.tr/tr/24-ogrenci-isleri", icon:"landmark"},
+    {id:uid(), title:"ÖYS", desc:"Öğrenme Yönetim Sistemi", url:"https://oys.ankara.edu.tr", icon:"bookOpen"}
   ],
   calendar:[
     {id:uid(), title:"E-Kayıt", start:"2026-08-24", end:"2026-08-26"},
@@ -1832,14 +1835,14 @@ const DEFAULTS = {
 };
 
 const COURSES = [
-  {title:"HTML5 ve CSS3 Temelleri", cat:"HTML/CSS", icon:"🌐", desc:"Web sayfası yapısı ve stil temelleri"},
-  {title:"JavaScript Programlama", cat:"JavaScript", icon:"⚡", desc:"Etkileşimli web uygulamaları geliştirme"},
-  {title:"PHP ve Veritabanı Yönetimi", cat:"Veritabanı", icon:"🗄️", desc:"Sunucu taraflı programlama ve MySQL"},
-  {title:"UI/UX Tasarım İlkeleri", cat:"Tasarım", icon:"🎨", desc:"Kullanıcı deneyimi ve arayüz tasarımı"},
-  {title:"Responsive Web Tasarım", cat:"Tasarım", icon:"📱", desc:"Çok cihazlı uyumlu tasarım teknikleri"},
-  {title:"WordPress ile Web Geliştirme", cat:"Diğer", icon:"🧩", desc:"CMS tabanlı site kurulumu ve özelleştirme"},
-  {title:"Grafik Tasarım Temelleri", cat:"Tasarım", icon:"🖌️", desc:"Görsel tasarım ve kompozisyon ilkeleri"},
-  {title:"Web Sunucu ve Barındırma", cat:"Diğer", icon:"🛰️", desc:"Hosting, domain ve yayınlama süreçleri"}
+  {title:"HTML5 ve CSS3 Temelleri", cat:"HTML/CSS", icon:"globe", desc:"Web sayfası yapısı ve stil temelleri"},
+  {title:"JavaScript Programlama", cat:"JavaScript", icon:"zap", desc:"Etkileşimli web uygulamaları geliştirme"},
+  {title:"PHP ve Veritabanı Yönetimi", cat:"Veritabanı", icon:"archive", desc:"Sunucu taraflı programlama ve MySQL"},
+  {title:"UI/UX Tasarım İlkeleri", cat:"Tasarım", icon:"palette", desc:"Kullanıcı deneyimi ve arayüz tasarımı"},
+  {title:"Responsive Web Tasarım", cat:"Tasarım", icon:"smartphone", desc:"Çok cihazlı uyumlu tasarım teknikleri"},
+  {title:"WordPress ile Web Geliştirme", cat:"Diğer", icon:"link", desc:"CMS tabanlı site kurulumu ve özelleştirme"},
+  {title:"Grafik Tasarım Temelleri", cat:"Tasarım", icon:"pencil", desc:"Görsel tasarım ve kompozisyon ilkeleri"},
+  {title:"Web Sunucu ve Barındırma", cat:"Diğer", icon:"globe", desc:"Hosting, domain ve yayınlama süreçleri"}
 ];
 
 /* ---------------- Veri erişim katmanı ---------------- */
@@ -1918,7 +1921,7 @@ function startAnnouncementsListener(){
         console.error('Firestore duyuru bağlantı hatası:', error);
         announcementsLoaded = true;
         toast('Duyurular yüklenemedi. İnternet bağlantınızı kontrol edin.', 'error');
-        const errHtml = emptyStateHtml('⚠️','Duyurulara ulaşılamadı. Bağlantınızı kontrol edip sayfayı yenileyin.');
+        const errHtml = emptyStateHtml('alertTriangle','Duyurulara ulaşılamadı. Bağlantınızı kontrol edip sayfayı yenileyin.');
         const annListEl = document.getElementById('annList');
         const homePrevEl = document.getElementById('homeAnnPreview');
         if(annListEl) annListEl.innerHTML = errHtml;
@@ -1992,12 +1995,81 @@ function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+/* ---------------- İkon sistemi: Lucide Icons ----------------
+   Portaldaki TÜM emoji ikonların yerini bu tek kaynak alır. Her ikon
+   aynı viewBox (0 0 24 24), aynı stroke-width (2) ve stroke="currentColor"
+   ile render edilir — rengini her zaman bulunduğu yerin metin/vurgu
+   renginden alır. Dış bir script/CDN'e bağımlılık YOKTUR, path verileri
+   doğrudan gömülüdür (MIT lisanslı, https://lucide.dev). */
+const LUCIDE = {
+  house:'<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  bookOpen:'<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  fileText:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  calendar:'<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+  bell:'<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+  bellRing:'<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/>',
+  userCircle:'<path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><circle cx="12" cy="12" r="10"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  bot:'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  creditCard:'<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>',
+  settings:'<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  moon:'<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>',
+  logOut:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+  alertTriangle:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  eye:'<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff:'<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/>',
+  graduationCap:'<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+  pencil:'<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>',
+  trash2:'<path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  link:'<path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  checkCircle:'<path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  lock:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  wallet:'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>',
+  ban:'<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+  trophy:'<path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/><path d="M6 3h12v9a6 6 0 0 1-6 6 6 6 0 0 1-6-6Z"/>',
+  mapPin:'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>',
+  monitor:'<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
+  landmark:'<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+  zap:'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  archive:'<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+  palette:'<path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>',
+  smartphone:'<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>',
+  sparkles:'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+  arrowUpRight:'<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
+  download:'<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>',
+  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+  award:'<path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.198 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/>',
+  hash:'<line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  shieldCheck:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>'
+};
+function ic(name, size, extraClass){
+  const d = LUCIDE[name] || '';
+  const cls = 'lucide-ic' + (extraClass ? ' '+extraClass : '');
+  const s = size || 18;
+  return `<svg class="${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+}
+function hydrateIcons(root){
+  (root || document).querySelectorAll('[data-icon]').forEach(el=>{
+    el.innerHTML = ic(el.dataset.icon, parseInt(el.dataset.size || '18', 10));
+  });
+}
+hydrateIcons();
+
 /* ---------------- Toast bildirimleri ---------------- */
 function toast(msg, type, durationMs){
   const c = document.getElementById('toastContainer');
   const el = document.createElement('div');
   el.className = 'toast' + (type ? ' '+type : '');
-  el.innerHTML = (type==='success'?'✅ ':type==='error'?'⚠️ ':'ℹ️ ') + escapeHtml(msg);
+  el.innerHTML = (type==='success'?ic('checkCircle',15):type==='error'?ic('alertTriangle',15):ic('info',15)) + ' ' + escapeHtml(msg);
   c.appendChild(el);
   setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(), 300); }, durationMs || 2600);
 }
@@ -2006,7 +2078,7 @@ function toast(msg, type, durationMs){
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
   const dark = theme === 'dark';
-  document.getElementById('darkToggleBtn').textContent = dark ? '☀️' : '🌙';
+  document.getElementById('darkToggleBtn').innerHTML = dark ? ic('sun',19) : ic('moon',19);
   const sw = document.getElementById('darkSwitch');
   if(sw) sw.checked = dark;
   const pv = document.getElementById('profileThemeVal');
@@ -2358,7 +2430,7 @@ function renderDirectory(){
   listEl.innerHTML = directoryUsersCache.length ? directoryUsersCache.map(u => {
     const online = isOnline(u);
     const adminActions = isAdmin()
-      ? `<div class="admin-item-actions"><button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Erişimi kaldır">🚫</button></div>`
+      ? `<div class="admin-item-actions"><button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Erişimi kaldır">${ic('ban',15)}</button></div>`
       : '';
     return `<div class="card directory-card">
       <div class="directory-avatar-wrap">
@@ -2371,7 +2443,7 @@ function renderDirectory(){
       </div>
       ${adminActions}
     </div>`;
-  }).join('') : emptyStateHtml('👥', 'Henüz onaylı üye yok.');
+  }).join('') : emptyStateHtml('users', 'Henüz onaylı üye yok.');
 }
 
 /* ---------------- Sayfa geçişleri ---------------- */
@@ -2401,13 +2473,13 @@ function switchPage(pageId, silent){
 // ana sayfa yalnızca Yardımcı kartı + Yaklaşan Tarihler + Duyurular'a
 // odaklanabilir.
 const QUICK_ITEMS = [
-  {icon:'👥', label:'Kullanıcı Dizini', nav:'page-directory'},
-  {icon:'📄', label:'PDF Arşivi', nav:'page-pdf'},
-  {icon:'📝', label:'Sınavlar', nav:'page-exams'},
-  {icon:'📖', label:'Ders İçerikleri', nav:'page-course-content'},
-  {icon:'🎓', label:'Faydalı Bağlantılar', nav:'page-links'},
-  {icon:'📅', label:'Akademik Takvim', nav:'page-calendar'},
-  {icon:'ℹ️', label:'Hakkında', nav:'page-about'}
+  {icon:'users', label:'Kullanıcı Dizini', nav:'page-directory'},
+  {icon:'fileText', label:'PDF Arşivi', nav:'page-pdf'},
+  {icon:'fileText', label:'Sınavlar', nav:'page-exams'},
+  {icon:'bookOpen', label:'Ders İçerikleri', nav:'page-course-content'},
+  {icon:'graduationCap', label:'Faydalı Bağlantılar', nav:'page-links'},
+  {icon:'calendar', label:'Akademik Takvim', nav:'page-calendar'},
+  {icon:'info', label:'Hakkında', nav:'page-about'}
 ];
 
 function renderProfileShortcuts(){
@@ -2415,7 +2487,7 @@ function renderProfileShortcuts(){
   if(!el) return;
   el.innerHTML = QUICK_ITEMS.map(q => `
     <div class="quick-item" data-nav="${q.nav}">
-      <div class="quick-icon">${q.icon}</div>
+      <div class="quick-icon">${ic(q.icon,22)}</div>
       <span>${q.label}</span>
     </div>`).join('');
 }
@@ -2444,22 +2516,22 @@ function renderHome(){
 
   const upcoming = Data.cal.filter(c => dateStatus(c.start,c.end) !== 'past').slice(0,4);
   const tlList = upcoming.length ? upcoming : Data.cal.slice(0,2);
-  document.getElementById('homeCalendarPreview').innerHTML = tlList.length ? tlList.map(homeTimelineItemHtml).join('') : emptyStateHtml('📅','Takvim kaydı yok');
+  document.getElementById('homeCalendarPreview').innerHTML = tlList.length ? tlList.map(homeTimelineItemHtml).join('') : emptyStateHtml('calendar','Takvim kaydı yok');
 
-  document.getElementById('homeAnnPreview').innerHTML = Data.ann.slice(0,2).map(annCardHtml).join('') || emptyStateHtml('📢','Henüz duyuru yok');
+  document.getElementById('homeAnnPreview').innerHTML = Data.ann.slice(0,2).map(annCardHtml).join('') || emptyStateHtml('bell','Henüz duyuru yok');
 
   renderProfileShortcuts();
 }
 
-function emptyStateHtml(emoji, text){
-  return `<div class="empty-state"><span class="emoji">${emoji}</span>${escapeHtml(text)}</div>`;
+function emptyStateHtml(iconName, text){
+  return `<div class="empty-state"><span class="emoji">${ic(iconName,30)}</span>${escapeHtml(text)}</div>`;
 }
 
 /* ---------------- Render: Duyurular ---------------- */
 function annCardHtml(a, idx){
   const authorLine = a.author ? `<span class="ann-author">— ${escapeHtml(a.author)}</span>` : '';
   const featured = idx === 0;
-  const chip = featured ? '<span class="ann-featured-chip">✨ Öne Çıkan</span>' : '';
+  const chip = featured ? `<span class="ann-featured-chip">${ic('sparkles',11)} Öne Çıkan</span>` : '';
   return `<div class="card ann-card${featured?' featured':''}">
     ${chip}
     <div class="ann-top"><h5>${escapeHtml(a.title)}</h5><span class="ann-date">${annDateLabel(a.createdAt)}</span></div>
@@ -2471,8 +2543,8 @@ function renderAnnouncements(){
   const list = Data.ann;
   const annListEl = document.getElementById('annList');
   annListEl.innerHTML = !announcementsLoaded
-    ? emptyStateHtml('⏳','Duyurular yükleniyor...')
-    : (list.length ? list.map(annCardHtml).join('') : emptyStateHtml('📢','Henüz duyuru bulunmuyor'));
+    ? emptyStateHtml('clock','Duyurular yükleniyor...')
+    : (list.length ? list.map(annCardHtml).join('') : emptyStateHtml('bell','Henüz duyuru bulunmuyor'));
   lsSet(LS.notifSeen, list.length);
   updateNotifDot();
 }
@@ -2515,14 +2587,14 @@ function reconcileUIState(){
 /* ---------------- Render: Faydalı Bağlantılar ---------------- */
 function linkCardHtml(l){
   return `<a class="card link-card" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer">
-    <div class="link-ic">${l.icon || '🔗'}</div>
+    <div class="link-ic">${ic(l.icon || 'link',20)}</div>
     <div class="link-info"><h5>${escapeHtml(l.title)}</h5><span>${escapeHtml(l.desc || l.url)}</span></div>
-    <div class="link-arrow">↗</div>
+    <div class="link-arrow">${ic('arrowUpRight',16)}</div>
   </a>`;
 }
 function renderLinks(){
   const list = Data.links;
-  document.getElementById('linksList').innerHTML = list.length ? list.map(linkCardHtml).join('') : emptyStateHtml('🎓','Bağlantı eklenmedi');
+  document.getElementById('linksList').innerHTML = list.length ? list.map(linkCardHtml).join('') : emptyStateHtml('graduationCap','Bağlantı eklenmedi');
 }
 
 /* ---------------- Render: Akademik Takvim ---------------- */
@@ -2540,7 +2612,7 @@ function renderCalendar(){
         <div style="margin-top:8px;">${badge}</div>
       </div>
     </div>`;
-  }).join('') : emptyStateHtml('📅','Takvim kaydı yok');
+  }).join('') : emptyStateHtml('calendar','Takvim kaydı yok');
 }
 
 /* ---------------- Render: Ders Notları ---------------- */
@@ -2557,11 +2629,11 @@ function renderCourses(){
   );
   document.getElementById('courseGrid').innerHTML = filtered.length ? filtered.map(c=>`
     <div class="card course-card" data-course-note>
-      <div class="course-ic">${c.icon}</div>
+      <div class="course-ic">${ic(c.icon,20)}</div>
       <h5>${escapeHtml(c.title)}</h5>
       <p>${escapeHtml(c.desc)}</p>
       <span class="chip chip-orange" style="align-self:flex-start;">${escapeHtml(c.cat)}</span>
-    </div>`).join('') : `<div style="grid-column:1/-1;">${emptyStateHtml('📚','Sonuç bulunamadı')}</div>`;
+    </div>`).join('') : `<div style="grid-column:1/-1;">${emptyStateHtml('bookOpen','Sonuç bulunamadı')}</div>`;
 }
 
 /* ---------------- Render: PDF Arşivi ---------------- */
@@ -2574,8 +2646,8 @@ function renderPdfs(){
     <div class="card pdf-card">
       <div class="pdf-ic">PDF</div>
       <div class="pdf-info"><h5>${escapeHtml(p.title)}</h5><span>${escapeHtml(p.category)} · ${escapeHtml(p.size||'')} · ${fmtDateShort(p.date||new Date().toISOString().slice(0,10))}</span></div>
-      <button class="pdf-dl" data-pdf-url="${escapeHtml(p.url)}" title="İndir">⬇</button>
-    </div>`).join('') : emptyStateHtml('📄','Sonuç bulunamadı');
+      <button class="pdf-dl" data-pdf-url="${escapeHtml(p.url)}" title="İndir">${ic('download',16)}</button>
+    </div>`).join('') : emptyStateHtml('fileText','Sonuç bulunamadı');
 }
 
 /* ---------------- Genel render tetikleyici ---------------- */
@@ -2659,18 +2731,18 @@ function renderAll(){
    YÖNETİCİ PANELİ
    ============================================================ */
 const ADMIN_TABS = [
-  {id:'ann', label:'📢 Duyurular'},
-  {id:'pdf', label:'📄 PDF'},
-  {id:'links', label:'🎓 Bağlantılar'},
-  {id:'cal', label:'📅 Takvim'},
-  {id:'home', label:'🏠 Ana Sayfa'},
-  {id:'users', label:'👥 Kullanıcılar'}
+  {id:'ann', icon:'bell', label:'Duyurular'},
+  {id:'pdf', icon:'fileText', label:'PDF'},
+  {id:'links', icon:'graduationCap', label:'Bağlantılar'},
+  {id:'cal', icon:'calendar', label:'Takvim'},
+  {id:'home', icon:'house', label:'Ana Sayfa'},
+  {id:'users', icon:'users', label:'Kullanıcılar'}
 ];
 let activeAdminTab = 'ann';
 
 function renderAdminTabs(){
   document.getElementById('adminTabs').innerHTML = ADMIN_TABS.map(t=>
-    `<button class="filter-chip ${t.id===activeAdminTab?'active':''}" data-admin-tab="${t.id}">${t.label}</button>`
+    `<button class="filter-chip ${t.id===activeAdminTab?'active':''}" data-admin-tab="${t.id}">${ic(t.icon,15)} ${t.label}</button>`
   ).join('');
 }
 
@@ -2679,49 +2751,49 @@ function renderAdminPanel(){
   const body = document.getElementById('adminBody');
   if(activeAdminTab === 'ann'){
     const list = Data.ann;
-    body.innerHTML = (!announcementsLoaded ? emptyStateHtml('⏳','Duyurular yükleniyor...') : (list.map(a=>`
+    body.innerHTML = (!announcementsLoaded ? emptyStateHtml('clock','Duyurular yükleniyor...') : (list.map(a=>`
       <div class="card admin-item">
         <div class="admin-item-info"><h5>${escapeHtml(a.title)}</h5><span>${annDateLabel(a.createdAt)}${a.author ? ' · '+escapeHtml(a.author) : ''}</span></div>
         <div class="admin-item-actions">
-          <button class="icon-sm-btn btn-ghost" data-edit="ann" data-id="${a.id}">✏️</button>
-          <button class="icon-sm-btn btn-danger-ghost" data-del="ann" data-id="${a.id}">🗑️</button>
+          <button class="icon-sm-btn btn-ghost" data-edit="ann" data-id="${a.id}">${ic('pencil',15)}</button>
+          <button class="icon-sm-btn btn-danger-ghost" data-del="ann" data-id="${a.id}">${ic('trash2',15)}</button>
         </div>
-      </div>`).join('') || emptyStateHtml('📢','Duyuru yok. Sağ alttaki + ile ekleyin.')));
+      </div>`).join('') || emptyStateHtml('bell','Duyuru yok. Sağ alttaki + ile ekleyin.')));
   } else if(activeAdminTab === 'pdf'){
     const list = Data.pdfs;
     body.innerHTML = list.map(p=>`
       <div class="card admin-item">
         <div class="admin-item-info"><h5>${escapeHtml(p.title)}</h5><span>${escapeHtml(p.category)} · ${escapeHtml(p.size||'')}</span></div>
         <div class="admin-item-actions">
-          <button class="icon-sm-btn btn-ghost" data-edit="pdf" data-id="${p.id}">✏️</button>
-          <button class="icon-sm-btn btn-danger-ghost" data-del="pdf" data-id="${p.id}">🗑️</button>
+          <button class="icon-sm-btn btn-ghost" data-edit="pdf" data-id="${p.id}">${ic('pencil',15)}</button>
+          <button class="icon-sm-btn btn-danger-ghost" data-del="pdf" data-id="${p.id}">${ic('trash2',15)}</button>
         </div>
-      </div>`).join('') || emptyStateHtml('📄','PDF yok. Sağ alttaki + ile ekleyin.');
+      </div>`).join('') || emptyStateHtml('fileText','PDF yok. Sağ alttaki + ile ekleyin.');
   } else if(activeAdminTab === 'links'){
     const list = Data.links;
     body.innerHTML = list.map(l=>`
       <div class="card admin-item">
         <div class="admin-item-info"><h5>${escapeHtml(l.title)}</h5><span>${escapeHtml(l.url)}</span></div>
         <div class="admin-item-actions">
-          <button class="icon-sm-btn btn-ghost" data-edit="links" data-id="${l.id}">✏️</button>
-          <button class="icon-sm-btn btn-danger-ghost" data-del="links" data-id="${l.id}">🗑️</button>
+          <button class="icon-sm-btn btn-ghost" data-edit="links" data-id="${l.id}">${ic('pencil',15)}</button>
+          <button class="icon-sm-btn btn-danger-ghost" data-del="links" data-id="${l.id}">${ic('trash2',15)}</button>
         </div>
-      </div>`).join('') || emptyStateHtml('🎓','Bağlantı yok. Sağ alttaki + ile ekleyin.');
+      </div>`).join('') || emptyStateHtml('graduationCap','Bağlantı yok. Sağ alttaki + ile ekleyin.');
   } else if(activeAdminTab === 'cal'){
     const list = Data.cal;
     body.innerHTML = `
       <div class="card admin-item" style="margin-bottom:14px;">
         <div class="admin-item-info"><h5>Dönem Ücreti</h5><span>${escapeHtml(Data.fee)}</span></div>
-        <div class="admin-item-actions"><button class="icon-sm-btn btn-ghost" id="editFeeBtn">✏️</button></div>
+        <div class="admin-item-actions"><button class="icon-sm-btn btn-ghost" id="editFeeBtn">${ic('pencil',15)}</button></div>
       </div>` +
       (list.map(c=>`
       <div class="card admin-item">
         <div class="admin-item-info"><h5>${escapeHtml(c.title)}</h5><span>${fmtDateShort(c.start)} – ${fmtDateShort(c.end)}</span></div>
         <div class="admin-item-actions">
-          <button class="icon-sm-btn btn-ghost" data-edit="cal" data-id="${c.id}">✏️</button>
-          <button class="icon-sm-btn btn-danger-ghost" data-del="cal" data-id="${c.id}">🗑️</button>
+          <button class="icon-sm-btn btn-ghost" data-edit="cal" data-id="${c.id}">${ic('pencil',15)}</button>
+          <button class="icon-sm-btn btn-danger-ghost" data-del="cal" data-id="${c.id}">${ic('trash2',15)}</button>
         </div>
-      </div>`).join('') || emptyStateHtml('📅','Takvim kaydı yok.'));
+      </div>`).join('') || emptyStateHtml('calendar','Takvim kaydı yok.'));
   } else if(activeAdminTab === 'home'){
     const h = Data.home;
     body.innerHTML = `
@@ -2737,15 +2809,15 @@ function renderAdminPanel(){
         <div class="admin-item-info" style="flex:1; min-width:0;">
           <h5>${escapeHtml(u.displayName||'—')} <span style="font-weight:400; color:var(--text-tertiary);">@${escapeHtml(u.username||'—')}</span></h5>
           <span>${escapeHtml(u.email||'—')}${u.createdAt ? ' · '+u.createdAt.toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'}) : ''}</span>
-          <span class="chip ${u.approved ? 'chip-green' : 'chip-orange'}" style="margin-top:6px; display:inline-block;">${u.approved ? '✅ Onaylı' : '⏳ Onay Bekliyor'}</span>
+          <span class="chip ${u.approved ? 'chip-green' : 'chip-orange'}" style="margin-top:6px; display:inline-block;">${u.approved ? ic('checkCircle',12)+' Onaylı' : ic('clock',12)+' Onay Bekliyor'}</span>
         </div>
         <div class="admin-item-actions">
           ${u.approved
-            ? `<button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Erişimi kaldır">🚫</button>`
-            : `<button class="icon-sm-btn btn-ghost" data-approve-user="${u.id}" title="Onayla">✅</button>
-               <button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Reddet">🗑️</button>`}
+            ? `<button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Erişimi kaldır">${ic('ban',15)}</button>`
+            : `<button class="icon-sm-btn btn-ghost" data-approve-user="${u.id}" title="Onayla">${ic('check',15)}</button>
+               <button class="icon-sm-btn btn-danger-ghost" data-reject-user="${u.id}" title="Reddet">${ic('trash2',15)}</button>`}
         </div>
-      </div>`).join('') : emptyStateHtml('👥','Henüz kayıtlı öğrenci yok.');
+      </div>`).join('') : emptyStateHtml('users','Henüz kayıtlı öğrenci yok.');
   }
   document.getElementById('adminFab').classList.toggle('hidden', activeAdminTab === 'home' || activeAdminTab === 'users');
 }
@@ -2805,7 +2877,7 @@ function openForm(type, id){
       <div class="form-group" style="text-align:center;">
         <div class="profile-avatar" id="editAvatarPreview" style="margin:0 auto 10px; cursor:pointer;" title="Fotoğrafı değiştirmek için tıkla"></div>
         <input type="file" id="f_avatarFile" accept="image/*" style="display:none;">
-        <button type="button" class="btn btn-outline" id="chooseAvatarBtn" style="width:auto; padding:8px 18px; font-size:12px;">📷 Fotoğraf Seç</button>
+        <button type="button" class="btn btn-outline" id="chooseAvatarBtn" style="width:auto; padding:8px 18px; font-size:12px;">${ic('camera',15)} Fotoğraf Seç</button>
       </div>
       <div class="form-group"><label>Ad Soyad</label><input type="text" id="f_displayName" value="${escapeHtml(record.displayName||'')}"></div>
       <div class="form-group"><label>Kullanıcı Adı</label><input type="text" id="f_username" value="${escapeHtml(record.username||'')}"></div>
@@ -2861,7 +2933,7 @@ function openForm(type, id){
       <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
       <div class="form-group"><label>Açıklama</label><input type="text" id="f_desc" value="${escapeHtml(record.desc||'')}"></div>
       <div class="form-group"><label>Bağlantı (URL)</label><input type="text" id="f_url" value="${escapeHtml(record.url||'')}" placeholder="https://"></div>
-      <div class="form-group"><label>İkon (emoji)</label><input type="text" id="f_icon" value="${escapeHtml(record.icon||'🔗')}" maxlength="4"></div>`;
+      <div class="form-group"><label>İkon (Lucide adı, ör. link, monitor, landmark)</label><input type="text" id="f_icon" value="${escapeHtml(record.icon||'link')}" maxlength="20"></div>`;
   } else if(type==='cal'){
     body.innerHTML = `
       <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
@@ -2957,7 +3029,7 @@ async function saveFormInner(){
     if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, category, size, url} : r); }
     else{ list.push({id:uid(), title, category, size, url, date:new Date().toISOString().slice(0,10)}); }
   } else if(type==='links'){
-    const title = val('f_title'), desc = val('f_desc'), url = val('f_url'), icon = val('f_icon')||'🔗';
+    const title = val('f_title'), desc = val('f_desc'), url = val('f_url'), icon = val('f_icon')||'link';
     if(!title || !url){ toast('Lütfen başlık ve bağlantı girin','error'); return; }
     if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, desc, url, icon} : r); }
     else{ list.push({id:uid(), title, desc, url, icon}); }
@@ -3311,13 +3383,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const inp = document.getElementById('loginPassword');
     const showing = inp.type === 'text';
     inp.type = showing ? 'password' : 'text';
-    this.textContent = showing ? '👁️' : '🙈';
+    this.innerHTML = showing ? ic('eye',18) : ic('eyeOff',18);
   });
   document.getElementById('toggleRegPw').addEventListener('click', function(){
     const inp = document.getElementById('regPassword');
     const showing = inp.type === 'text';
     inp.type = showing ? 'password' : 'text';
-    this.textContent = showing ? '👁️' : '🙈';
+    this.innerHTML = showing ? ic('eye',18) : ic('eyeOff',18);
   });
 
   /* ---- Giriş / Kayıt görünümleri arasında geçiş ---- */
@@ -3572,7 +3644,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const inp = document.getElementById('adminPassword');
     const showing = inp.type === 'text';
     inp.type = showing ? 'password' : 'text';
-    this.textContent = showing ? '👁️' : '🙈';
+    this.innerHTML = showing ? ic('eye',18) : ic('eyeOff',18);
   });
   function attemptAdminLogin(){
     const pass = document.getElementById('adminPassword').value;
@@ -3791,11 +3863,11 @@ function pushHistory(role, text){
 const FAQ_DATA=[
   {
     keywords:['merhaba','selam','iyi günler','naber','nasılsın'],
-    answer:'Merhaba 👋 Ben WTK Yardımcı. Sana sınavlar, dersler, ders içerikleri/müfredat, PDF arşivi, duyurular, akademik takvim, dönem ücreti ve faydalı bağlantılar (OBS, ÖYS) hakkında portal içeriğinden yanıt verebilirim. Ne öğrenmek istersin?'
+    answer:'Merhaba! Ben WTK Yardımcı. Sana sınavlar, dersler, ders içerikleri/müfredat, PDF arşivi, duyurular, akademik takvim, dönem ücreti ve faydalı bağlantılar (OBS, ÖYS) hakkında portal içeriğinden yanıt verebilirim. Ne öğrenmek istersin?'
   },
   {
     keywords:['teşekkür','sağol','saol','sagol','eyvallah'],
-    answer:'Rica ederim! Başka bir sorun olursa buradayım. 🙂'
+    answer:'Rica ederim! Başka bir sorun olursa buradayım.'
   },
   {
     keywords:['sınav','vize','final','bütünleme','çoktan seçmeli','kaç soru','sınav süresi','sınav yapısı'],
@@ -3839,11 +3911,11 @@ const FAQ_DATA=[
   },
   {
     keywords:['karanlık mod','tema değiştir','dark mode'],
-    answer:'Karanlık moda geçmek için sağ üstteki 🌙 simgesine ya da Profil sayfasındaki "Karanlık Mod" anahtarına dokunabilirsin.'
+    answer:'Karanlık moda geçmek için sağ üstteki simgeye ya da Profil sayfasındaki "Karanlık Mod" anahtarına dokunabilirsin.'
   },
   {
     keywords:['bildirim','bildirimler','duyuru geldi mi'],
-    answer:'En güncel duyurular üst çubuktaki 🔔 simgesine dokununca açılan panelde listelenir; tüm duyurular için Duyurular sayfasına bakabilirsin.'
+    answer:'En güncel duyurular üst çubuktaki bildirim simgesine dokununca açılan panelde listelenir; tüm duyurular için Duyurular sayfasına bakabilirsin.'
   },
   {
     keywords:['yönetici','admin','duyuru nasıl eklenir','içerik nasıl güncellenir'],
@@ -3949,7 +4021,7 @@ function searchPortalKnowledge(query){
     const score=scoreMatch(qNorm, kwNorm);
     if(score>bestScore){
       bestScore=score;
-      best={ text: typeof item.answer==='function' ? item.answer() : item.answer, source:'🔎 Portal SSS' };
+      best={ text: typeof item.answer==='function' ? item.answer() : item.answer, source:'Portal SSS' };
     }
   });
 
@@ -3959,7 +4031,7 @@ function searchPortalKnowledge(query){
   if(codeHit){
     return {
       text:`${codeHit.code} — ${codeHit.name}: ${codeHit.semester}, ${codeHit.akts} AKTS${codeHit.elective?' (seçmeli ders grubu)':''}. Tüm ders planı için Dersler ve İçerikleri sayfasına bakabilirsin.`,
-      source:'🔎 Portal Müfredatı'
+      source:'Portal Müfredatı'
     };
   }
   CURRICULUM.forEach(c=>{
@@ -3967,7 +4039,7 @@ function searchPortalKnowledge(query){
     const score=scoreMatch(qNorm, textNorm);
     if(score>bestScore){
       bestScore=score;
-      best={ text:`${c.name} (${c.code}) dersi ${c.semester} döneminde okutulur ve ${c.akts} AKTS'dir${c.elective?' (seçmeli ders grubunda yer alır)':''}.`, source:'🔎 Portal Müfredatı' };
+      best={ text:`${c.name} (${c.code}) dersi ${c.semester} döneminde okutulur ve ${c.akts} AKTS'dir${c.elective?' (seçmeli ders grubunda yer alır)':''}.`, source:'Portal Müfredatı' };
     }
   });
 
@@ -3977,7 +4049,7 @@ function searchPortalKnowledge(query){
     if(score>bestScore){
       bestScore=score;
       const excerpt=(a.content||'').slice(0,180);
-      best={ text:`📢 ${a.title}: ${excerpt}${(a.content||'').length>180?'…':''}`, source:'🔎 Portal Duyuruları' };
+      best={ text:`${a.title}: ${excerpt}${(a.content||'').length>180?'…':''}`, source:'Portal Duyuruları' };
     }
   });
 
@@ -3986,7 +4058,7 @@ function searchPortalKnowledge(query){
     const score=scoreMatch(qNorm, textNorm);
     if(score>bestScore){
       bestScore=score;
-      best={ text:`📄 "${p.title}" (${p.category}) PDF Arşivi sayfasında mevcut — boyut: ${p.size}.`, source:'🔎 Portal PDF Arşivi' };
+      best={ text:`"${p.title}" (${p.category}) PDF Arşivi sayfasında mevcut — boyut: ${p.size}.`, source:'Portal PDF Arşivi' };
     }
   });
 
@@ -3995,7 +4067,7 @@ function searchPortalKnowledge(query){
     const score=scoreMatch(qNorm, textNorm);
     if(score>bestScore){
       bestScore=score;
-      best={ text:`${c.icon} ${c.title}: ${c.desc}. Not ve kaynaklar için Ders Notları sayfasına bakabilirsin.`, source:'🔎 Portal Dersleri' };
+      best={ text:`${c.title}: ${c.desc}. Not ve kaynaklar için Ders Notları sayfasına bakabilirsin.`, source:'Portal Dersleri' };
     }
   });
 
@@ -4004,7 +4076,7 @@ function searchPortalKnowledge(query){
     const score=scoreMatch(qNorm, textNorm);
     if(score>bestScore){
       bestScore=score;
-      best={ text:`🔗 ${l.title} (${l.desc}): ${l.url}`, source:'🔎 Portal Bağlantıları' };
+      best={ text:`${l.title} (${l.desc}): ${l.url}`, source:'Portal Bağlantıları' };
     }
   });
 
@@ -4013,7 +4085,7 @@ function searchPortalKnowledge(query){
     const score=scoreMatch(qNorm, textNorm);
     if(score>bestScore){
       bestScore=score;
-      best={ text:`📅 ${ev.title}: ${ev.start} – ${ev.end}`, source:'🔎 Portal Akademik Takvimi' };
+      best={ text:`${ev.title}: ${ev.start} – ${ev.end}`, source:'Portal Akademik Takvimi' };
     }
   });
 
@@ -4073,17 +4145,17 @@ input.addEventListener('keydown', (e)=>{
 });
 })();
 </script>
-<button id="wtkChatBtn">🤖</button>
+<button id="wtkChatBtn" data-icon="bot" data-size="26"></button>
 
 <div id="wtkChatWindow">
   <div id="wtkChatHeader">
     WTK Yardımcı
-    <button id="wtkCloseBtn">✕</button>
+    <button id="wtkCloseBtn" data-icon="x" data-size="16"></button>
   </div>
 
   <div id="wtkMessages">
     <div class="wtk-bot">
-      Merhaba 👋 Ben WTK Yardımcı.
+      Merhaba! Ben WTK Yardımcı.
     </div>
   </div>
 
