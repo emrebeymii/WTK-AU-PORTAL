@@ -10,7 +10,7 @@
    activate aşaması eski sürümdeki önbellekleri otomatik temizler, bu
    yüzden depolama zamanla şişmez. ============================================================ */
 
-const CACHE_NAME = 'wtk-portal-shell-v1';
+const CACHE_NAME = 'wtk-portal-shell-v2';
 
 // Yalnızca gerçekten gereken dosyalar — "her şeyi önbelleğe al" YOK.
 const APP_SHELL = [
