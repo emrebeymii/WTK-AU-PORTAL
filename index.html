@@ -6,6 +6,18 @@
 <title>WTK Portal | Ankara Üniversitesi Açıköğretim</title>
 <meta name="description" content="Ankara Üniversitesi Açıköğretim Web Tasarımı ve Kodlama bölümü öğrencileri için bağımsız topluluk portalı.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23ff7a00'/%3E%3Cpolyline points='16,32 38,68 50,42 62,68 84,32' fill='none' stroke='white' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+<!-- ============ PWA (Progressive Web App) ============ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff7a00">
+<!-- Apple: Ana ekrana eklenince tam ekran/uygulama gibi açılması için -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WTK Portal">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<!-- Android/Chrome tarafında da aynı davranış için standart karşılığı -->
+<meta name="mobile-web-app-capable" content="yes">
+
 <style>
 /* ============================================================
    WTK PORTAL — TEK DOSYA STİL TABLOSU
@@ -4164,5 +4176,19 @@ input.addEventListener('keydown', (e)=>{
     <button id="wtkSendBtn">Gönder</button>
   </div>
 </div>
+
+<script>
+  // Service Worker kaydı — sayfa tamamen yüklendikten SONRA yapılır ki
+  // ilk açılış performansını hiç etkilemesin. Desteklemeyen tarayıcılarda
+  // (eski Safari vb.) sessizce atlanır, portal normal şekilde çalışmaya
+  // devam eder — PWA desteği bir "ek", bir zorunluluk değildir.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => {
+        console.warn('Service Worker kaydı başarısız (portal yine de normal çalışır):', err);
+      });
+    });
+  }
+</script>
 </body>
 </html>
