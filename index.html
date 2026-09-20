@@ -54,7 +54,7 @@
   --font:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
   --t-fast:.18s cubic-bezier(.4,0,.2,1);
   --t-base:.32s cubic-bezier(.4,0,.2,1);
-  --topbar-h:64px;
+  --topbar-h:48px;
   --navbar-h:72px;
 }
 
@@ -385,8 +385,16 @@ img{max-width:100%; display:block;}
 
 /* ---------- Top bar ---------- */
 .topbar{
-  position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between;
-  padding:0 16px; height:var(--topbar-h); border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:60;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-top:env(safe-area-inset-top);
+    padding-left:16px;
+    padding-right:16px;
+    height:calc(var(--topbar-h) + env(safe-area-inset-top)); border-bottom:1px solid var(--border);
 }
 .topbar-left{display:flex; align-items:center; gap:10px; min-width:0;}
 .topbar-logo{width:30px; height:27px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
