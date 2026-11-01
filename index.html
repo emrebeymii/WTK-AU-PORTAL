@@ -1304,7 +1304,7 @@ cursor:not-allowed;
       <!-- ---- ANA SAYFA ---- -->
       <section id="page-home" class="page active">
         <div class="welcome-block">
-          <div class="greet" id="homeGreet">WTK Campus'e Hoş Geldin</div>
+          <div class="greet" id="homeGreet">WTK Campus'e Hoş Geldin (:</div>
           <div class="date" id="homeDate"></div>
         </div>
 
@@ -1811,7 +1811,7 @@ const ADMIN_EMAIL       = "emre.dmre0@gmail.com"; // Firebase Console > Authenti
 const LS = {
   theme:'wtk_theme',
   pdfs:'wtk_pdfs', links:'wtk_links',
-  calendar:'wtk_calendar', fee:'wtk_fee', home:'wtk_home_content', notifSeen:'wtk_notif_seen',
+  fee:'wtk_fee', home:'wtk_home_content', notifSeen:'wtk_notif_seen',
   duckBadge:'wtk_duck_badge_golden', portalHoleLast:'wtk_portal_hole_last_shown'
 };
 
@@ -1844,12 +1844,6 @@ const DEFAULTS = {
     {id:uid(), title:"Öğrenci İşleri", desc:"Ankara Üniversitesi Öğrenci İşleri", url:"https://ankuzef.ankara.edu.tr/tr/24-ogrenci-isleri", icon:"landmark"},
     {id:uid(), title:"ÖYS", desc:"Öğrenme Yönetim Sistemi", url:"https://oys.ankara.edu.tr", icon:"bookOpen"}
   ],
-  calendar:[
-    {id:uid(), title:"E-Kayıt", start:"2026-08-24", end:"2026-08-26"},
-    {id:uid(), title:"Öğrenim ve Materyal Ücreti", start:"2026-09-16", end:"2026-09-27"},
-    {id:uid(), title:"Güz Yarıyılı Ücret Yatırma", start:"2026-09-16", end:"2026-09-27"},
-    {id:uid(), title:"Bahar Yarıyılı Ücret Yatırma", start:"2027-02-08", end:"2027-02-14"}
-  ],
   fee:"6.250₺",
   home:{ highlightTitle:"Hızlı Bilgi", highlightText:"E-Kayıt süreci başladı, tarihleri Akademik Takvim sayfasından takip edebilirsin." }
 };
@@ -1870,7 +1864,6 @@ const Data = {
   init(){
     if(lsGet(LS.pdfs,null)===null) lsSet(LS.pdfs, DEFAULTS.pdfs);
     if(lsGet(LS.links,null)===null) lsSet(LS.links, DEFAULTS.links);
-    if(lsGet(LS.calendar,null)===null) lsSet(LS.calendar, DEFAULTS.calendar);
     if(lsGet(LS.fee,null)===null) lsSet(LS.fee, DEFAULTS.fee);
     // NOT: "home" (Ana Sayfa Hızlı Bilgi) artık Firestore'dan geldiği için
     // burada localStorage'a seed edilmiyor — bkz. homeContentCache.
@@ -1880,7 +1873,7 @@ const Data = {
   get ann(){ return announcementsCache; },
   get pdfs(){ return lsGet(LS.pdfs, []); },
   get links(){ return lsGet(LS.links, []); },
-  get cal(){ return lsGet(LS.calendar, []).sort((a,b)=> new Date(a.start)-new Date(b.start)); },
+  get cal(){ return calendarCache; },
   get fee(){ return lsGet(LS.fee, DEFAULTS.fee); },
   get home(){ return homeContentCache; },
   save(key, val){ lsSet(key, val); }
@@ -1951,6 +1944,40 @@ function startAnnouncementsListener(){
   }catch(err){
     console.error('Firestore başlatma hatası:', err);
     toast('Duyuru sistemi başlatılamadı', 'error');
+  }
+}
+
+/* ---------------- FIRESTORE: AKADEMİK TAKVİM ----------------
+   academicCalendar koleksiyonu: { title, start, end, order }
+   announcements ile aynı mimari (onSnapshot). localStorage KULLANILMAZ. */
+let calendarCache = [];
+let calendarLoaded = false;
+function startCalendarListener(){
+  try{
+    const calQuery = query(collection(db, 'academicCalendar'), orderBy('start', 'asc'));
+    onSnapshot(calQuery,
+      (snapshot) => {
+        calendarCache = snapshot.docs.map(d => {
+          const data = d.data();
+          return { id: d.id, title: data.title || '', start: data.start || '', end: data.end || '', order: typeof data.order === 'number' ? data.order : 0 };
+        });
+        calendarCache.sort((a, b) => new Date(a.start) - new Date(b.start));
+        calendarLoaded = true;
+        renderHome();
+        renderCalendar();
+        if(isAdmin() && activeAdminTab === 'cal') renderAdminPanel();
+      },
+      (error) => {
+        console.error('Firestore akademik takvim bağlantı hatası:', error);
+        calendarLoaded = true;
+        toast('Akademik takvim yüklenemedi. İnternet bağlantınızı kontrol edin.', 'error');
+        const el = document.getElementById('calendarTimeline');
+        if(el) el.innerHTML = emptyStateHtml('alertTriangle','Takvime ulaşılamadı. Bağlantınızı kontrol edip sayfayı yenileyin.');
+      }
+    );
+  }catch(err){
+    console.error('Firestore başlatma hatası:', err);
+    toast('Akademik takvim sistemi başlatılamadı', 'error');
   }
 }
 
@@ -2370,12 +2397,34 @@ function isAdmin(){ return !!currentAdminUser; }
 let currentAdminUser = null;
 let allUsersCache = [];          // Yönetici panelindeki "Kullanıcılar" listesi
 let usersListenerUnsub = null;
+/* ---- Tek seferlik aktarım: eski localStorage takvimi -> Firestore ----
+   Yalnızca ADMIN oturumunda çalışır (öğrencilerin cihazındaki eski varsayılan
+   veriyi çoğaltmasın diye) ve bayrak sayesinde bir kez çalışır. */
+const CAL_MIGRATION_FLAG = 'wtk_calendar_migrated_v1';
+async function migrateLocalCalendarToFirestoreOnce(){
+  if(localStorage.getItem(CAL_MIGRATION_FLAG) === '1') return;
+  let localEvents = [];
+  try{ localEvents = JSON.parse(localStorage.getItem('wtk_calendar') || '[]'); }catch(e){ localEvents = []; }
+  if(!Array.isArray(localEvents) || localEvents.length === 0){ localStorage.setItem(CAL_MIGRATION_FLAG, '1'); return; }
+  try{
+    for(const ev of localEvents){
+      if(!ev || !ev.title || !ev.start || !ev.end) continue;
+      await addDoc(collection(adminDb, 'academicCalendar'), { title: ev.title, start: ev.start, end: ev.end, order: Date.now() });
+    }
+    localStorage.setItem(CAL_MIGRATION_FLAG, '1');
+    toast(localEvents.length + " yerel takvim kaydı Firestore'a aktarıldı", 'success');
+  }catch(err){
+    console.error('Takvim aktarım hatası (sonraki admin girişinde tekrar denenir):', err);
+  }
+}
+
 function startAdminAuthListener(){
   onAuthStateChanged(adminAuth, (user) => {
     currentAdminUser = user;
 
     if(usersListenerUnsub){ usersListenerUnsub(); usersListenerUnsub = null; }
     if(user){
+      migrateLocalCalendarToFirestoreOnce();
       // Kullanıcı listesi yalnızca yönetici oturumu açıkken dinlenir
       // (Güvenlik Kuralları da yalnızca admin'in tüm kullanıcıları
       // listeleyebilmesine izin vermelidir).
@@ -3039,8 +3088,32 @@ async function saveFormInner(){
     return;
   }
 
-  /* ---- PDF / Bağlantı / Takvim: değişmedi, localStorage'da kalmaya devam ediyor ---- */
-  const dataMap = {pdf:LS.pdfs, links:LS.links, cal:LS.calendar};
+  /* ---- AKADEMİK TAKVİM: Firestore'a yazılır (localStorage YOK) ---- */
+  if(type === 'cal'){
+    const title = val('f_title'), start = val('f_start'), end = val('f_end');
+    if(!title || !start || !end){ toast('Lütfen tüm alanları doldurun','error'); return; }
+    const saveBtn = document.getElementById('formModalSave');
+    const originalLabel = saveBtn.textContent;
+    saveBtn.disabled = true; saveBtn.textContent = 'Kaydediliyor...';
+    try{
+      if(isEdit){
+        await updateDoc(doc(adminDb, 'academicCalendar', id), { title, start, end });
+      } else {
+        await addDoc(collection(adminDb, 'academicCalendar'), { title, start, end, order: Date.now() });
+      }
+      closeModal('formModal');
+      toast(isEdit ? 'Takvim kaydı güncellendi' : 'Takvim kaydı eklendi', 'success');
+    }catch(err){
+      console.error('Takvim kaydetme hatası:', err);
+      toast('Takvim kaydedilemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
+    }finally{
+      saveBtn.disabled = false; saveBtn.textContent = originalLabel;
+    }
+    return;
+  }
+
+  /* ---- PDF / Bağlantı: değişmedi, localStorage'da kalmaya devam ediyor ---- */
+  const dataMap = {pdf:LS.pdfs, links:LS.links};
   let list = lsGet(dataMap[type], []);
 
   if(type==='pdf'){
@@ -3053,11 +3126,6 @@ async function saveFormInner(){
     if(!title || !url){ toast('Lütfen başlık ve bağlantı girin','error'); return; }
     if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, desc, url, icon} : r); }
     else{ list.push({id:uid(), title, desc, url, icon}); }
-  } else if(type==='cal'){
-    const title = val('f_title'), start = val('f_start'), end = val('f_end');
-    if(!title || !start || !end){ toast('Lütfen tüm alanları doldurun','error'); return; }
-    if(isEdit){ list = list.map(r=> r.id===id ? {...r, title, start, end} : r); }
-    else{ list.push({id:uid(), title, start, end}); }
   }
 
   lsSet(dataMap[type], list);
@@ -3079,8 +3147,19 @@ async function deleteRecord(type, id){
     }
     return;
   }
-  /* ---- PDF / Bağlantı / Takvim: değişmedi ---- */
-  const dataMap = {pdf:LS.pdfs, links:LS.links, cal:LS.calendar};
+  /* ---- AKADEMİK TAKVİM: Firestore'dan silinir (localStorage YOK) ---- */
+  if(type === 'cal'){
+    try{
+      await deleteDoc(doc(adminDb, 'academicCalendar', id));
+      toast('Takvim kaydı silindi', 'success');
+    }catch(err){
+      console.error('Takvim kaydı silme hatası:', err);
+      toast('Takvim kaydı silinemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
+    }
+    return;
+  }
+  /* ---- PDF / Bağlantı: değişmedi ---- */
+  const dataMap = {pdf:LS.pdfs, links:LS.links};
   const list = lsGet(dataMap[type], []).filter(r=>r.id!==id);
   lsSet(dataMap[type], list);
   toast('Silindi', 'success');
@@ -3387,6 +3466,7 @@ document.addEventListener('DOMContentLoaded', () => {
      hemen başlat (giriş ekranı açıkken bile arka planda çeksin, ilgili
      sayfaya gelindiğinde veri zaten hazır olsun) ---- */
   startAnnouncementsListener();
+  startCalendarListener();
   startHomeContentListener();
   startAdminAuthListener();
   startStudentAuthListener();
