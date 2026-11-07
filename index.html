@@ -2720,7 +2720,7 @@ function renderPdfs(){
     <div class="card pdf-card">
       <div class="pdf-ic">PDF</div>
       <div class="pdf-info"><h5>${escapeHtml(p.title)}</h5><span>${escapeHtml(p.category)} · ${escapeHtml(p.size||'')} · ${fmtDateShort(p.date||new Date().toISOString().slice(0,10))}</span></div>
-      <button class="pdf-dl" data-pdf-url="${escapeHtml(p.url)}" title="İndir">${ic('download',16)}</button>
+      <a class="pdf-dl" href="${escapeHtml(p.url)}" download title="İndir" onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:center;text-decoration:none">${ic('download',16)}</a>
     </div>`).join('') : emptyStateHtml('fileText','Sonuç bulunamadı');
 }
 
