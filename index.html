@@ -1818,6 +1818,11 @@ const LS = {
 /* ---------------- Depolama yardımcıları ---------------- */
 function lsGet(key, fallback){
   try{
+    if (key.toLowerCase().includes("pdf") && localStorage.getItem("wtk_pdf_version") !== DATA_VERSION){
+      localStorage.removeItem(key);
+      localStorage.setItem("wtk_pdf_version", DATA_VERSION);
+      return fallback;
+    }
     const raw = localStorage.getItem(key);
     return raw === null ? fallback : JSON.parse(raw);
   }catch(e){ return fallback; }
@@ -1830,6 +1835,7 @@ function uid(){ return Date.now().toString(36) + Math.random().toString(36).slic
 /* ---------------- Varsayılan veriler ----------------
    NOT: "announcements" (duyurular) artık Firestore'dan geldiği için
    burada yerel bir varsayılan/seed dizisi TUTULMUYOR. */
+const DATA_VERSION = "2026-11-07-pdfs";
 const DEFAULTS = {
   pdfs:[
     {id:uid(), title:"Türk Dili I - Vize Föyü", category:"Vize Föyleri", url:"pdfs/ATDI107_Turk_Dili_I_Foy.pdf", size:"97 KB", date:"2026-11-07"},
