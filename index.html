@@ -764,7 +764,7 @@ img{max-width:100%; display:block;}
 .admin-lock-note{margin:16px 18px; padding:14px; border-radius:var(--radius-md); background:var(--info-bg); color:var(--info); font-size:12.5px; display:flex; gap:10px; align-items:flex-start; line-height:1.5;}
 
 /* Toasts */
-.toast-container{position:fixed; top:23px; left:50%; transform:translateX(-50%); z-index:400; display:flex; flex-direction:column; gap:8px; width:min(90%,380px); align-items:center;}
+.toast-container{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:400; display:flex; flex-direction:column; gap:8px; width:min(90%,380px); align-items:center;}
 .toast{
   background:var(--text); color:var(--bg); padding:12px 18px; border-radius:14px; font-size:13px; font-weight:600; box-shadow:var(--shadow-lg);
   display:flex; align-items:center; gap:9px; animation:toastIn .35s cubic-bezier(.34,1.56,.64,1); max-width:100%;
@@ -1096,6 +1096,22 @@ animation:wtkTypingBounce 1.1s infinite ease-in-out;
 opacity:.5;
 cursor:not-allowed;
 }
+/* ---------- Soru-Cevap ---------- */
+.qa-card{padding:14px 16px;}
+.qa-top{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.qa-meta{flex:1; min-width:0; display:flex; flex-direction:column;}
+.qa-meta b{font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.qa-meta span{font-size:11px; color:var(--text-tertiary);}
+.qa-card h5{font-size:15px; font-weight:800; line-height:1.4; margin-bottom:6px;}
+.qa-card p{font-size:13px; color:var(--text-secondary); line-height:1.6; white-space:pre-wrap; word-break:break-word;}
+.qa-card[data-qid]{cursor:pointer;}
+.qa-answer{margin-top:10px; padding:12px 14px;}
+.qa-answer.solution{border-left:3px solid var(--success);}
+.qa-actions{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+.qa-actions button{font-size:11.5px; font-weight:700; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:5px;}
+.qa-actions button.danger{color:var(--danger);}
+.qa-note{margin-top:14px; font-size:12.5px; color:var(--text-tertiary); text-align:center;}
+.qa-head{font-size:13px; font-weight:800; margin:18px 0 0;}
 </style>
 </head>
 <body>
@@ -1304,7 +1320,7 @@ cursor:not-allowed;
       <!-- ---- ANA SAYFA ---- -->
       <section id="page-home" class="page active">
         <div class="welcome-block">
-          <div class="greet" id="homeGreet">Hoş Geldin 🎓</div>
+          <div class="greet" id="homeGreet">WTK Campus'e Hoş Geldin (:</div>
           <div class="date" id="homeDate"></div>
         </div>
 
@@ -1489,6 +1505,27 @@ cursor:not-allowed;
           <div class="stat-box"><b id="dirActiveCount">0</b><span class="online-dot online" style="position:static; display:inline-block; border:none;"></span> <span>ŞU AN AKTİF</span></div>
         </div>
         <div class="directory-list container-pad" id="directoryList"></div>
+      </section>
+
+      <!-- ---- SORU-CEVAP ---- -->
+      <section id="page-questions" class="page">
+        <div class="page-header"><h2><span data-icon="messageCircle" data-size="22"></span> Soru-Cevap</h2><p>Sorularını topluluğa sor</p></div>
+        <div class="container-pad" style="padding-top:12px;">
+          <button class="btn btn-primary btn-block" id="askQuestionBtn"><span data-icon="plus" data-size="17"></span> Soru Sor</button>
+        </div>
+        <div class="directory-list container-pad" id="questionsList"></div>
+      </section>
+
+      <!-- ---- SORU DETAYI ---- -->
+      <section id="page-question" class="page">
+        <div class="container-pad" style="padding-top:16px;">
+          <button class="link-more" data-nav="page-questions"><span data-icon="arrowLeft" data-size="14"></span> Sorulara dön</button>
+        </div>
+        <div class="container-pad" id="questionDetailBody" style="padding-top:12px;"></div>
+        <div class="container-pad" id="answerForm" style="padding-top:14px;">
+          <div class="form-group"><label>Cevabın</label><textarea id="answerInput" maxlength="2000" placeholder="Cevabını yaz..."></textarea></div>
+          <button class="btn btn-primary btn-block" id="sendAnswerBtn">Cevabı Gönder</button>
+        </div>
       </section>
 
       <!-- ---- SINAVLAR ---- -->
@@ -1818,11 +1855,6 @@ const LS = {
 /* ---------------- Depolama yardımcıları ---------------- */
 function lsGet(key, fallback){
   try{
-    if (key.toLowerCase().includes("pdf") && localStorage.getItem("wtk_pdf_version") !== DATA_VERSION){
-      localStorage.removeItem(key);
-      localStorage.setItem("wtk_pdf_version", DATA_VERSION);
-      return fallback;
-    }
     const raw = localStorage.getItem(key);
     return raw === null ? fallback : JSON.parse(raw);
   }catch(e){ return fallback; }
@@ -1835,14 +1867,14 @@ function uid(){ return Date.now().toString(36) + Math.random().toString(36).slic
 /* ---------------- Varsayılan veriler ----------------
    NOT: "announcements" (duyurular) artık Firestore'dan geldiği için
    burada yerel bir varsayılan/seed dizisi TUTULMUYOR. */
-const DATA_VERSION = "2026-11-07-pdfs";
 const DEFAULTS = {
   pdfs:[
-    {id:uid(), title:"Türk Dili I - Vize Föyü", category:"Vize Föyleri", url:"pdfs/ATDI107_Turk_Dili_I_Foy.pdf", size:"97 KB", date:"2026-11-07"},
-    {id:uid(), title:"Atatürk İlkeleri ve İnkılap Tarihi I - Vize Föyü", category:"Vize Föyleri", url:"pdfs/AATA107_Ataturk_Ilkeleri_ve_Inkilap_Tarihi_I_Foy.pdf", size:"92 KB", date:"2026-11-07"},
-    {id:uid(), title:"Bilgi ve İletişim Teknolojileri I - Vize Föyü", category:"Vize Föyleri", url:"pdfs/ABIT101_Bilgi_ve_Iletisim_Teknolojileri_I_Foy.pdf", size:"89 KB", date:"2026-11-07"},
-    {id:uid(), title:"Ağ Temelleri - Vize Föyü", category:"Vize Föyleri", url:"pdfs/AWEB1101_Ag_Temelleri_Foy.pdf", size:"90 KB", date:"2026-11-07"},
-    {id:uid(), title:"Elektronik Ticarete Giriş - Vize Föyü", category:"Vize Föyleri", url:"pdfs/AAUF1107_Elektronik_Ticarete_Giris_Foy.pdf", size:"90 KB", date:"2026-11-07"}
+    {id:uid(), title:"HTML5 & CSS3 Ders Notu - Ünite 1", category:"HTML/CSS", url:"#", size:"2.4 MB", date:"2026-08-18"},
+    {id:uid(), title:"JavaScript Temelleri Sunumu", category:"JavaScript", url:"#", size:"3.1 MB", date:"2026-08-15"},
+    {id:uid(), title:"Responsive Tasarım Uygulama Rehberi", category:"Tasarım", url:"#", size:"1.8 MB", date:"2026-08-10"},
+    {id:uid(), title:"Veritabanı Yönetimi - SQL Özet", category:"Veritabanı", url:"#", size:"2.0 MB", date:"2026-07-29"},
+    {id:uid(), title:"UI/UX Tasarım İlkeleri Kitapçığı", category:"Tasarım", url:"#", size:"4.6 MB", date:"2026-07-20"},
+    {id:uid(), title:"PHP ile Web Programlama Notları", category:"Diğer", url:"#", size:"2.9 MB", date:"2026-07-05"}
   ],
   links:[
     {id:uid(), title:"OBS", desc:"Öğrenci Bilgi Sistemi", url:"https://obs.ankara.edu.tr/account/login?returnurl=/Preparation/HazirlikDonemKayit", icon:"monitor"},
@@ -2101,6 +2133,9 @@ const LUCIDE = {
   award:'<path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.198 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/>',
   hash:'<line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>',
   info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  arrowLeft:'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  messageCircle:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
   shieldCheck:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>'
 };
 function ic(name, size, extraClass){
@@ -2335,6 +2370,9 @@ function startStudentAuthListener(){
     if(profileUnsub){ profileUnsub(); profileUnsub = null; }
     if(directoryUnsub){ directoryUnsub(); directoryUnsub = null; }
     if(directoryRefreshTimer){ clearInterval(directoryRefreshTimer); directoryRefreshTimer = null; }
+    if(questionsUnsub){ questionsUnsub(); questionsUnsub = null; }
+    if(answersUnsub){ answersUnsub(); answersUnsub = null; }
+    currentQuestionId = null;
     stopHeartbeat();
     currentStudentUser = user;
     currentUserProfile = null;
@@ -2370,6 +2408,7 @@ function startStudentAuthListener(){
         syncPublicProfile(); // ilk oluşturma + her profil düzenlemesinde otomatik yeniden senkronizasyon
         startHeartbeat();
         startDirectoryListener();
+        startQuestionsListener();
         trySplashDismiss();
       } else {
         showAuthScreen('pendingScreen');
@@ -2481,12 +2520,165 @@ function startDirectoryListener(){
       .map(d => ({ id: d.id, ...d.data(), lastSeen: toJsDateSafe(d.data().lastSeen) }))
       .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||'', 'tr'));
     renderDirectory();
+    renderQuestions();
+    renderQuestionDetail();
   }, (err) => console.error('Kullanıcı dizini dinleme hatası:', err));
   // 5 dakikalık çevrimiçi eşiği zamana bağlı olduğu için, yeni bir
   // Firestore güncellemesi gelmese bile listeyi periyodik tazeler
   // (aksi halde biri sessizce "çevrimdışı" olduğunda ekran geç fark eder).
   if(directoryRefreshTimer) clearInterval(directoryRefreshTimer);
   directoryRefreshTimer = setInterval(renderDirectory, 30 * 1000);
+}
+
+/* ---------------- SORU DETAYI + CEVAPLAR ----------------
+   questions/{qid}/answers/{aid}: { content, authorUid, createdAt }
+   Çözüm işaretleme: yalnızca soru sahibi (kurallar: solvedAnswerId).
+   Silme: yazar veya admin (admin, adminDb oturumuyla). */
+let currentQuestionId = null;
+let answersCache = [];
+let answersUnsub = null;
+function qaWhen(d){ return d ? d.toLocaleDateString('tr-TR',{day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : 'şimdi'; }
+function openQuestion(id){
+  currentQuestionId = id;
+  answersCache = [];
+  if(answersUnsub){ answersUnsub(); answersUnsub = null; }
+  const aq = query(collection(db, 'questions', id, 'answers'), orderBy('createdAt', 'asc'));
+  answersUnsub = onSnapshot(aq, (snap) => {
+    answersCache = snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: toJsDateSafe(d.data().createdAt) }));
+    renderQuestionDetail();
+  }, (err) => {
+    console.error('Cevap dinleme hatası:', err);
+    toast('Cevaplar yüklenemedi', 'error');
+  });
+  renderQuestionDetail();
+  const inp = document.getElementById('answerInput'); if(inp) inp.value = '';
+  switchPage('page-question');
+}
+function renderQuestionDetail(){
+  const el = document.getElementById('questionDetailBody');
+  const form = document.getElementById('answerForm');
+  if(!el || !form) return;
+  const q = questionsCache.find(x => x.id === currentQuestionId);
+  if(!q){
+    el.innerHTML = emptyStateHtml('alertTriangle', 'Bu soru bulunamadı ya da silinmiş.');
+    form.classList.add('hidden');
+    return;
+  }
+  form.classList.remove('hidden');
+  const uid = currentStudentUser ? currentStudentUser.uid : null;
+  const isOwner = q.authorUid === uid;
+  const author = directoryUsersCache.find(u => u.id === q.authorUid) || {};
+  const solved = !!q.solvedAnswerId && answersCache.some(a => a.id === q.solvedAnswerId);
+  const qDel = (isOwner || isAdmin()) ? `<div class="qa-actions"><button class="danger" data-qa-action="del-question">${ic('trash2',13)} Soruyu sil</button></div>` : '';
+  const answers = answersCache.length ? answersCache.map(a => {
+    const au = directoryUsersCache.find(u => u.id === a.authorUid) || {};
+    const isSol = q.solvedAnswerId === a.id;
+    const btns = [];
+    if(isOwner) btns.push(`<button data-qa-action="solve" data-aid="${a.id}">${ic('checkCircle',13)} ${isSol ? 'Çözümü kaldır' : 'Çözüm olarak işaretle'}</button>`);
+    if(a.authorUid === uid || isAdmin()) btns.push(`<button class="danger" data-qa-action="del-answer" data-aid="${a.id}">${ic('trash2',13)} Sil</button>`);
+    return `<div class="card qa-card qa-answer${isSol ? ' solution' : ''}">
+      <div class="qa-top">${avatarThumbHtml(au,30)}<div class="qa-meta"><b>${escapeHtml(au.displayName || 'Üye')}</b><span>${qaWhen(a.createdAt)}</span></div>${isSol ? `<span class="chip chip-green">${ic('checkCircle',12)} Çözüm</span>` : ''}</div>
+      <p>${escapeHtml(a.content || '')}</p>
+      ${btns.length ? `<div class="qa-actions">${btns.join('')}</div>` : ''}
+    </div>`;
+  }).join('') : '<div class="qa-note">Henüz cevap yok. İlk cevabı sen yaz.</div>';
+  el.innerHTML = `<div class="card qa-card">
+      <div class="qa-top">${avatarThumbHtml(author,34)}<div class="qa-meta"><b>${escapeHtml(author.displayName || 'Üye')}</b><span>${qaWhen(q.createdAt)}</span></div>${solved ? `<span class="chip chip-green">${ic('checkCircle',12)} Çözüldü</span>` : ''}</div>
+      <h5>${escapeHtml(q.title || '')}</h5>
+      <p>${escapeHtml(q.content || '')}</p>
+      ${qDel}
+    </div>
+    <div class="qa-head">Cevaplar (${answersCache.length})</div>
+    ${answers}`;
+}
+async function handleQuestionAction(e){
+  const btn = e.target.closest('[data-qa-action]');
+  if(!btn || !currentQuestionId) return;
+  const action = btn.dataset.qaAction, aid = btn.dataset.aid;
+  const q = questionsCache.find(x => x.id === currentQuestionId);
+  if(!q) return;
+  const uid = currentStudentUser ? currentStudentUser.uid : null;
+  const dbx = isAdmin() ? adminDb : db;
+  try{
+    if(action === 'solve'){
+      await updateDoc(doc(db, 'questions', currentQuestionId), { solvedAnswerId: q.solvedAnswerId === aid ? null : aid });
+    } else if(action === 'del-answer'){
+      if(!confirm('Bu cevabı silmek istediğine emin misin?')) return;
+      await deleteDoc(doc(dbx, 'questions', currentQuestionId, 'answers', aid));
+      if(q.solvedAnswerId === aid && q.authorUid === uid){
+        await updateDoc(doc(db, 'questions', currentQuestionId), { solvedAnswerId: null }).catch(()=>{});
+      }
+      toast('Cevap silindi', 'success');
+    } else if(action === 'del-question'){
+      if(!confirm('Bu soruyu silmek istediğine emin misin? Bu işlem geri alınamaz.')) return;
+      await deleteDoc(doc(dbx, 'questions', currentQuestionId));
+      toast('Soru silindi', 'success');
+      switchPage('page-questions');
+    }
+  }catch(err){
+    console.error('Soru-Cevap işlem hatası:', err);
+    toast('İşlem başarısız. Yetkini ve bağlantını kontrol et.', 'error');
+  }
+}
+async function sendAnswer(){
+  const inp = document.getElementById('answerInput');
+  const btn = document.getElementById('sendAnswerBtn');
+  const content = inp.value.trim();
+  if(!currentStudentUser){ toast('Oturum bulunamadı, lütfen tekrar giriş yap', 'error'); return; }
+  if(!currentQuestionId){ return; }
+  if(!content){ toast('Lütfen cevabını yaz', 'error'); return; }
+  if(content.length > 2000){ toast('Cevap çok uzun', 'error'); return; }
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+  try{
+    await addDoc(collection(db, 'questions', currentQuestionId, 'answers'), {
+      content, authorUid: currentStudentUser.uid, createdAt: serverTimestamp()
+    });
+    inp.value = '';
+    toast('Cevabın yayınlandı', 'success');
+  }catch(err){
+    console.error('Cevap gönderme hatası:', err);
+    toast('Cevap gönderilemedi. Bağlantını kontrol edip tekrar dene.', 'error');
+  }finally{
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+
+/* ---------------- SORU-CEVAP (genel akış) ----------------
+   questions/{id}: { title, content, authorUid, createdAt, solvedAnswerId }
+   Okuma/yazma yetkisi Firestore kurallarında: yalnızca onaylı üyeler.
+   Yazar adı/avatarı publicProfiles'tan (directoryUsersCache) gelir. */
+let questionsCache = [];
+let questionsUnsub = null;
+function startQuestionsListener(){
+  if(questionsUnsub) return;
+  const q = query(collection(db, 'questions'), orderBy('createdAt', 'desc'));
+  questionsUnsub = onSnapshot(q, (snapshot) => {
+    questionsCache = snapshot.docs.map(d => ({ id: d.id, ...d.data(), createdAt: toJsDateSafe(d.data().createdAt) }));
+    renderQuestions();
+    renderQuestionDetail();
+  }, (err) => {
+    console.error('Soru listesi dinleme hatası:', err);
+    const el = document.getElementById('questionsList');
+    if(el) el.innerHTML = emptyStateHtml('alertTriangle','Sorulara ulaşılamadı. Bağlantını ve Firestore kurallarını kontrol et.');
+  });
+}
+function renderQuestions(){
+  const el = document.getElementById('questionsList');
+  if(!el) return;
+  if(!questionsCache.length){ el.innerHTML = emptyStateHtml('messageCircle','Henüz soru yok. İlk soruyu sen sor!'); return; }
+  el.innerHTML = questionsCache.map(q => {
+    const author = directoryUsersCache.find(u => u.id === q.authorUid) || {};
+    const text = q.content || '';
+    const excerpt = text.length > 160 ? text.slice(0,160) + '…' : text;
+    const date = q.createdAt ? q.createdAt.toLocaleDateString('tr-TR',{day:'numeric', month:'short'}) : 'şimdi';
+    const solved = q.solvedAnswerId ? `<span class="chip chip-green">${ic('checkCircle',12)} Çözüldü</span>` : '';
+    return `<div class="card qa-card" data-qid="${q.id}">
+      <div class="qa-top">${avatarThumbHtml(author,34)}<div class="qa-meta"><b>${escapeHtml(author.displayName || 'Üye')}</b><span>${date}</span></div>${solved}</div>
+      <h5>${escapeHtml(q.title || '')}</h5>
+      <p>${escapeHtml(excerpt)}</p>
+    </div>`;
+  }).join('');
 }
 
 function renderDirectory(){
@@ -2547,6 +2739,7 @@ function switchPage(pageId, silent){
 // ana sayfa yalnızca Yardımcı kartı + Yaklaşan Tarihler + Duyurular'a
 // odaklanabilir.
 const QUICK_ITEMS = [
+  {icon:'messageCircle', label:'Soru-Cevap', nav:'page-questions'},
   {icon:'users', label:'Kullanıcı Dizini', nav:'page-directory'},
   {icon:'fileText', label:'PDF Arşivi', nav:'page-pdf'},
   {icon:'fileText', label:'Sınavlar', nav:'page-exams'},
@@ -2720,7 +2913,7 @@ function renderPdfs(){
     <div class="card pdf-card">
       <div class="pdf-ic">PDF</div>
       <div class="pdf-info"><h5>${escapeHtml(p.title)}</h5><span>${escapeHtml(p.category)} · ${escapeHtml(p.size||'')} · ${fmtDateShort(p.date||new Date().toISOString().slice(0,10))}</span></div>
-      <a class="pdf-dl" href="${escapeHtml(p.url)}" download title="İndir" onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:center;text-decoration:none">${ic('download',16)}</a>
+      <button class="pdf-dl" data-pdf-url="${escapeHtml(p.url)}" title="İndir">${ic('download',16)}</button>
     </div>`).join('') : emptyStateHtml('fileText','Sonuç bulunamadı');
 }
 
@@ -2933,7 +3126,7 @@ function openForm(type, id){
   formCtx = {type, id: id || null};
   pendingAvatarDataUrl = null;
   const isEdit = !!id;
-  const titleMap = {ann:'Duyuru', pdf:'PDF', links:'Bağlantı', cal:'Takvim Kaydı', profile:'Profil'};
+  const titleMap = {ann:'Duyuru', pdf:'PDF', links:'Bağlantı', cal:'Takvim Kaydı', profile:'Profil', question:'Soru'};
   document.getElementById('formModalTitle').textContent = type==='profile' ? 'Profili Düzenle' : (isEdit?'Düzenle: ':'Yeni ') + titleMap[type];
   document.getElementById('formModalSub').textContent = type==='profile' ? 'Bu bilgiler tüm portalda görünür.' : (isEdit ? 'Mevcut kaydı güncelleyin.' : 'Aşağıdaki alanları doldurun.');
   const body = document.getElementById('formModalBody');
@@ -2989,6 +3182,10 @@ function openForm(type, id){
         e.target.value = ''; // aynı dosya tekrar seçilirse 'change' yine tetiklensin
       }
     });
+  } else if(type==='question'){
+    body.innerHTML = `
+      <div class="form-group"><label>Başlık</label><input type="text" id="f_qTitle" maxlength="150" placeholder="Sorunu kısaca özetle"></div>
+      <div class="form-group"><label>Açıklama</label><textarea id="f_qContent" maxlength="3000" placeholder="Detayları yaz..."></textarea></div>`;
   } else if(type==='ann'){
     body.innerHTML = `
       <div class="form-group"><label>Başlık</label><input type="text" id="f_title" value="${escapeHtml(record.title||'')}"></div>
@@ -3087,6 +3284,31 @@ async function saveFormInner(){
       console.error('Duyuru kaydetme hatası:', err);
       toast('Duyuru kaydedilemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
       // Modalı KAPATMIYORUZ ki kullanıcı yazdığını kaybetmeden tekrar denesin.
+    }finally{
+      saveBtn.disabled = false; saveBtn.textContent = originalLabel;
+    }
+    return;
+  }
+
+  /* ---- SORU: öğrencinin KENDİ oturumuyla (db) questions'a yazılır ---- */
+  if(type === 'question'){
+    if(!currentStudentUser){ toast('Oturum bulunamadı, lütfen tekrar giriş yapın','error'); return; }
+    const title = val('f_qTitle'), content = val('f_qContent');
+    if(!title || !content){ toast('Lütfen başlık ve açıklama girin','error'); return; }
+    if(title.length > 150 || content.length > 3000){ toast('Metin çok uzun','error'); return; }
+    const saveBtn = document.getElementById('formModalSave');
+    const originalLabel = saveBtn.textContent;
+    saveBtn.disabled = true; saveBtn.textContent = 'Gönderiliyor...';
+    try{
+      await addDoc(collection(db, 'questions'), {
+        title, content, authorUid: currentStudentUser.uid,
+        createdAt: serverTimestamp(), solvedAnswerId: null
+      });
+      closeModal('formModal');
+      toast('Sorun yayınlandı', 'success');
+    }catch(err){
+      console.error('Soru kaydetme hatası:', err);
+      toast('Soru gönderilemedi. Bağlantını kontrol edip tekrar dene.', 'error');
     }finally{
       saveBtn.disabled = false; saveBtn.textContent = originalLabel;
     }
@@ -3706,6 +3928,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('avatarBtn').addEventListener('click', ()=> switchPage('page-profile'));
   document.getElementById('goAboutBtn').addEventListener('click', ()=> switchPage('page-about'));
   document.getElementById('editProfileBtn').addEventListener('click', ()=> openForm('profile', null));
+  document.getElementById('askQuestionBtn').addEventListener('click', ()=> openForm('question', null));
+  document.getElementById('questionsList').addEventListener('click', (e)=>{
+    const card = e.target.closest('[data-qid]');
+    if(card) openQuestion(card.dataset.qid);
+  });
+  document.getElementById('questionDetailBody').addEventListener('click', handleQuestionAction);
+  document.getElementById('sendAnswerBtn').addEventListener('click', sendAnswer);
 
   /* ---- Çıkış yap ---- */
   document.getElementById('logoutBtn').addEventListener('click', doLogout);
