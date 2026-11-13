@@ -1,3 +1,4 @@
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 /* ============================================================
    WTK PORTAL — Service Worker
    Amaç: sadece "uygulama kabuğunu" (index.html + manifest + ikonlar +
