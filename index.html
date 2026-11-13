@@ -4517,5 +4517,20 @@ input.addEventListener('keydown', (e)=>{
     });
   }
 </script>
+
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "40b1db9d-151c-477f-a688-75b60ab14c88",
+      serviceWorkerPath: "/WTK-AU-PORTAL/OneSignalSDKWorker.js",
+      serviceWorkerParam: {
+        scope: "/WTK-AU-PORTAL/"
+      }
+    });
+  });
+</script>
 </body>
 </html>
